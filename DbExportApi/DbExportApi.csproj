@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D7D6A556-313B-4719-8C0A-75CE22C2E0D9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DbExport</RootNamespace>
+    <AssemblyName>DbExportApi</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="adodb, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\References\adodb.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.ADOX">
+      <HintPath>..\References\Interop.ADOX.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ExportOptions.cs" />
+    <Compile Include="IVisitor.cs" />
+    <Compile Include="IVisitorAcceptor.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\Access\AccessSchemaBuilder.cs" />
+    <Compile Include="Providers\Access\AccessSchemaProvider.cs" />
+    <Compile Include="Providers\CodeGenerator.cs" />
+    <Compile Include="Providers\ISchemaProvider.cs" />
+    <Compile Include="Providers\MySqlClient\MySqlCodeGenerator.cs" />
+    <Compile Include="Providers\MySqlClient\MySqlOptions.cs" />
+    <Compile Include="Providers\MySqlClient\MySqlSchemaProvider.cs" />
+    <Compile Include="Providers\Npgsql\NpgsqlCodeGenerator.cs" />
+    <Compile Include="Providers\Npgsql\NpgsqlSchemaProvider.cs" />
+    <Compile Include="Providers\OracleClient\OracleCodeGenerator.cs" />
+    <Compile Include="Providers\OracleClient\OracleSchemaProvider.cs" />
+    <Compile Include="Providers\SchemaProvider.cs" />
+    <Compile Include="Providers\SqlClient\SqlCodeGenerator.cs" />
+    <Compile Include="Providers\SqlClient\SqlSchemaProvider.cs" />
+    <Compile Include="Providers\SQLite\SQLiteCodeGenerator.cs" />
+    <Compile Include="Providers\SQLite\SQLiteSchemaProvider.cs" />
+    <Compile Include="Providers\SQLite\SqlParser\AstNode.cs" />
+    <Compile Include="Providers\SQLite\SqlParser\Parser.cs" />
+    <Compile Include="Providers\SQLite\SqlParser\Scanner.cs" />
+    <Compile Include="Providers\SQLite\SqlParser\Token.cs" />
+    <Compile Include="Schema\Column.cs" />
+    <Compile Include="Schema\ColumnAttribute.cs" />
+    <Compile Include="Schema\ColumnCollection.cs" />
+    <Compile Include="Schema\ColumnSet.cs" />
+    <Compile Include="Schema\ColumnType.cs" />
+    <Compile Include="Schema\Database.cs" />
+    <Compile Include="Schema\ForeignKey.cs" />
+    <Compile Include="Schema\ForeignKeyCollection.cs" />
+    <Compile Include="Schema\ForeignKeyRule.cs" />
+    <Compile Include="Schema\ICheckable.cs" />
+    <Compile Include="Schema\Index.cs" />
+    <Compile Include="Schema\IndexCollection.cs" />
+    <Compile Include="Schema\Key.cs" />
+    <Compile Include="Schema\PrimaryKey.cs" />
+    <Compile Include="Schema\SchemaItem.cs" />
+    <Compile Include="Schema\SchemaItemCollection.cs" />
+    <Compile Include="Schema\Table.cs" />
+    <Compile Include="Schema\TableCollection.cs" />
+    <Compile Include="SqlHelper.cs" />
+    <Compile Include="Utility.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

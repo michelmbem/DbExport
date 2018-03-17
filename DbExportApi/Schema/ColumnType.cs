@@ -1,0 +1,36 @@
+﻿namespace DbExport.Schema
+{
+    public enum ColumnType
+    {
+        Unknown,
+        Boolean,
+        TinyInt,
+        UnsignedTinyInt,
+        SmallInt,
+        UnsignedSmallInt,
+        Integer,
+        UnsignedInt,
+        BigInt,
+        UnsignedBigInt,
+        SinglePrecision,
+        DoublePrecision,
+        Currency,
+        Decimal,
+        Date,
+        Time,
+        DateTime,
+        Interval,
+        Char,
+        NChar,
+        VarChar,
+        NVarChar,
+        Text,
+        NText,
+        Bit,
+        Blob,
+        File,
+        Xml,
+        Guid,
+        RowVersion
+    }
+}
