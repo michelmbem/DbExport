@@ -55,9 +55,10 @@ namespace DbExport.UI.Forms
             this.pnlTop.Controls.Add(this.lblProviderName);
             this.pnlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlTop.Location = new System.Drawing.Point(0, 0);
+            this.pnlTop.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pnlTop.Name = "pnlTop";
-            this.pnlTop.Padding = new System.Windows.Forms.Padding(5);
-            this.pnlTop.Size = new System.Drawing.Size(354, 30);
+            this.pnlTop.Padding = new System.Windows.Forms.Padding(6, 7, 6, 7);
+            this.pnlTop.Size = new System.Drawing.Size(414, 39);
             this.pnlTop.TabIndex = 0;
             this.pnlTop.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlTop_Paint);
             // 
@@ -65,9 +66,10 @@ namespace DbExport.UI.Forms
             // 
             this.lblProviderName.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblProviderName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblProviderName.Location = new System.Drawing.Point(5, 5);
+            this.lblProviderName.Location = new System.Drawing.Point(6, 7);
+            this.lblProviderName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblProviderName.Name = "lblProviderName";
-            this.lblProviderName.Size = new System.Drawing.Size(344, 20);
+            this.lblProviderName.Size = new System.Drawing.Size(402, 25);
             this.lblProviderName.TabIndex = 0;
             this.lblProviderName.Text = "[Provider Name]";
             this.lblProviderName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -77,9 +79,10 @@ namespace DbExport.UI.Forms
             this.pnlMiddle.Controls.Add(this.connectionPaneContainer);
             this.pnlMiddle.Controls.Add(this.btnTestConnection);
             this.pnlMiddle.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlMiddle.Location = new System.Drawing.Point(90, 30);
+            this.pnlMiddle.Location = new System.Drawing.Point(105, 39);
+            this.pnlMiddle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pnlMiddle.Name = "pnlMiddle";
-            this.pnlMiddle.Size = new System.Drawing.Size(264, 212);
+            this.pnlMiddle.Size = new System.Drawing.Size(309, 280);
             this.pnlMiddle.TabIndex = 1;
             // 
             // connectionPaneContainer
@@ -88,31 +91,38 @@ namespace DbExport.UI.Forms
             this.connectionPaneContainer.Controls.Add(this.connectionPane);
             this.connectionPaneContainer.Dock = System.Windows.Forms.DockStyle.Top;
             this.connectionPaneContainer.Location = new System.Drawing.Point(0, 0);
+            this.connectionPaneContainer.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.connectionPaneContainer.Name = "connectionPaneContainer";
-            this.connectionPaneContainer.Size = new System.Drawing.Size(264, 160);
+            this.connectionPaneContainer.Size = new System.Drawing.Size(309, 209);
             this.connectionPaneContainer.TabIndex = 3;
             // 
-            // sqliteConnectionPane
+            // dataFileConnectionPane
             // 
             this.dataFileConnectionPane.BrowseMode = DbExport.UI.Controls.FileDialogMode.Save;
-            this.dataFileConnectionPane.Location = new System.Drawing.Point(0, 10);
-            this.dataFileConnectionPane.Name = "sqliteConnectionPane";
-            this.dataFileConnectionPane.Size = new System.Drawing.Size(264, 140);
+            this.dataFileConnectionPane.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dataFileConnectionPane.Location = new System.Drawing.Point(0, 0);
+            this.dataFileConnectionPane.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.dataFileConnectionPane.Name = "dataFileConnectionPane";
+            this.dataFileConnectionPane.ProviderName = null;
+            this.dataFileConnectionPane.Size = new System.Drawing.Size(308, 209);
             this.dataFileConnectionPane.TabIndex = 0;
             // 
             // connectionPane
             // 
+            this.connectionPane.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.connectionPane.Location = new System.Drawing.Point(0, 0);
+            this.connectionPane.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.connectionPane.Name = "connectionPane";
             this.connectionPane.ProviderName = null;
-            this.connectionPane.Size = new System.Drawing.Size(264, 160);
+            this.connectionPane.Size = new System.Drawing.Size(308, 209);
             this.connectionPane.TabIndex = 0;
             // 
             // btnTestConnection
             // 
-            this.btnTestConnection.Location = new System.Drawing.Point(82, 166);
+            this.btnTestConnection.Location = new System.Drawing.Point(96, 220);
+            this.btnTestConnection.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnTestConnection.Name = "btnTestConnection";
-            this.btnTestConnection.Size = new System.Drawing.Size(100, 23);
+            this.btnTestConnection.Size = new System.Drawing.Size(117, 30);
             this.btnTestConnection.TabIndex = 1;
             this.btnTestConnection.Text = "Test Connection";
             this.btnTestConnection.UseVisualStyleBackColor = true;
@@ -123,27 +133,30 @@ namespace DbExport.UI.Forms
             this.pnlBottom.Controls.Add(this.btnCancel);
             this.pnlBottom.Controls.Add(this.btnOK);
             this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlBottom.Location = new System.Drawing.Point(0, 242);
+            this.pnlBottom.Location = new System.Drawing.Point(0, 319);
+            this.pnlBottom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pnlBottom.Name = "pnlBottom";
-            this.pnlBottom.Size = new System.Drawing.Size(354, 40);
+            this.pnlBottom.Size = new System.Drawing.Size(414, 52);
             this.pnlBottom.TabIndex = 2;
             this.pnlBottom.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlBottom_Paint);
             // 
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(267, 9);
+            this.btnCancel.Location = new System.Drawing.Point(312, 12);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.Size = new System.Drawing.Size(88, 30);
             this.btnCancel.TabIndex = 1;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(186, 9);
+            this.btnOK.Location = new System.Drawing.Point(217, 12);
+            this.btnOK.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(75, 23);
+            this.btnOK.Size = new System.Drawing.Size(88, 30);
             this.btnOK.TabIndex = 0;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
@@ -153,19 +166,21 @@ namespace DbExport.UI.Forms
             // 
             this.pnlLeft.Controls.Add(this.picBanner);
             this.pnlLeft.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pnlLeft.Location = new System.Drawing.Point(0, 30);
+            this.pnlLeft.Location = new System.Drawing.Point(0, 39);
+            this.pnlLeft.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pnlLeft.Name = "pnlLeft";
-            this.pnlLeft.Padding = new System.Windows.Forms.Padding(2);
-            this.pnlLeft.Size = new System.Drawing.Size(90, 212);
+            this.pnlLeft.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.pnlLeft.Size = new System.Drawing.Size(105, 280);
             this.pnlLeft.TabIndex = 3;
             // 
             // picBanner
             // 
             this.picBanner.Dock = System.Windows.Forms.DockStyle.Fill;
             this.picBanner.Image = global::DbExport.Properties.Resources.DbConnect;
-            this.picBanner.Location = new System.Drawing.Point(2, 2);
+            this.picBanner.Location = new System.Drawing.Point(2, 3);
+            this.picBanner.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.picBanner.Name = "picBanner";
-            this.picBanner.Size = new System.Drawing.Size(86, 208);
+            this.picBanner.Size = new System.Drawing.Size(101, 274);
             this.picBanner.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.picBanner.TabIndex = 0;
             this.picBanner.TabStop = false;
@@ -173,15 +188,17 @@ namespace DbExport.UI.Forms
             // ConnectionDialog
             // 
             this.AcceptButton = this.btnOK;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(354, 282);
+            this.ClientSize = new System.Drawing.Size(414, 371);
             this.Controls.Add(this.pnlMiddle);
             this.Controls.Add(this.pnlLeft);
             this.Controls.Add(this.pnlTop);
             this.Controls.Add(this.pnlBottom);
+            this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ConnectionDialog";

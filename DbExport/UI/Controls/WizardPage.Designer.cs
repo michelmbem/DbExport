@@ -30,36 +30,39 @@ namespace DbExport.UI.Controls
         {
             this.pnlContent = new System.Windows.Forms.Panel();
             this.pîcBanner = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize) (this.pîcBanner)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlContent
             // 
             this.pnlContent.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlContent.Location = new System.Drawing.Point(120, 0);
+            this.pnlContent.Location = new System.Drawing.Point(150, 0);
+            this.pnlContent.Margin = new System.Windows.Forms.Padding(4);
             this.pnlContent.Name = "pnlContent";
-            this.pnlContent.Size = new System.Drawing.Size(280, 300);
+            this.pnlContent.Size = new System.Drawing.Size(350, 350);
             this.pnlContent.TabIndex = 0;
             // 
             // pîcBanner
             // 
             this.pîcBanner.Dock = System.Windows.Forms.DockStyle.Left;
             this.pîcBanner.Location = new System.Drawing.Point(0, 0);
+            this.pîcBanner.Margin = new System.Windows.Forms.Padding(4);
             this.pîcBanner.Name = "pîcBanner";
-            this.pîcBanner.Size = new System.Drawing.Size(120, 300);
+            this.pîcBanner.Size = new System.Drawing.Size(150, 350);
             this.pîcBanner.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pîcBanner.TabIndex = 2;
             this.pîcBanner.TabStop = false;
             // 
             // WizardPage
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.pnlContent);
             this.Controls.Add(this.pîcBanner);
+            this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "WizardPage";
-            this.Size = new System.Drawing.Size(400, 300);
-            ((System.ComponentModel.ISupportInitialize) (this.pîcBanner)).EndInit();
+            this.Size = new System.Drawing.Size(500, 350);
+            ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).EndInit();
             this.ResumeLayout(false);
 
         }

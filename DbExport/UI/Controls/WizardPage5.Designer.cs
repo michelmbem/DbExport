@@ -50,14 +50,15 @@
             // pîcBanner
             // 
             this.pîcBanner.Image = global::DbExport.Properties.Resources.Stage4;
+            this.pîcBanner.Margin = new System.Windows.Forms.Padding(5);
             // 
             // lblTitle
             // 
             this.lblTitle.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTitle.Location = new System.Drawing.Point(0, 0);
+            this.lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(280, 23);
+            this.lblTitle.Size = new System.Drawing.Size(350, 30);
             this.lblTitle.TabIndex = 0;
             this.lblTitle.Text = "Select the items that you would like to export";
             this.lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -67,17 +68,19 @@
             this.bottomPane.Controls.Add(this.btnUnselectAll);
             this.bottomPane.Controls.Add(this.btnSelectAll);
             this.bottomPane.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.bottomPane.Location = new System.Drawing.Point(0, 270);
+            this.bottomPane.Location = new System.Drawing.Point(0, 311);
+            this.bottomPane.Margin = new System.Windows.Forms.Padding(4);
             this.bottomPane.Name = "bottomPane";
-            this.bottomPane.Size = new System.Drawing.Size(280, 30);
+            this.bottomPane.Size = new System.Drawing.Size(350, 39);
             this.bottomPane.TabIndex = 2;
             // 
             // btnUnselectAll
             // 
             this.btnUnselectAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUnselectAll.Location = new System.Drawing.Point(202, 4);
+            this.btnUnselectAll.Location = new System.Drawing.Point(258, 5);
+            this.btnUnselectAll.Margin = new System.Windows.Forms.Padding(4);
             this.btnUnselectAll.Name = "btnUnselectAll";
-            this.btnUnselectAll.Size = new System.Drawing.Size(75, 23);
+            this.btnUnselectAll.Size = new System.Drawing.Size(88, 30);
             this.btnUnselectAll.TabIndex = 1;
             this.btnUnselectAll.Text = "None";
             this.btnUnselectAll.UseVisualStyleBackColor = true;
@@ -86,9 +89,10 @@
             // btnSelectAll
             // 
             this.btnSelectAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectAll.Location = new System.Drawing.Point(126, 4);
+            this.btnSelectAll.Location = new System.Drawing.Point(170, 5);
+            this.btnSelectAll.Margin = new System.Windows.Forms.Padding(4);
             this.btnSelectAll.Name = "btnSelectAll";
-            this.btnSelectAll.Size = new System.Drawing.Size(75, 23);
+            this.btnSelectAll.Size = new System.Drawing.Size(88, 30);
             this.btnSelectAll.TabIndex = 0;
             this.btnSelectAll.Text = "All";
             this.btnSelectAll.UseVisualStyleBackColor = true;
@@ -100,10 +104,11 @@
             this.tvItems.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvItems.ImageIndex = 0;
             this.tvItems.ImageList = this.itemsIcons;
-            this.tvItems.Location = new System.Drawing.Point(0, 23);
+            this.tvItems.Location = new System.Drawing.Point(0, 30);
+            this.tvItems.Margin = new System.Windows.Forms.Padding(4);
             this.tvItems.Name = "tvItems";
             this.tvItems.SelectedImageIndex = 0;
-            this.tvItems.Size = new System.Drawing.Size(280, 247);
+            this.tvItems.Size = new System.Drawing.Size(350, 281);
             this.tvItems.TabIndex = 1;
             this.tvItems.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.tvItems_AfterCheck);
             // 
@@ -118,8 +123,8 @@
             // 
             // WizardPage5
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "WizardPage5";
             this.pnlContent.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).EndInit();

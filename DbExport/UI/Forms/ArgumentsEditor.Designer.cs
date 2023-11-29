@@ -52,26 +52,29 @@
             this.pnlBottom.Controls.Add(this.btnCancel);
             this.pnlBottom.Controls.Add(this.btnOK);
             this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlBottom.Location = new System.Drawing.Point(0, 144);
+            this.pnlBottom.Location = new System.Drawing.Point(0, 219);
+            this.pnlBottom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.pnlBottom.Name = "pnlBottom";
-            this.pnlBottom.Size = new System.Drawing.Size(244, 32);
+            this.pnlBottom.Size = new System.Drawing.Size(334, 42);
             this.pnlBottom.TabIndex = 2;
             // 
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(125, 5);
+            this.btnCancel.Location = new System.Drawing.Point(167, 7);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(60, 23);
+            this.btnCancel.Size = new System.Drawing.Size(70, 30);
             this.btnCancel.TabIndex = 1;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(59, 5);
+            this.btnOK.Location = new System.Drawing.Point(90, 7);
+            this.btnOK.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(60, 23);
+            this.btnOK.Size = new System.Drawing.Size(70, 30);
             this.btnOK.TabIndex = 0;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
@@ -80,6 +83,7 @@
             // toolStrip
             // 
             this.toolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsbServer,
             this.tsbUid,
@@ -93,17 +97,17 @@
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
             this.toolStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.toolStrip.Size = new System.Drawing.Size(244, 25);
+            this.toolStrip.Size = new System.Drawing.Size(334, 31);
             this.toolStrip.TabIndex = 3;
             this.toolStrip.Text = "toolStrip1";
             // 
             // tsbServer
             // 
             this.tsbServer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbServer.Image = ((System.Drawing.Image) (resources.GetObject("tsbServer.Image")));
+            this.tsbServer.Image = ((System.Drawing.Image)(resources.GetObject("tsbServer.Image")));
             this.tsbServer.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbServer.Name = "tsbServer";
-            this.tsbServer.Size = new System.Drawing.Size(23, 22);
+            this.tsbServer.Size = new System.Drawing.Size(28, 28);
             this.tsbServer.Tag = "server";
             this.tsbServer.Text = "Insert a placeholder for the server\'s location";
             this.tsbServer.Click += new System.EventHandler(this.tsbServer_Click);
@@ -111,7 +115,7 @@
             // tsbUid
             // 
             this.tsbUid.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbUid.Image = ((System.Drawing.Image) (resources.GetObject("tsbUid.Image")));
+            this.tsbUid.Image = ((System.Drawing.Image)(resources.GetObject("tsbUid.Image")));
             this.tsbUid.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbUid.Name = "tsbUid";
             this.tsbUid.Size = new System.Drawing.Size(23, 22);
@@ -122,7 +126,7 @@
             // tsbPwd
             // 
             this.tsbPwd.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbPwd.Image = ((System.Drawing.Image) (resources.GetObject("tsbPwd.Image")));
+            this.tsbPwd.Image = ((System.Drawing.Image)(resources.GetObject("tsbPwd.Image")));
             this.tsbPwd.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbPwd.Name = "tsbPwd";
             this.tsbPwd.Size = new System.Drawing.Size(23, 22);
@@ -133,7 +137,7 @@
             // tsbDbName
             // 
             this.tsbDbName.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbDbName.Image = ((System.Drawing.Image) (resources.GetObject("tsbDbName.Image")));
+            this.tsbDbName.Image = ((System.Drawing.Image)(resources.GetObject("tsbDbName.Image")));
             this.tsbDbName.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbDbName.Name = "tsbDbName";
             this.tsbDbName.Size = new System.Drawing.Size(23, 22);
@@ -149,7 +153,7 @@
             // tsbFilePath
             // 
             this.tsbFilePath.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbFilePath.Image = ((System.Drawing.Image) (resources.GetObject("tsbFilePath.Image")));
+            this.tsbFilePath.Image = ((System.Drawing.Image)(resources.GetObject("tsbFilePath.Image")));
             this.tsbFilePath.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbFilePath.Name = "tsbFilePath";
             this.tsbFilePath.Size = new System.Drawing.Size(23, 22);
@@ -160,7 +164,7 @@
             // tsbFileName
             // 
             this.tsbFileName.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbFileName.Image = ((System.Drawing.Image) (resources.GetObject("tsbFileName.Image")));
+            this.tsbFileName.Image = ((System.Drawing.Image)(resources.GetObject("tsbFileName.Image")));
             this.tsbFileName.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbFileName.Name = "tsbFileName";
             this.tsbFileName.Size = new System.Drawing.Size(23, 22);
@@ -171,7 +175,7 @@
             // tsbFileExt
             // 
             this.tsbFileExt.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbFileExt.Image = ((System.Drawing.Image) (resources.GetObject("tsbFileExt.Image")));
+            this.tsbFileExt.Image = ((System.Drawing.Image)(resources.GetObject("tsbFileExt.Image")));
             this.tsbFileExt.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbFileExt.Name = "tsbFileExt";
             this.tsbFileExt.Size = new System.Drawing.Size(23, 22);
@@ -182,7 +186,7 @@
             // tsbDirName
             // 
             this.tsbDirName.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbDirName.Image = ((System.Drawing.Image) (resources.GetObject("tsbDirName.Image")));
+            this.tsbDirName.Image = ((System.Drawing.Image)(resources.GetObject("tsbDirName.Image")));
             this.tsbDirName.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbDirName.Name = "tsbDirName";
             this.tsbDirName.Size = new System.Drawing.Size(23, 22);
@@ -193,24 +197,27 @@
             // rtbArguments
             // 
             this.rtbArguments.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.rtbArguments.Location = new System.Drawing.Point(0, 25);
+            this.rtbArguments.Location = new System.Drawing.Point(0, 31);
+            this.rtbArguments.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.rtbArguments.Name = "rtbArguments";
-            this.rtbArguments.Size = new System.Drawing.Size(244, 119);
+            this.rtbArguments.Size = new System.Drawing.Size(334, 188);
             this.rtbArguments.TabIndex = 4;
             this.rtbArguments.Text = "";
             // 
             // ArgumentsEditor
             // 
             this.AcceptButton = this.btnOK;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(244, 176);
+            this.ClientSize = new System.Drawing.Size(334, 261);
             this.ControlBox = false;
             this.Controls.Add(this.rtbArguments);
             this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.pnlBottom);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ArgumentsEditor";

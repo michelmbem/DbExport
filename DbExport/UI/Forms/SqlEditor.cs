@@ -116,10 +116,10 @@ namespace DbExport.UI.Forms
         private void UpdateCutCopyCaretInfo()
         {
             clearToolStripMenuItem.Enabled = cutToolStripMenuItem.Enabled
-                                             = copyToolStripMenuItem.Enabled
-                                               = tsbCut.Enabled
-                                                 = tsbCopy.Enabled
-                                                   = sciEditor.Selection.Length > 0;
+                                           = copyToolStripMenuItem.Enabled
+                                           = tsbCut.Enabled
+                                           = tsbCopy.Enabled
+                                           = sciEditor.Selection.Length > 0;
 
             statusItemCaretInfo.Text = string.Format("Ln: {0}, Col: {1}, Sel: {2}",
                                                      sciEditor.Caret.LineNumber + 1,
@@ -139,9 +139,9 @@ namespace DbExport.UI.Forms
         private bool PromptToSave()
         {
             var answer = MessageBox.Show("Save the script before exiting?",
-                                                  Text,
-                                                  MessageBoxButtons.YesNoCancel,
-                                                  MessageBoxIcon.Question);
+                                         Text,
+                                         MessageBoxButtons.YesNoCancel,
+                                         MessageBoxIcon.Question);
 
             switch (answer)
             {
@@ -157,7 +157,7 @@ namespace DbExport.UI.Forms
 
         private void LoadCustomCommands()
         {
-            var path = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DbExport"), "commands.xml");
+            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DbExport", "commands.xml");
 
             if (File.Exists(path))
             {
@@ -171,39 +171,39 @@ namespace DbExport.UI.Forms
                 customCommands = new List<CustomCommand>();
 
                 var row = new CustomCommand
-                              {
-                                  Name = "sqlcmd",
-                                  Description = "Run SqlCmd",
-                                  Command = "SqlCmd",
-                                  Arguments = "-S ${server} -U ${uid} -P ${pwd} -i \"${filePath}\""
-                              };
+                    {
+                        Name = "sqlcmd",
+                        Description = "Run SqlCmd",
+                        Command = "SqlCmd",
+                        Arguments = "-S ${server} -U ${uid} -P ${pwd} -i \"${filePath}\""
+                    };
                 customCommands.Add(row);
 
                 row = new CustomCommand
-                          {
-                              Name = "sqlplus",
-                              Description = "Run SQL*Plus",
-                              Command = "sqlplus",
-                              Arguments = "${uid}/${pwd}@${server} @\"${filePath}\""
-                          };
+                    {
+                        Name = "sqlplus",
+                        Description = "Run SQL*Plus",
+                        Command = "sqlplus",
+                        Arguments = "${uid}/${pwd}@${server} @\"${filePath}\""
+                    };
                 customCommands.Add(row);
 
                 row = new CustomCommand
-                          {
-                              Name = "mysql",
-                              Description = "MySQL Command Line",
-                              Command = "mysql",
-                              Arguments = "-h ${server} -u ${uid} –p ${pwd} < \"${filePath}\""
-                          };
+                    {
+                        Name = "mysql",
+                        Description = "MySQL Command Line",
+                        Command = "mysql",
+                        Arguments = "-h ${server} -u ${uid} –p ${pwd} < \"${filePath}\""
+                    };
                 customCommands.Add(row);
 
                 row = new CustomCommand
-                          {
-                              Name = "psql",
-                              Description = "PostgreSQL Command Line",
-                              Command = "psql",
-                              Arguments = "-h ${server} -U ${uid} -d ${dbName} -f \"${filePath}\""
-                          };
+                    {
+                        Name = "psql",
+                        Description = "PostgreSQL Command Line",
+                        Command = "psql",
+                        Arguments = "-h ${server} -U ${uid} -d ${dbName} -f \"${filePath}\""
+                    };
                 customCommands.Add(row);
             }
 
@@ -235,10 +235,10 @@ namespace DbExport.UI.Forms
             {
                 var menuItem = new ToolStripMenuItem(row.Description) { Tag = row };
                 menuItem.Click += (s1, e1) =>
-                                      {
-                                          var cmdRow = (CustomCommand) ((ToolStripMenuItem) s1).Tag;
-                                          RunCommand(cmdRow.Command, cmdRow.Arguments);
-                                      };
+                    {
+                        var cmdRow = (CustomCommand) ((ToolStripMenuItem) s1).Tag;
+                        RunCommand(cmdRow.Command, cmdRow.Arguments);
+                    };
                 toolsToolStripMenuItem.DropDownItems.Add(menuItem);
             }
         }

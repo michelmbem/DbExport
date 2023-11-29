@@ -30,14 +30,14 @@ namespace DbExport.UI.Controls
         {
             this.pnlCredentials = new System.Windows.Forms.Panel();
             this.pnlConnectionPane = new System.Windows.Forms.Panel();
-            this.dataFileConnectionPane = new DataFileConnectionPane();
-            this.sqlServerConnectionPane = new SqlServerConnectionPane();
+            this.dataFileConnectionPane = new DbExport.UI.Controls.DataFileConnectionPane();
+            this.sqlServerConnectionPane = new DbExport.UI.Controls.SqlServerConnectionPane();
             this.btnTest = new System.Windows.Forms.Button();
             this.pnlProvider = new System.Windows.Forms.Panel();
             this.cboProvider = new System.Windows.Forms.ComboBox();
             this.lblProvider = new System.Windows.Forms.Label();
             this.pnlContent.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize) (this.pîcBanner)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).BeginInit();
             this.pnlCredentials.SuspendLayout();
             this.pnlConnectionPane.SuspendLayout();
             this.pnlProvider.SuspendLayout();
@@ -51,49 +51,62 @@ namespace DbExport.UI.Controls
             // pîcBanner
             // 
             this.pîcBanner.Image = global::DbExport.Properties.Resources.Stage2;
+            this.pîcBanner.Margin = new System.Windows.Forms.Padding(5);
             // 
             // pnlCredentials
             // 
             this.pnlCredentials.Controls.Add(this.pnlConnectionPane);
             this.pnlCredentials.Controls.Add(this.btnTest);
             this.pnlCredentials.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlCredentials.Location = new System.Drawing.Point(0, 50);
+            this.pnlCredentials.Location = new System.Drawing.Point(0, 65);
+            this.pnlCredentials.Margin = new System.Windows.Forms.Padding(4);
             this.pnlCredentials.Name = "pnlCredentials";
-            this.pnlCredentials.Size = new System.Drawing.Size(280, 250);
+            this.pnlCredentials.Size = new System.Drawing.Size(350, 285);
             this.pnlCredentials.TabIndex = 1;
             // 
             // pnlConnectionPane
             // 
+            this.pnlConnectionPane.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlConnectionPane.Controls.Add(this.dataFileConnectionPane);
             this.pnlConnectionPane.Controls.Add(this.sqlServerConnectionPane);
-            this.pnlConnectionPane.Location = new System.Drawing.Point(10, 6);
+            this.pnlConnectionPane.Location = new System.Drawing.Point(0, 0);
+            this.pnlConnectionPane.Margin = new System.Windows.Forms.Padding(4);
             this.pnlConnectionPane.Name = "pnlConnectionPane";
-            this.pnlConnectionPane.Size = new System.Drawing.Size(260, 160);
+            this.pnlConnectionPane.Size = new System.Drawing.Size(350, 209);
             this.pnlConnectionPane.TabIndex = 9;
             // 
             // dataFileConnectionPane
             // 
-            this.dataFileConnectionPane.Anchor = ((System.Windows.Forms.AnchorStyles) (((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                                                                                      | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataFileConnectionPane.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataFileConnectionPane.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataFileConnectionPane.Location = new System.Drawing.Point(0, 0);
+            this.dataFileConnectionPane.Margin = new System.Windows.Forms.Padding(5);
             this.dataFileConnectionPane.Name = "dataFileConnectionPane";
-            this.dataFileConnectionPane.Size = new System.Drawing.Size(260, 160);
+            this.dataFileConnectionPane.ProviderName = null;
+            this.dataFileConnectionPane.Size = new System.Drawing.Size(350, 210);
             this.dataFileConnectionPane.TabIndex = 0;
             // 
             // sqlServerConnectionPane
             // 
+            this.sqlServerConnectionPane.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.sqlServerConnectionPane.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.sqlServerConnectionPane.Location = new System.Drawing.Point(0, 0);
+            this.sqlServerConnectionPane.Margin = new System.Windows.Forms.Padding(4);
             this.sqlServerConnectionPane.Name = "sqlServerConnectionPane";
             this.sqlServerConnectionPane.ProviderName = null;
-            this.sqlServerConnectionPane.Size = new System.Drawing.Size(260, 160);
+            this.sqlServerConnectionPane.Size = new System.Drawing.Size(350, 210);
             this.sqlServerConnectionPane.TabIndex = 1;
             // 
             // btnTest
             // 
             this.btnTest.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnTest.Location = new System.Drawing.Point(90, 172);
+            this.btnTest.Location = new System.Drawing.Point(117, 225);
+            this.btnTest.Margin = new System.Windows.Forms.Padding(4);
             this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(100, 23);
+            this.btnTest.Size = new System.Drawing.Size(117, 30);
             this.btnTest.TabIndex = 8;
             this.btnTest.Text = "Test Connection";
             this.btnTest.UseVisualStyleBackColor = true;
@@ -105,36 +118,39 @@ namespace DbExport.UI.Controls
             this.pnlProvider.Controls.Add(this.lblProvider);
             this.pnlProvider.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlProvider.Location = new System.Drawing.Point(0, 0);
+            this.pnlProvider.Margin = new System.Windows.Forms.Padding(4);
             this.pnlProvider.Name = "pnlProvider";
-            this.pnlProvider.Size = new System.Drawing.Size(280, 50);
+            this.pnlProvider.Size = new System.Drawing.Size(350, 65);
             this.pnlProvider.TabIndex = 0;
             // 
             // cboProvider
             // 
             this.cboProvider.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboProvider.FormattingEnabled = true;
-            this.cboProvider.Location = new System.Drawing.Point(62, 16);
+            this.cboProvider.Location = new System.Drawing.Point(85, 21);
+            this.cboProvider.Margin = new System.Windows.Forms.Padding(4);
             this.cboProvider.Name = "cboProvider";
-            this.cboProvider.Size = new System.Drawing.Size(180, 21);
+            this.cboProvider.Size = new System.Drawing.Size(253, 25);
             this.cboProvider.TabIndex = 1;
             this.cboProvider.SelectedIndexChanged += new System.EventHandler(this.cboProvider_SelectedIndexChanged);
             // 
             // lblProvider
             // 
             this.lblProvider.AutoSize = true;
-            this.lblProvider.Location = new System.Drawing.Point(7, 19);
+            this.lblProvider.Location = new System.Drawing.Point(9, 24);
+            this.lblProvider.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblProvider.Name = "lblProvider";
-            this.lblProvider.Size = new System.Drawing.Size(49, 13);
+            this.lblProvider.Size = new System.Drawing.Size(60, 17);
             this.lblProvider.TabIndex = 0;
             this.lblProvider.Text = "Provider:";
             // 
             // WizardPage2
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "WizardPage2";
             this.pnlContent.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize) (this.pîcBanner)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).EndInit();
             this.pnlCredentials.ResumeLayout(false);
             this.pnlConnectionPane.ResumeLayout(false);
             this.pnlProvider.ResumeLayout(false);

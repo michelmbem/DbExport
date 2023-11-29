@@ -41,19 +41,21 @@ namespace DbExport.UI.Controls
             // 
             this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPassword.Location = new System.Drawing.Point(71, 132);
+            this.txtPassword.Location = new System.Drawing.Point(83, 173);
+            this.txtPassword.Margin = new System.Windows.Forms.Padding(4);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
-            this.txtPassword.Size = new System.Drawing.Size(180, 20);
+            this.txtPassword.Size = new System.Drawing.Size(206, 25);
             this.txtPassword.TabIndex = 6;
             this.txtPassword.UseSystemPasswordChar = true;
             // 
             // lblPassword
             // 
             this.lblPassword.AutoSize = true;
-            this.lblPassword.Location = new System.Drawing.Point(9, 136);
+            this.lblPassword.Location = new System.Drawing.Point(10, 178);
+            this.lblPassword.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPassword.Name = "lblPassword";
-            this.lblPassword.Size = new System.Drawing.Size(56, 13);
+            this.lblPassword.Size = new System.Drawing.Size(67, 17);
             this.lblPassword.TabIndex = 5;
             this.lblPassword.Text = "Password:";
             // 
@@ -61,26 +63,29 @@ namespace DbExport.UI.Controls
             // 
             this.txtUserID.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtUserID.Location = new System.Drawing.Point(71, 107);
+            this.txtUserID.Location = new System.Drawing.Point(83, 140);
+            this.txtUserID.Margin = new System.Windows.Forms.Padding(4);
             this.txtUserID.Name = "txtUserID";
-            this.txtUserID.Size = new System.Drawing.Size(180, 20);
+            this.txtUserID.Size = new System.Drawing.Size(206, 25);
             this.txtUserID.TabIndex = 4;
             // 
             // lblUserID
             // 
             this.lblUserID.AutoSize = true;
-            this.lblUserID.Location = new System.Drawing.Point(19, 111);
+            this.lblUserID.Location = new System.Drawing.Point(22, 145);
+            this.lblUserID.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblUserID.Name = "lblUserID";
-            this.lblUserID.Size = new System.Drawing.Size(46, 13);
+            this.lblUserID.Size = new System.Drawing.Size(54, 17);
             this.lblUserID.TabIndex = 3;
             this.lblUserID.Text = "User ID:";
             // 
             // lblHost
             // 
             this.lblHost.AutoSize = true;
-            this.lblHost.Location = new System.Drawing.Point(16, 27);
+            this.lblHost.Location = new System.Drawing.Point(19, 35);
+            this.lblHost.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblHost.Name = "lblHost";
-            this.lblHost.Size = new System.Drawing.Size(49, 13);
+            this.lblHost.Size = new System.Drawing.Size(59, 17);
             this.lblHost.TabIndex = 0;
             this.lblHost.Text = "Data file:";
             // 
@@ -88,18 +93,20 @@ namespace DbExport.UI.Controls
             // 
             this.txtDataFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtDataFile.Location = new System.Drawing.Point(71, 8);
+            this.txtDataFile.Location = new System.Drawing.Point(83, 10);
+            this.txtDataFile.Margin = new System.Windows.Forms.Padding(4);
             this.txtDataFile.Multiline = true;
             this.txtDataFile.Name = "txtDataFile";
-            this.txtDataFile.Size = new System.Drawing.Size(180, 60);
+            this.txtDataFile.Size = new System.Drawing.Size(206, 77);
             this.txtDataFile.TabIndex = 1;
             // 
             // btnBrowse
             // 
             this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBrowse.Location = new System.Drawing.Point(176, 72);
+            this.btnBrowse.Location = new System.Drawing.Point(202, 94);
+            this.btnBrowse.Margin = new System.Windows.Forms.Padding(4);
             this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(75, 23);
+            this.btnBrowse.Size = new System.Drawing.Size(88, 30);
             this.btnBrowse.TabIndex = 2;
             this.btnBrowse.Text = "Browse";
             this.btnBrowse.UseVisualStyleBackColor = true;
@@ -107,8 +114,7 @@ namespace DbExport.UI.Controls
             // 
             // DataFileConnectionPane
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.btnBrowse);
             this.Controls.Add(this.txtDataFile);
             this.Controls.Add(this.txtPassword);
@@ -116,8 +122,10 @@ namespace DbExport.UI.Controls
             this.Controls.Add(this.txtUserID);
             this.Controls.Add(this.lblUserID);
             this.Controls.Add(this.lblHost);
+            this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "DataFileConnectionPane";
-            this.Size = new System.Drawing.Size(260, 160);
+            this.Size = new System.Drawing.Size(300, 210);
             this.ResumeLayout(false);
             this.PerformLayout();
 

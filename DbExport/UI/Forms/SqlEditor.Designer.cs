@@ -101,6 +101,7 @@ namespace DbExport.UI.Forms
             // 
             // toolStrip
             // 
+            this.toolStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsbSave,
             this.tsbPageSetup,
@@ -118,9 +119,9 @@ namespace DbExport.UI.Forms
             this.toolStripSeparator4,
             this.tsbConnect,
             this.tsbRun});
-            this.toolStrip.Location = new System.Drawing.Point(0, 24);
+            this.toolStrip.Location = new System.Drawing.Point(0, 25);
             this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Size = new System.Drawing.Size(784, 25);
+            this.toolStrip.Size = new System.Drawing.Size(884, 31);
             this.toolStrip.TabIndex = 0;
             this.toolStrip.Text = "toolStrip1";
             // 
@@ -130,7 +131,7 @@ namespace DbExport.UI.Forms
             this.tsbSave.Image = ((System.Drawing.Image)(resources.GetObject("tsbSave.Image")));
             this.tsbSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbSave.Name = "tsbSave";
-            this.tsbSave.Size = new System.Drawing.Size(23, 22);
+            this.tsbSave.Size = new System.Drawing.Size(28, 28);
             this.tsbSave.Text = "Save";
             this.tsbSave.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -140,7 +141,7 @@ namespace DbExport.UI.Forms
             this.tsbPageSetup.Image = ((System.Drawing.Image)(resources.GetObject("tsbPageSetup.Image")));
             this.tsbPageSetup.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbPageSetup.Name = "tsbPageSetup";
-            this.tsbPageSetup.Size = new System.Drawing.Size(23, 22);
+            this.tsbPageSetup.Size = new System.Drawing.Size(28, 28);
             this.tsbPageSetup.Text = "Page setup";
             this.tsbPageSetup.Click += new System.EventHandler(this.pageSetupToolStripMenuItem_Click);
             // 
@@ -150,14 +151,14 @@ namespace DbExport.UI.Forms
             this.tsbPrint.Image = ((System.Drawing.Image)(resources.GetObject("tsbPrint.Image")));
             this.tsbPrint.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbPrint.Name = "tsbPrint";
-            this.tsbPrint.Size = new System.Drawing.Size(23, 22);
+            this.tsbPrint.Size = new System.Drawing.Size(28, 28);
             this.tsbPrint.Text = "Print";
             this.tsbPrint.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 31);
             // 
             // tsbUndo
             // 
@@ -165,7 +166,7 @@ namespace DbExport.UI.Forms
             this.tsbUndo.Image = ((System.Drawing.Image)(resources.GetObject("tsbUndo.Image")));
             this.tsbUndo.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbUndo.Name = "tsbUndo";
-            this.tsbUndo.Size = new System.Drawing.Size(23, 22);
+            this.tsbUndo.Size = new System.Drawing.Size(28, 28);
             this.tsbUndo.Text = "Undo";
             this.tsbUndo.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
             // 
@@ -175,14 +176,14 @@ namespace DbExport.UI.Forms
             this.tsbRedo.Image = ((System.Drawing.Image)(resources.GetObject("tsbRedo.Image")));
             this.tsbRedo.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbRedo.Name = "tsbRedo";
-            this.tsbRedo.Size = new System.Drawing.Size(23, 22);
+            this.tsbRedo.Size = new System.Drawing.Size(28, 28);
             this.tsbRedo.Text = "Redo";
             this.tsbRedo.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 31);
             // 
             // tsbCut
             // 
@@ -190,7 +191,7 @@ namespace DbExport.UI.Forms
             this.tsbCut.Image = ((System.Drawing.Image)(resources.GetObject("tsbCut.Image")));
             this.tsbCut.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbCut.Name = "tsbCut";
-            this.tsbCut.Size = new System.Drawing.Size(23, 22);
+            this.tsbCut.Size = new System.Drawing.Size(28, 28);
             this.tsbCut.Text = "Cut";
             this.tsbCut.Click += new System.EventHandler(this.cutToolStripMenuItem_Click);
             // 
@@ -200,7 +201,7 @@ namespace DbExport.UI.Forms
             this.tsbCopy.Image = ((System.Drawing.Image)(resources.GetObject("tsbCopy.Image")));
             this.tsbCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbCopy.Name = "tsbCopy";
-            this.tsbCopy.Size = new System.Drawing.Size(23, 22);
+            this.tsbCopy.Size = new System.Drawing.Size(28, 28);
             this.tsbCopy.Text = "Copy";
             this.tsbCopy.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
             // 
@@ -210,21 +211,21 @@ namespace DbExport.UI.Forms
             this.tsbPaste.Image = ((System.Drawing.Image)(resources.GetObject("tsbPaste.Image")));
             this.tsbPaste.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbPaste.Name = "tsbPaste";
-            this.tsbPaste.Size = new System.Drawing.Size(23, 22);
+            this.tsbPaste.Size = new System.Drawing.Size(28, 28);
             this.tsbPaste.Text = "Paste";
             this.tsbPaste.Click += new System.EventHandler(this.pasteToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 31);
             // 
             // tscFind
             // 
             this.tscFind.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.tscFind.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.tscFind.Name = "tscFind";
-            this.tscFind.Size = new System.Drawing.Size(121, 25);
+            this.tscFind.Size = new System.Drawing.Size(140, 31);
             this.tscFind.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tscFind_KeyUp);
             // 
             // tsbFind
@@ -233,14 +234,14 @@ namespace DbExport.UI.Forms
             this.tsbFind.Image = ((System.Drawing.Image)(resources.GetObject("tsbFind.Image")));
             this.tsbFind.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbFind.Name = "tsbFind";
-            this.tsbFind.Size = new System.Drawing.Size(23, 22);
+            this.tsbFind.Size = new System.Drawing.Size(28, 28);
             this.tsbFind.Text = "Find";
             this.tsbFind.Click += new System.EventHandler(this.tsbFind_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 31);
             // 
             // tsbConnect
             // 
@@ -248,7 +249,7 @@ namespace DbExport.UI.Forms
             this.tsbConnect.Image = ((System.Drawing.Image)(resources.GetObject("tsbConnect.Image")));
             this.tsbConnect.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbConnect.Name = "tsbConnect";
-            this.tsbConnect.Size = new System.Drawing.Size(23, 22);
+            this.tsbConnect.Size = new System.Drawing.Size(28, 28);
             this.tsbConnect.Text = "Configure database connection";
             this.tsbConnect.Click += new System.EventHandler(this.configureConnectionToolStripMenuItem_Click);
             // 
@@ -258,7 +259,7 @@ namespace DbExport.UI.Forms
             this.tsbRun.Image = ((System.Drawing.Image)(resources.GetObject("tsbRun.Image")));
             this.tsbRun.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbRun.Name = "tsbRun";
-            this.tsbRun.Size = new System.Drawing.Size(23, 22);
+            this.tsbRun.Size = new System.Drawing.Size(28, 28);
             this.tsbRun.Text = "Run the script";
             this.tsbRun.Click += new System.EventHandler(this.runToolStripMenuItem_Click);
             // 
@@ -268,9 +269,10 @@ namespace DbExport.UI.Forms
             this.pnlContent.Controls.Add(this.sciEditor);
             this.pnlContent.Controls.Add(this.statusStrip);
             this.pnlContent.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlContent.Location = new System.Drawing.Point(0, 49);
+            this.pnlContent.Location = new System.Drawing.Point(0, 56);
+            this.pnlContent.Margin = new System.Windows.Forms.Padding(4);
             this.pnlContent.Name = "pnlContent";
-            this.pnlContent.Size = new System.Drawing.Size(784, 512);
+            this.pnlContent.Size = new System.Drawing.Size(884, 605);
             this.pnlContent.TabIndex = 1;
             // 
             // sciEditor
@@ -280,16 +282,19 @@ namespace DbExport.UI.Forms
             this.sciEditor.ConfigurationManager.CustomLocation = "sql.xml";
             this.sciEditor.ConfigurationManager.Language = "sql";
             this.sciEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sciEditor.Folding.IsEnabled = false;
             this.sciEditor.Indentation.SmartIndentType = ScintillaNet.SmartIndent.Simple;
             this.sciEditor.Indentation.TabWidth = 4;
             this.sciEditor.IsBraceMatching = true;
             this.sciEditor.Location = new System.Drawing.Point(0, 0);
+            this.sciEditor.Margin = new System.Windows.Forms.Padding(4);
             this.sciEditor.Margins.Margin0.Width = 40;
             this.sciEditor.Margins.Margin1.Width = 0;
             this.sciEditor.Margins.Margin2.Width = 16;
             this.sciEditor.Name = "sciEditor";
             this.sciEditor.Scrolling.HorizontalWidth = 1;
-            this.sciEditor.Size = new System.Drawing.Size(780, 486);
+            this.sciEditor.Size = new System.Drawing.Size(880, 572);
+            this.sciEditor.Styles.Bits = 0;
             this.sciEditor.Styles.BraceBad.FontName = "Verdana";
             this.sciEditor.Styles.BraceLight.FontName = "Verdana";
             this.sciEditor.Styles.ControlChar.FontName = "Verdana";
@@ -312,9 +317,10 @@ namespace DbExport.UI.Forms
             this.statusItemInsLock,
             this.statusItemCapsLock,
             this.statusItemNumLock});
-            this.statusStrip.Location = new System.Drawing.Point(0, 486);
+            this.statusStrip.Location = new System.Drawing.Point(0, 572);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(780, 22);
+            this.statusStrip.Padding = new System.Windows.Forms.Padding(1, 0, 16, 0);
+            this.statusStrip.Size = new System.Drawing.Size(880, 29);
             this.statusStrip.TabIndex = 0;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -322,7 +328,7 @@ namespace DbExport.UI.Forms
             // 
             this.statusItemMain.AutoSize = false;
             this.statusItemMain.Name = "statusItemMain";
-            this.statusItemMain.Size = new System.Drawing.Size(495, 17);
+            this.statusItemMain.Size = new System.Drawing.Size(593, 24);
             this.statusItemMain.Spring = true;
             this.statusItemMain.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -330,26 +336,26 @@ namespace DbExport.UI.Forms
             // 
             this.statusItemCaretInfo.AutoSize = false;
             this.statusItemCaretInfo.Name = "statusItemCaretInfo";
-            this.statusItemCaretInfo.Size = new System.Drawing.Size(150, 17);
+            this.statusItemCaretInfo.Size = new System.Drawing.Size(150, 24);
             this.statusItemCaretInfo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // statusItemInsLock
             // 
             this.statusItemInsLock.AutoSize = false;
             this.statusItemInsLock.Name = "statusItemInsLock";
-            this.statusItemInsLock.Size = new System.Drawing.Size(40, 17);
+            this.statusItemInsLock.Size = new System.Drawing.Size(40, 24);
             // 
             // statusItemCapsLock
             // 
             this.statusItemCapsLock.AutoSize = false;
             this.statusItemCapsLock.Name = "statusItemCapsLock";
-            this.statusItemCapsLock.Size = new System.Drawing.Size(40, 17);
+            this.statusItemCapsLock.Size = new System.Drawing.Size(40, 24);
             // 
             // statusItemNumLock
             // 
             this.statusItemNumLock.AutoSize = false;
             this.statusItemNumLock.Name = "statusItemNumLock";
-            this.statusItemNumLock.Size = new System.Drawing.Size(40, 17);
+            this.statusItemNumLock.Size = new System.Drawing.Size(40, 24);
             // 
             // menuStrip
             // 
@@ -362,7 +368,8 @@ namespace DbExport.UI.Forms
             this.toolStripMenuItem2});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(784, 24);
+            this.menuStrip.Padding = new System.Windows.Forms.Padding(7, 3, 0, 3);
+            this.menuStrip.Size = new System.Drawing.Size(884, 25);
             this.menuStrip.TabIndex = 2;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -377,7 +384,7 @@ namespace DbExport.UI.Forms
             this.toolStripMenuItem4,
             this.quitToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 20);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(37, 19);
             this.toolStripMenuItem1.Text = "&File";
             // 
             // saveToolStripMenuItem
@@ -446,7 +453,7 @@ namespace DbExport.UI.Forms
             this.findToolStripMenuItem,
             this.replaceToolStripMenuItem});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 19);
             this.editToolStripMenuItem.Text = "&Edit";
             // 
             // undoToolStripMenuItem
@@ -546,7 +553,7 @@ namespace DbExport.UI.Forms
             this.toolStripMenuItem8,
             this.lineNumbersToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 19);
             this.viewToolStripMenuItem.Text = "&View";
             // 
             // toolbarToolStripMenuItem
@@ -590,7 +597,7 @@ namespace DbExport.UI.Forms
             this.configureConnectionToolStripMenuItem,
             this.runToolStripMenuItem});
             this.sqlToolStripMenuItem.Name = "sqlToolStripMenuItem";
-            this.sqlToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
+            this.sqlToolStripMenuItem.Size = new System.Drawing.Size(49, 19);
             this.sqlToolStripMenuItem.Text = "&Script";
             // 
             // configureConnectionToolStripMenuItem
@@ -616,7 +623,7 @@ namespace DbExport.UI.Forms
             this.configureToolsToolStripMenuItem,
             this.toolStripMenuItem10});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 19);
             this.toolsToolStripMenuItem.Text = "&Tools";
             // 
             // configureToolsToolStripMenuItem
@@ -639,7 +646,7 @@ namespace DbExport.UI.Forms
             this.toolStripMenuItem9,
             this.sQLHelpToolStripMenuItem});
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(24, 20);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(24, 19);
             this.toolStripMenuItem2.Text = "&?";
             // 
             // helpToolStripMenuItem
@@ -647,38 +654,40 @@ namespace DbExport.UI.Forms
             this.helpToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("helpToolStripMenuItem.Image")));
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.helpToolStripMenuItem.Text = "&Help";
             this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
             // aboutDbExportToolStripMenuItem
             // 
             this.aboutDbExportToolStripMenuItem.Name = "aboutDbExportToolStripMenuItem";
-            this.aboutDbExportToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.aboutDbExportToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.aboutDbExportToolStripMenuItem.Text = "&About DbExport...";
             this.aboutDbExportToolStripMenuItem.Click += new System.EventHandler(this.aboutDbExportToolStripMenuItem_Click);
             // 
             // toolStripMenuItem9
             // 
             this.toolStripMenuItem9.Name = "toolStripMenuItem9";
-            this.toolStripMenuItem9.Size = new System.Drawing.Size(164, 6);
+            this.toolStripMenuItem9.Size = new System.Drawing.Size(165, 6);
             // 
             // sQLHelpToolStripMenuItem
             // 
             this.sQLHelpToolStripMenuItem.Name = "sQLHelpToolStripMenuItem";
-            this.sQLHelpToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.sQLHelpToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.sQLHelpToolStripMenuItem.Text = "&SQL Help";
             this.sQLHelpToolStripMenuItem.Click += new System.EventHandler(this.sQLHelpToolStripMenuItem_Click);
             // 
             // SqlEditor
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 561);
+            this.ClientSize = new System.Drawing.Size(884, 661);
             this.Controls.Add(this.pnlContent);
             this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.menuStrip);
+            this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "SqlEditor";
             this.Text = "DbExport\'s SQL Editor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SqlEditor_FormClosing);
