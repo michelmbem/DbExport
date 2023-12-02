@@ -37,7 +37,7 @@
             this.tvItems = new System.Windows.Forms.TreeView();
             this.itemsIcons = new System.Windows.Forms.ImageList(this.components);
             this.pnlContent.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).BeginInit();
             this.bottomPane.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,8 +49,8 @@
             // 
             // pîcBanner
             // 
-            this.pîcBanner.Image = global::DbExport.Properties.Resources.Stage4;
-            this.pîcBanner.Margin = new System.Windows.Forms.Padding(5);
+            this.picBanner.Image = global::DbExport.Properties.Resources.Stage4;
+            this.picBanner.Margin = new System.Windows.Forms.Padding(5);
             // 
             // lblTitle
             // 
@@ -127,7 +127,7 @@
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "WizardPage5";
             this.pnlContent.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).EndInit();
             this.bottomPane.ResumeLayout(false);
             this.ResumeLayout(false);
 

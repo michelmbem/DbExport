@@ -18,7 +18,7 @@ namespace DbExport.UI.Forms
 
         private static readonly ILog log = LogManager.GetLogger(typeof(SqlEditor));
 
-        private ScintillaNet.PageSettings pageSettings = new ScintillaNet.PageSettings();
+        private ScintillaPrinting.PageSettings pageSettings = new ScintillaPrinting.PageSettings();
         private List<CustomCommand> customCommands;
         private string fileName;
         private bool saved = true;
@@ -102,15 +102,15 @@ namespace DbExport.UI.Forms
 
         private void UpdateAll()
         {
-            sciEditor.UndoRedo.EmptyUndoBuffer();
+            sciEditor.EmptyUndoBuffer();
             UpdateUndoRedo();
             UpdateCutCopyCaretInfo();
         }
 
         private void UpdateUndoRedo()
         {
-            tsbUndo.Enabled = undoToolStripMenuItem.Enabled = sciEditor.UndoRedo.CanUndo;
-            tsbRedo.Enabled = redoToolStripMenuItem.Enabled = sciEditor.UndoRedo.CanRedo;
+            tsbUndo.Enabled = undoToolStripMenuItem.Enabled = sciEditor.CanUndo;
+            tsbRedo.Enabled = redoToolStripMenuItem.Enabled = sciEditor.CanRedo;
         }
 
         private void UpdateCutCopyCaretInfo()
@@ -119,12 +119,12 @@ namespace DbExport.UI.Forms
                                            = copyToolStripMenuItem.Enabled
                                            = tsbCut.Enabled
                                            = tsbCopy.Enabled
-                                           = sciEditor.Selection.Length > 0;
+                                           = sciEditor.SelectedText.Length > 0;
 
             statusItemCaretInfo.Text = string.Format("Ln: {0}, Col: {1}, Sel: {2}",
-                                                     sciEditor.Caret.LineNumber + 1,
-                                                     sciEditor.GetColumn(sciEditor.Caret.Position) + 1,
-                                                     sciEditor.Selection.Length);
+                                                     sciEditor.CurrentLine + 1,
+                                                     sciEditor.GetColumn(sciEditor.CurrentPosition) + 1,
+                                                     sciEditor.SelectedText.Length);
         }
 
         private void RegisterSearchString(string searchString)
@@ -133,7 +133,7 @@ namespace DbExport.UI.Forms
             tscFind.Items.Insert(0, searchString);
             while (tscFind.Items.Count > MAX_SEARCH_STRINGS)
                 tscFind.Items.RemoveAt(MAX_SEARCH_STRINGS);
-            sciEditor.FindReplace.LastFindString = searchString;
+            //sciEditor.FindReplace.LastFindString = searchString;
         }
 
         private bool PromptToSave()
@@ -280,7 +280,7 @@ namespace DbExport.UI.Forms
 
         private void Application_Idle(object sender, EventArgs e)
         {
-            tsbPaste.Enabled = pasteToolStripMenuItem.Enabled = sciEditor.Clipboard.CanPaste;
+            tsbPaste.Enabled = pasteToolStripMenuItem.Enabled = sciEditor.CanPaste;
 
             var insLock = (GetKeyState(VK_INSERT) & 0xFFF) != 0;
             statusItemInsLock.Text = insLock ? "OVR" : "INS";
@@ -291,13 +291,13 @@ namespace DbExport.UI.Forms
             var numLock = (GetKeyState(VK_NUMLOCK) & 0xFFF) != 0;
             statusItemNumLock.Text = numLock ? "NUM" : string.Empty;
 
-            var hw = 0;
+            /*var hw = 0;
 
-            foreach (var line in sciEditor.Lines.VisibleLines)
+            foreach (var line in sciEditor.VisibleLines)
                 hw = Math.Max(hw, 8 * line.Length);
 
             if (hw > sciEditor.Scrolling.HorizontalWidth)
-                sciEditor.Scrolling.HorizontalWidth = hw;
+                sciEditor.Scrolling.HorizontalWidth = hw;*/
         }
 
         private void SqlEditor_Load(object sender, EventArgs e)
@@ -350,7 +350,7 @@ namespace DbExport.UI.Forms
             {
                 psd.PageSettings = pageSettings;
                 if (psd.ShowDialog() == DialogResult.Cancel) return;
-                pageSettings = new ScintillaNet.PageSettings
+                pageSettings = new ScintillaPrinting.PageSettings
                                    {
                                        PrinterSettings = psd.PageSettings.PrinterSettings,
                                        PrinterResolution = psd.PageSettings.PrinterResolution,
@@ -365,11 +365,11 @@ namespace DbExport.UI.Forms
 
         private void printToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(fileName))
+            /*if (!string.IsNullOrEmpty(fileName))
                 sciEditor.Printing.PrintDocument.DocumentName = Path.GetFileName(fileName);
 
             sciEditor.Printing.PageSettings = pageSettings;
-            sciEditor.Printing.Print(sender == printToolStripMenuItem);
+            sciEditor.Printing.Print(sender == printToolStripMenuItem);*/
         }
 
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -379,47 +379,47 @@ namespace DbExport.UI.Forms
 
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sciEditor.UndoRedo.Undo();
+            sciEditor.Undo();
         }
 
         private void redoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sciEditor.UndoRedo.Redo();
+            sciEditor.Redo();
         }
 
         private void cutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sciEditor.Clipboard.Cut();
+            sciEditor.Cut();
         }
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sciEditor.Clipboard.Copy();
+            sciEditor.Copy();
         }
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sciEditor.Clipboard.Paste();
+            sciEditor.Paste();
         }
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sciEditor.Selection.Clear();
+            sciEditor.ClearSelections();
         }
 
         private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sciEditor.Selection.SelectAll();
+            sciEditor.SelectAll();
         }
 
         private void findToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sciEditor.FindReplace.ShowFind();
+            sciEditor.FindForm().Show(this);
         }
 
         private void replaceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            sciEditor.FindReplace.ShowReplace();
+            //sciEditor.FindReplace.ShowReplace();
         }
 
         private void checkBoxMenuItem_Click(object sender, EventArgs e)
@@ -527,10 +527,10 @@ namespace DbExport.UI.Forms
 
         private void tsbFind_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(tscFind.Text)) return;
+            /*if (string.IsNullOrEmpty(tscFind.Text)) return;
             var range = sciEditor.FindReplace.FindNext(tscFind.Text, true);
             if (range != null) range.Select();
-            RegisterSearchString(tscFind.Text);
+            RegisterSearchString(tscFind.Text);*/
         }
 
         private void tscFind_KeyUp(object sender, KeyEventArgs e)
@@ -539,7 +539,7 @@ namespace DbExport.UI.Forms
                 tsbFind_Click(null, null);
         }
 
-        private void sciEditor_TextLengthChanged(object sender, ScintillaNet.TextModifiedEventArgs e)
+        private void sciEditor_TextLengthChanged(object sender, ScintillaNET.ModificationEventArgs e)
         {
             UpdateUndoRedo();
         }

@@ -42,7 +42,7 @@ namespace DbExport.UI.Controls
             this.radExportData = new System.Windows.Forms.RadioButton();
             this.radExportSchema = new System.Windows.Forms.RadioButton();
             this.pnlContent.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).BeginInit();
             this.grpProviderOptions.SuspendLayout();
             this.prgExportFlags.SuspendLayout();
             this.grpMainOptions.SuspendLayout();
@@ -54,10 +54,10 @@ namespace DbExport.UI.Controls
             this.pnlContent.Controls.Add(this.prgExportFlags);
             this.pnlContent.Controls.Add(this.grpMainOptions);
             // 
-            // pîcBanner
+            // picBanner
             // 
-            this.pîcBanner.Image = global::DbExport.Properties.Resources.Stage4;
-            this.pîcBanner.Margin = new System.Windows.Forms.Padding(5);
+            this.picBanner.Image = global::DbExport.Properties.Resources.Stage4;
+            this.picBanner.Margin = new System.Windows.Forms.Padding(5);
             // 
             // grpProviderOptions
             // 
@@ -226,7 +226,7 @@ namespace DbExport.UI.Controls
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "WizardPage4";
             this.pnlContent.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).EndInit();
             this.grpProviderOptions.ResumeLayout(false);
             this.prgExportFlags.ResumeLayout(false);
             this.prgExportFlags.PerformLayout();

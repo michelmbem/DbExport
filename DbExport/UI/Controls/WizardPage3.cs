@@ -49,12 +49,14 @@ namespace DbExport.UI.Controls
                 case 6:  // SQLite
                     sqlServerConnectionPane.Visible = false;
                     dataFileConnectionPane.Reset();
+                    dataFileConnectionPane.Width = pnlCredentials.Width;
                     dataFileConnectionPane.Visible = true;
                     dataFileConnectionPane.ProviderName = ProviderName;
                     break;
                 default:
                     dataFileConnectionPane.Visible = false;
                     sqlServerConnectionPane.Reset();
+                    sqlServerConnectionPane.Width = pnlCredentials.Width;
                     sqlServerConnectionPane.Visible = true;
                     sqlServerConnectionPane.ProviderName = ProviderName;
                     break;

@@ -33,11 +33,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="adodb, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <SpecificVersion>False</SpecificVersion>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-      <HintPath>..\References\adodb.dll</HintPath>
-    </Reference>
     <Reference Include="Interop.ADOX">
       <HintPath>..\References\Interop.ADOX.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -48,6 +43,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="adodb">
+      <HintPath>..\packages\ADODB.7.10.3077\lib\adodb.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExportOptions.cs" />
@@ -94,6 +92,9 @@
     <Compile Include="Schema\TableCollection.cs" />
     <Compile Include="SqlHelper.cs" />
     <Compile Include="Utility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

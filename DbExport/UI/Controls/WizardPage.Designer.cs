@@ -29,8 +29,8 @@ namespace DbExport.UI.Controls
         private void InitializeComponent()
         {
             this.pnlContent = new System.Windows.Forms.Panel();
-            this.pîcBanner = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).BeginInit();
+            this.picBanner = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlContent
@@ -42,27 +42,27 @@ namespace DbExport.UI.Controls
             this.pnlContent.Size = new System.Drawing.Size(350, 350);
             this.pnlContent.TabIndex = 0;
             // 
-            // pîcBanner
+            // picBanner
             // 
-            this.pîcBanner.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pîcBanner.Location = new System.Drawing.Point(0, 0);
-            this.pîcBanner.Margin = new System.Windows.Forms.Padding(4);
-            this.pîcBanner.Name = "pîcBanner";
-            this.pîcBanner.Size = new System.Drawing.Size(150, 350);
-            this.pîcBanner.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pîcBanner.TabIndex = 2;
-            this.pîcBanner.TabStop = false;
+            this.picBanner.Dock = System.Windows.Forms.DockStyle.Left;
+            this.picBanner.Location = new System.Drawing.Point(0, 0);
+            this.picBanner.Margin = new System.Windows.Forms.Padding(4);
+            this.picBanner.Name = "picBanner";
+            this.picBanner.Size = new System.Drawing.Size(150, 350);
+            this.picBanner.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picBanner.TabIndex = 2;
+            this.picBanner.TabStop = false;
             // 
             // WizardPage
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.pnlContent);
-            this.Controls.Add(this.pîcBanner);
+            this.Controls.Add(this.picBanner);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "WizardPage";
             this.Size = new System.Drawing.Size(500, 350);
-            ((System.ComponentModel.ISupportInitialize)(this.pîcBanner)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -70,7 +70,7 @@ namespace DbExport.UI.Controls
         #endregion
 
         protected System.Windows.Forms.Panel pnlContent;
-        protected System.Windows.Forms.PictureBox pîcBanner;
+        protected System.Windows.Forms.PictureBox picBanner;
 
     }
 }

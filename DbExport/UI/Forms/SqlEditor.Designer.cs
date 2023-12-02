@@ -47,7 +47,7 @@ namespace DbExport.UI.Forms
             this.tsbConnect = new System.Windows.Forms.ToolStripButton();
             this.tsbRun = new System.Windows.Forms.ToolStripButton();
             this.pnlContent = new System.Windows.Forms.Panel();
-            this.sciEditor = new ScintillaNet.Scintilla();
+            this.sciEditor = new ScintillaNET.Scintilla();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusItemMain = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusItemCaretInfo = new System.Windows.Forms.ToolStripStatusLabel();
@@ -277,37 +277,37 @@ namespace DbExport.UI.Forms
             // 
             // sciEditor
             // 
-            this.sciEditor.Caret.CurrentLineBackgroundColor = System.Drawing.Color.Lavender;
-            this.sciEditor.Caret.HighlightCurrentLine = true;
-            this.sciEditor.ConfigurationManager.CustomLocation = "sql.xml";
-            this.sciEditor.ConfigurationManager.Language = "sql";
+            this.sciEditor.CaretLineBackColor = System.Drawing.Color.Lavender;
+            this.sciEditor.CaretLineVisible = true;
+            //this.sciEditor.ConfigurationManager.CustomLocation = "sql.xml";
+            //this.sciEditor.ConfigurationManager.Language = "sql";
             this.sciEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.sciEditor.Folding.IsEnabled = false;
-            this.sciEditor.Indentation.SmartIndentType = ScintillaNet.SmartIndent.Simple;
-            this.sciEditor.Indentation.TabWidth = 4;
-            this.sciEditor.IsBraceMatching = true;
+            //this.sciEditor.Folding.IsEnabled = false;
+            //this.sciEditor.Indentation.SmartIndentType = ScintillaNet.SmartIndent.Simple;
+            //this.sciEditor.Indentation.TabWidth = 4;
+            //this.sciEditor.IsBraceMatching = true;
             this.sciEditor.Location = new System.Drawing.Point(0, 0);
             this.sciEditor.Margin = new System.Windows.Forms.Padding(4);
-            this.sciEditor.Margins.Margin0.Width = 40;
-            this.sciEditor.Margins.Margin1.Width = 0;
-            this.sciEditor.Margins.Margin2.Width = 16;
+            //this.sciEditor.Margins.Margin0.Width = 40;
+            //this.sciEditor.Margins.Margin1.Width = 0;
+            //this.sciEditor.Margins.Margin2.Width = 16;
             this.sciEditor.Name = "sciEditor";
-            this.sciEditor.Scrolling.HorizontalWidth = 1;
+            //this.sciEditor.Scrolling.HorizontalWidth = 1;
             this.sciEditor.Size = new System.Drawing.Size(880, 572);
-            this.sciEditor.Styles.Bits = 0;
-            this.sciEditor.Styles.BraceBad.FontName = "Verdana";
-            this.sciEditor.Styles.BraceLight.FontName = "Verdana";
-            this.sciEditor.Styles.ControlChar.FontName = "Verdana";
-            this.sciEditor.Styles.Default.FontName = "Verdana";
-            this.sciEditor.Styles.IndentGuide.FontName = "Verdana";
-            this.sciEditor.Styles.LastPredefined.FontName = "Verdana";
-            this.sciEditor.Styles.LineNumber.FontName = "Verdana";
-            this.sciEditor.Styles.LineNumber.IsChangeable = false;
-            this.sciEditor.Styles.Max.FontName = "Verdana";
+            //this.sciEditor.Styles.Bits = 0;
+            //this.sciEditor.Styles.BraceBad.FontName = "Verdana";
+            //this.sciEditor.Styles.BraceLight.FontName = "Verdana";
+            //this.sciEditor.Styles.ControlChar.FontName = "Verdana";
+            //this.sciEditor.Styles.Default.FontName = "Verdana";
+            //this.sciEditor.Styles.IndentGuide.FontName = "Verdana";
+            //this.sciEditor.Styles.LastPredefined.FontName = "Verdana";
+            //this.sciEditor.Styles.LineNumber.FontName = "Verdana";
+            //this.sciEditor.Styles.LineNumber.IsChangeable = false;
+            //this.sciEditor.Styles.Max.FontName = "Verdana";
             this.sciEditor.TabIndex = 1;
-            this.sciEditor.TextInserted += new System.EventHandler<ScintillaNet.TextModifiedEventArgs>(this.sciEditor_TextLengthChanged);
-            this.sciEditor.TextDeleted += new System.EventHandler<ScintillaNet.TextModifiedEventArgs>(this.sciEditor_TextLengthChanged);
-            this.sciEditor.SelectionChanged += new System.EventHandler(this.sciEditor_SelectionChanged);
+            //this.sciEditor.TextInserted += new System.EventHandler<ScintillaNet.TextModifiedEventArgs>(this.sciEditor_TextLengthChanged);
+            //this.sciEditor.TextDeleted += new System.EventHandler<ScintillaNet.TextModifiedEventArgs>(this.sciEditor_TextLengthChanged);
+            //this.sciEditor.SelectionChanged += new System.EventHandler(this.sciEditor_SelectionChanged);
             // 
             // statusStrip
             // 
@@ -712,7 +712,7 @@ namespace DbExport.UI.Forms
         private System.Windows.Forms.Panel pnlContent;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.MenuStrip menuStrip;
-        private ScintillaNet.Scintilla sciEditor;
+        private ScintillaNET.Scintilla sciEditor;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveasToolStripMenuItem;
