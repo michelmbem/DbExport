@@ -63,13 +63,6 @@ namespace DbExport.UI.Controls
             this.pnlBanner.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pnlBanner.BackgroundImage")));
             this.pnlBanner.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.pnlBanner.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlBanner.Controls.Add(this.lblStage5Name);
-            this.pnlBanner.Controls.Add(this.lblStage7Name);
-            this.pnlBanner.Controls.Add(this.lblStage6Name);
-            this.pnlBanner.Controls.Add(this.lblStage4Name);
-            this.pnlBanner.Controls.Add(this.lblStage3Name);
-            this.pnlBanner.Controls.Add(this.lblStage2Name);
-            this.pnlBanner.Controls.Add(this.lblStage1Name);
             this.pnlBanner.Controls.Add(this.lblStage7);
             this.pnlBanner.Controls.Add(this.lblStage6);
             this.pnlBanner.Controls.Add(this.lblStage5);
@@ -77,6 +70,13 @@ namespace DbExport.UI.Controls
             this.pnlBanner.Controls.Add(this.lblStage3);
             this.pnlBanner.Controls.Add(this.lblStage2);
             this.pnlBanner.Controls.Add(this.lblStage1);
+            this.pnlBanner.Controls.Add(this.lblStage5Name);
+            this.pnlBanner.Controls.Add(this.lblStage7Name);
+            this.pnlBanner.Controls.Add(this.lblStage6Name);
+            this.pnlBanner.Controls.Add(this.lblStage4Name);
+            this.pnlBanner.Controls.Add(this.lblStage3Name);
+            this.pnlBanner.Controls.Add(this.lblStage2Name);
+            this.pnlBanner.Controls.Add(this.lblStage1Name);
             this.pnlBanner.Controls.Add(this.lblVerticalBar);
             this.pnlBanner.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnlBanner.Location = new System.Drawing.Point(0, 0);
@@ -90,7 +90,7 @@ namespace DbExport.UI.Controls
             this.lblStage5Name.BackColor = System.Drawing.Color.Transparent;
             this.lblStage5Name.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStage5Name.ForeColor = System.Drawing.Color.White;
-            this.lblStage5Name.Location = new System.Drawing.Point(28, 216);
+            this.lblStage5Name.Location = new System.Drawing.Point(22, 216);
             this.lblStage5Name.Name = "lblStage5Name";
             this.lblStage5Name.Size = new System.Drawing.Size(94, 20);
             this.lblStage5Name.TabIndex = 14;
@@ -102,7 +102,7 @@ namespace DbExport.UI.Controls
             this.lblStage7Name.BackColor = System.Drawing.Color.Transparent;
             this.lblStage7Name.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStage7Name.ForeColor = System.Drawing.Color.White;
-            this.lblStage7Name.Location = new System.Drawing.Point(28, 324);
+            this.lblStage7Name.Location = new System.Drawing.Point(22, 324);
             this.lblStage7Name.Name = "lblStage7Name";
             this.lblStage7Name.Size = new System.Drawing.Size(65, 20);
             this.lblStage7Name.TabIndex = 13;
@@ -114,7 +114,7 @@ namespace DbExport.UI.Controls
             this.lblStage6Name.BackColor = System.Drawing.Color.Transparent;
             this.lblStage6Name.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStage6Name.ForeColor = System.Drawing.Color.White;
-            this.lblStage6Name.Location = new System.Drawing.Point(28, 269);
+            this.lblStage6Name.Location = new System.Drawing.Point(22, 269);
             this.lblStage6Name.Name = "lblStage6Name";
             this.lblStage6Name.Size = new System.Drawing.Size(77, 20);
             this.lblStage6Name.TabIndex = 12;
@@ -126,7 +126,7 @@ namespace DbExport.UI.Controls
             this.lblStage4Name.BackColor = System.Drawing.Color.Transparent;
             this.lblStage4Name.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStage4Name.ForeColor = System.Drawing.Color.White;
-            this.lblStage4Name.Location = new System.Drawing.Point(28, 163);
+            this.lblStage4Name.Location = new System.Drawing.Point(22, 163);
             this.lblStage4Name.Name = "lblStage4Name";
             this.lblStage4Name.Size = new System.Drawing.Size(78, 20);
             this.lblStage4Name.TabIndex = 11;
@@ -138,7 +138,7 @@ namespace DbExport.UI.Controls
             this.lblStage3Name.BackColor = System.Drawing.Color.Transparent;
             this.lblStage3Name.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStage3Name.ForeColor = System.Drawing.Color.White;
-            this.lblStage3Name.Location = new System.Drawing.Point(28, 110);
+            this.lblStage3Name.Location = new System.Drawing.Point(22, 110);
             this.lblStage3Name.Name = "lblStage3Name";
             this.lblStage3Name.Size = new System.Drawing.Size(99, 20);
             this.lblStage3Name.TabIndex = 10;
@@ -150,7 +150,7 @@ namespace DbExport.UI.Controls
             this.lblStage2Name.BackColor = System.Drawing.Color.Transparent;
             this.lblStage2Name.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStage2Name.ForeColor = System.Drawing.Color.White;
-            this.lblStage2Name.Location = new System.Drawing.Point(28, 57);
+            this.lblStage2Name.Location = new System.Drawing.Point(22, 57);
             this.lblStage2Name.Name = "lblStage2Name";
             this.lblStage2Name.Size = new System.Drawing.Size(101, 20);
             this.lblStage2Name.TabIndex = 9;
@@ -162,7 +162,7 @@ namespace DbExport.UI.Controls
             this.lblStage1Name.BackColor = System.Drawing.Color.Transparent;
             this.lblStage1Name.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblStage1Name.ForeColor = System.Drawing.Color.White;
-            this.lblStage1Name.Location = new System.Drawing.Point(28, 4);
+            this.lblStage1Name.Location = new System.Drawing.Point(22, 4);
             this.lblStage1Name.Name = "lblStage1Name";
             this.lblStage1Name.Size = new System.Drawing.Size(74, 20);
             this.lblStage1Name.TabIndex = 8;
@@ -171,7 +171,7 @@ namespace DbExport.UI.Controls
             // lblStage7
             // 
             this.lblStage7.BackColor = System.Drawing.Color.White;
-            this.lblStage7.Location = new System.Drawing.Point(15, 330);
+            this.lblStage7.Location = new System.Drawing.Point(10, 330);
             this.lblStage7.Name = "lblStage7";
             this.lblStage7.Size = new System.Drawing.Size(10, 10);
             this.lblStage7.TabIndex = 7;
@@ -179,7 +179,7 @@ namespace DbExport.UI.Controls
             // lblStage6
             // 
             this.lblStage6.BackColor = System.Drawing.Color.White;
-            this.lblStage6.Location = new System.Drawing.Point(15, 275);
+            this.lblStage6.Location = new System.Drawing.Point(10, 275);
             this.lblStage6.Name = "lblStage6";
             this.lblStage6.Size = new System.Drawing.Size(10, 10);
             this.lblStage6.TabIndex = 6;
@@ -187,7 +187,7 @@ namespace DbExport.UI.Controls
             // lblStage5
             // 
             this.lblStage5.BackColor = System.Drawing.Color.White;
-            this.lblStage5.Location = new System.Drawing.Point(15, 222);
+            this.lblStage5.Location = new System.Drawing.Point(10, 222);
             this.lblStage5.Name = "lblStage5";
             this.lblStage5.Size = new System.Drawing.Size(10, 10);
             this.lblStage5.TabIndex = 5;
@@ -195,7 +195,7 @@ namespace DbExport.UI.Controls
             // lblStage4
             // 
             this.lblStage4.BackColor = System.Drawing.Color.White;
-            this.lblStage4.Location = new System.Drawing.Point(15, 169);
+            this.lblStage4.Location = new System.Drawing.Point(10, 169);
             this.lblStage4.Name = "lblStage4";
             this.lblStage4.Size = new System.Drawing.Size(10, 10);
             this.lblStage4.TabIndex = 4;
@@ -203,7 +203,7 @@ namespace DbExport.UI.Controls
             // lblStage3
             // 
             this.lblStage3.BackColor = System.Drawing.Color.White;
-            this.lblStage3.Location = new System.Drawing.Point(15, 116);
+            this.lblStage3.Location = new System.Drawing.Point(10, 116);
             this.lblStage3.Name = "lblStage3";
             this.lblStage3.Size = new System.Drawing.Size(10, 10);
             this.lblStage3.TabIndex = 3;
@@ -211,7 +211,7 @@ namespace DbExport.UI.Controls
             // lblStage2
             // 
             this.lblStage2.BackColor = System.Drawing.Color.White;
-            this.lblStage2.Location = new System.Drawing.Point(15, 63);
+            this.lblStage2.Location = new System.Drawing.Point(10, 63);
             this.lblStage2.Name = "lblStage2";
             this.lblStage2.Size = new System.Drawing.Size(10, 10);
             this.lblStage2.TabIndex = 2;
@@ -219,7 +219,7 @@ namespace DbExport.UI.Controls
             // lblStage1
             // 
             this.lblStage1.BackColor = System.Drawing.Color.White;
-            this.lblStage1.Location = new System.Drawing.Point(15, 10);
+            this.lblStage1.Location = new System.Drawing.Point(10, 10);
             this.lblStage1.Name = "lblStage1";
             this.lblStage1.Size = new System.Drawing.Size(10, 10);
             this.lblStage1.TabIndex = 1;
@@ -227,9 +227,9 @@ namespace DbExport.UI.Controls
             // lblVerticalBar
             // 
             this.lblVerticalBar.BackColor = System.Drawing.Color.White;
-            this.lblVerticalBar.Location = new System.Drawing.Point(10, 10);
+            this.lblVerticalBar.Location = new System.Drawing.Point(14, 10);
             this.lblVerticalBar.Name = "lblVerticalBar";
-            this.lblVerticalBar.Size = new System.Drawing.Size(5, 330);
+            this.lblVerticalBar.Size = new System.Drawing.Size(2, 330);
             this.lblVerticalBar.TabIndex = 0;
             // 
             // WizardPage

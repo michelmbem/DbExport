@@ -28,7 +28,7 @@ namespace DbExport.Providers.OracleClient
 
         public override string ProviderName
         {
-            get { return "System.Data.OracleClient"; }
+            get { return "Oracle.ManagedDataAccess.Client"; }
         }
 
         protected override bool SupportsDbCreation

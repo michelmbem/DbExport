@@ -32,11 +32,6 @@ namespace DbExport.UI.Forms
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.pnlActivePage = new System.Windows.Forms.Panel();
-            this.pnlNavBar = new System.Windows.Forms.Panel();
-            this.btnPrevious = new System.Windows.Forms.Button();
-            this.btnQuit = new System.Windows.Forms.Button();
-            this.btnDone = new System.Windows.Forms.Button();
-            this.btnNext = new System.Windows.Forms.Button();
             this.wizardPage7 = new DbExport.UI.Controls.WizardPage7();
             this.wizardPage6 = new DbExport.UI.Controls.WizardPage6();
             this.wizardPage5 = new DbExport.UI.Controls.WizardPage5();
@@ -44,6 +39,11 @@ namespace DbExport.UI.Forms
             this.wizardPage3 = new DbExport.UI.Controls.WizardPage3();
             this.wizardPage2 = new DbExport.UI.Controls.WizardPage2();
             this.wizardPage1 = new DbExport.UI.Controls.WizardPage1();
+            this.pnlNavBar = new System.Windows.Forms.Panel();
+            this.btnPrevious = new System.Windows.Forms.Button();
+            this.btnQuit = new System.Windows.Forms.Button();
+            this.btnDone = new System.Windows.Forms.Button();
+            this.btnNext = new System.Windows.Forms.Button();
             this.pnlActivePage.SuspendLayout();
             this.pnlNavBar.SuspendLayout();
             this.SuspendLayout();
@@ -63,69 +63,6 @@ namespace DbExport.UI.Forms
             this.pnlActivePage.Name = "pnlActivePage";
             this.pnlActivePage.Size = new System.Drawing.Size(524, 351);
             this.pnlActivePage.TabIndex = 0;
-            // 
-            // pnlNavBar
-            // 
-            this.pnlNavBar.Controls.Add(this.btnPrevious);
-            this.pnlNavBar.Controls.Add(this.btnQuit);
-            this.pnlNavBar.Controls.Add(this.btnDone);
-            this.pnlNavBar.Controls.Add(this.btnNext);
-            this.pnlNavBar.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlNavBar.Location = new System.Drawing.Point(0, 351);
-            this.pnlNavBar.Margin = new System.Windows.Forms.Padding(4);
-            this.pnlNavBar.Name = "pnlNavBar";
-            this.pnlNavBar.Size = new System.Drawing.Size(524, 50);
-            this.pnlNavBar.TabIndex = 1;
-            this.pnlNavBar.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlNavBar_Paint);
-            // 
-            // btnPrevious
-            // 
-            this.btnPrevious.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnPrevious.Location = new System.Drawing.Point(332, 10);
-            this.btnPrevious.Margin = new System.Windows.Forms.Padding(4);
-            this.btnPrevious.Name = "btnPrevious";
-            this.btnPrevious.Size = new System.Drawing.Size(88, 30);
-            this.btnPrevious.TabIndex = 1;
-            this.btnPrevious.Text = "Previous";
-            this.btnPrevious.UseVisualStyleBackColor = true;
-            this.btnPrevious.Click += new System.EventHandler(this.btnPrevious_Click);
-            // 
-            // btnQuit
-            // 
-            this.btnQuit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnQuit.Location = new System.Drawing.Point(237, 10);
-            this.btnQuit.Margin = new System.Windows.Forms.Padding(4);
-            this.btnQuit.Name = "btnQuit";
-            this.btnQuit.Size = new System.Drawing.Size(88, 30);
-            this.btnQuit.TabIndex = 0;
-            this.btnQuit.Text = "Quit";
-            this.btnQuit.UseVisualStyleBackColor = true;
-            this.btnQuit.Click += new System.EventHandler(this.btnQuit_Click);
-            // 
-            // btnDone
-            // 
-            this.btnDone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDone.Location = new System.Drawing.Point(426, 10);
-            this.btnDone.Margin = new System.Windows.Forms.Padding(4);
-            this.btnDone.Name = "btnDone";
-            this.btnDone.Size = new System.Drawing.Size(88, 30);
-            this.btnDone.TabIndex = 3;
-            this.btnDone.Text = "Done";
-            this.btnDone.UseVisualStyleBackColor = true;
-            this.btnDone.Visible = false;
-            this.btnDone.Click += new System.EventHandler(this.btnDone_Click);
-            // 
-            // btnNext
-            // 
-            this.btnNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnNext.Location = new System.Drawing.Point(425, 11);
-            this.btnNext.Margin = new System.Windows.Forms.Padding(4);
-            this.btnNext.Name = "btnNext";
-            this.btnNext.Size = new System.Drawing.Size(88, 30);
-            this.btnNext.TabIndex = 2;
-            this.btnNext.Text = "Next";
-            this.btnNext.UseVisualStyleBackColor = true;
-            this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
             // 
             // wizardPage7
             // 
@@ -200,6 +137,69 @@ namespace DbExport.UI.Forms
             this.wizardPage1.Name = "wizardPage1";
             this.wizardPage1.Size = new System.Drawing.Size(524, 351);
             this.wizardPage1.TabIndex = 0;
+            // 
+            // pnlNavBar
+            // 
+            this.pnlNavBar.Controls.Add(this.btnPrevious);
+            this.pnlNavBar.Controls.Add(this.btnQuit);
+            this.pnlNavBar.Controls.Add(this.btnDone);
+            this.pnlNavBar.Controls.Add(this.btnNext);
+            this.pnlNavBar.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnlNavBar.Location = new System.Drawing.Point(0, 351);
+            this.pnlNavBar.Margin = new System.Windows.Forms.Padding(4);
+            this.pnlNavBar.Name = "pnlNavBar";
+            this.pnlNavBar.Size = new System.Drawing.Size(524, 50);
+            this.pnlNavBar.TabIndex = 1;
+            this.pnlNavBar.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlNavBar_Paint);
+            // 
+            // btnPrevious
+            // 
+            this.btnPrevious.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPrevious.Location = new System.Drawing.Point(332, 10);
+            this.btnPrevious.Margin = new System.Windows.Forms.Padding(4);
+            this.btnPrevious.Name = "btnPrevious";
+            this.btnPrevious.Size = new System.Drawing.Size(88, 30);
+            this.btnPrevious.TabIndex = 1;
+            this.btnPrevious.Text = "Previous";
+            this.btnPrevious.UseVisualStyleBackColor = true;
+            this.btnPrevious.Click += new System.EventHandler(this.btnPrevious_Click);
+            // 
+            // btnQuit
+            // 
+            this.btnQuit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnQuit.Location = new System.Drawing.Point(237, 10);
+            this.btnQuit.Margin = new System.Windows.Forms.Padding(4);
+            this.btnQuit.Name = "btnQuit";
+            this.btnQuit.Size = new System.Drawing.Size(88, 30);
+            this.btnQuit.TabIndex = 0;
+            this.btnQuit.Text = "Quit";
+            this.btnQuit.UseVisualStyleBackColor = true;
+            this.btnQuit.Click += new System.EventHandler(this.btnQuit_Click);
+            // 
+            // btnDone
+            // 
+            this.btnDone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDone.Location = new System.Drawing.Point(426, 10);
+            this.btnDone.Margin = new System.Windows.Forms.Padding(4);
+            this.btnDone.Name = "btnDone";
+            this.btnDone.Size = new System.Drawing.Size(88, 30);
+            this.btnDone.TabIndex = 3;
+            this.btnDone.Text = "Done";
+            this.btnDone.UseVisualStyleBackColor = true;
+            this.btnDone.Visible = false;
+            this.btnDone.Click += new System.EventHandler(this.btnDone_Click);
+            // 
+            // btnNext
+            // 
+            this.btnNext.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnNext.Location = new System.Drawing.Point(425, 11);
+            this.btnNext.Margin = new System.Windows.Forms.Padding(4);
+            this.btnNext.Name = "btnNext";
+            this.btnNext.Size = new System.Drawing.Size(88, 30);
+            this.btnNext.TabIndex = 2;
+            this.btnNext.Text = "Next";
+            this.btnNext.UseVisualStyleBackColor = true;
+            this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
             // 
             // MainForm
             // 

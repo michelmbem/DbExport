@@ -1,5 +1,7 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Text;
 using System.Windows.Forms;
 
@@ -18,6 +20,8 @@ namespace DbExport.UI.Controls
 
     public partial class DataFileConnectionPane : UserControl
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(DataFileConnectionPane));
+        
         private string providerName;
         
         public DataFileConnectionPane()
@@ -31,7 +35,7 @@ namespace DbExport.UI.Controls
         [Browsable(false)]
         public string ProviderName
         {
-            get { return providerName; }
+            get => providerName;
             set
             {
                 if (providerName == value) return;
@@ -58,7 +62,7 @@ namespace DbExport.UI.Controls
                         if (txtPassword.Text.Trim().Length > 0) sb.AppendFormat(";Password={0}", txtPassword.Text);
                         break;
                     case "LocalDB":
-                        sb.AppendFormat("Data Source=(LocalDB)\\v11.0;AttachDbFilename=\"{0}\";Integrated Security=True", txtDataFile.Text);
+                        sb.AppendFormat("Data Source=(LocalDB)\\{0};AttachDbFilename=\"{1}\";Integrated Security=True", cboInstance.Text, txtDataFile.Text);
                         break;
                     case "System.Data.SQLite":
                         sb.AppendFormat("Data Source=\"{0}\"", txtDataFile.Text);
@@ -84,17 +88,54 @@ namespace DbExport.UI.Controls
             {
                 case "System.Data.OleDb":
                     txtUserID.Enabled = txtPassword.Enabled = true;
+                    lblInstance.Visible = cboInstance.Visible = false;
                     break;
                 case "LocalDB":
                     txtUserID.Clear();
                     txtPassword.Clear();
                     txtUserID.Enabled = txtPassword.Enabled = false;
+                    lblInstance.Visible = cboInstance.Visible = true;
+                    LoadLocalDbInstances();
                     break;
                 case "System.Data.SQLite":
                     txtUserID.Clear();
                     txtUserID.Enabled = false;
                     txtPassword.Enabled = true;
+                    lblInstance.Visible = cboInstance.Visible = false;
                     break;
+            }
+        }
+
+        private void LoadLocalDbInstances()
+        {
+            cboInstance.Items.Clear();
+
+            try
+            {
+                var sqllocaldb_info = new Process();
+                sqllocaldb_info.StartInfo.FileName = "cmd.exe";
+                sqllocaldb_info.StartInfo.Arguments = "/C sqllocaldb info";
+                sqllocaldb_info.StartInfo.UseShellExecute = false;
+                sqllocaldb_info.StartInfo.RedirectStandardOutput = true;
+                sqllocaldb_info.StartInfo.CreateNoWindow = true;
+                sqllocaldb_info.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                sqllocaldb_info.Start();
+
+                string sOutput = sqllocaldb_info.StandardOutput.ReadToEnd();
+                sqllocaldb_info.WaitForExit();
+
+                if (string.IsNullOrWhiteSpace(sOutput) || sOutput.Contains("not recognized")) return;
+
+                string[] instances = sOutput.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                foreach (var instance in instances)
+                {
+                    if (string.IsNullOrWhiteSpace(instance)) continue;
+                    cboInstance.Items.Add(instance);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Debug(ex);
             }
         }
 

@@ -43,7 +43,7 @@ namespace DbExport.Providers
             {
                 case "System.Data.SqlClient":
                     return new SqlClient.SqlCodeGenerator(output);
-                case "System.Data.OracleClient":
+                case "Oracle.ManagedDataAccess.Client":
                     return new OracleClient.OracleCodeGenerator(output);
                 case "MySql.Data.MySqlClient":
                     return new MySqlClient.MySqlCodeGenerator(output);

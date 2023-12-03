@@ -14,7 +14,7 @@ namespace DbExport.Providers
                     return new Access.AccessSchemaProvider(connectionString);
                 case "System.Data.SqlClient":
                     return new SqlClient.SqlSchemaProvider(connectionString);
-                case "System.Data.OracleClient":
+                case "Oracle.ManagedDataAccess.Client":
                     return new OracleClient.OracleSchemaProvider(connectionString);
                 case "MySql.Data.MySqlClient":
                     return new MySqlClient.MySqlSchemaProvider(connectionString);

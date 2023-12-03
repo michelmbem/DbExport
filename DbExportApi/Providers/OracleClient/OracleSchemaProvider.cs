@@ -24,7 +24,7 @@ namespace DbExport.Providers.OracleClient
 
         public string ProviderName
         {
-            get { return "System.Data.OracleClient"; }
+            get { return "Oracle.ManagedDataAccess.Client"; }
         }
 
         public string ConnectionString

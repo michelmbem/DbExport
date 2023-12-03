@@ -35,6 +35,8 @@ namespace DbExport.UI.Controls
             this.lblHost = new System.Windows.Forms.Label();
             this.txtDataFile = new System.Windows.Forms.TextBox();
             this.btnBrowse = new System.Windows.Forms.Button();
+            this.cboInstance = new System.Windows.Forms.ComboBox();
+            this.lblInstance = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // txtPassword
@@ -46,7 +48,7 @@ namespace DbExport.UI.Controls
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(206, 25);
-            this.txtPassword.TabIndex = 6;
+            this.txtPassword.TabIndex = 8;
             this.txtPassword.UseSystemPasswordChar = true;
             // 
             // lblPassword
@@ -56,7 +58,7 @@ namespace DbExport.UI.Controls
             this.lblPassword.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPassword.Name = "lblPassword";
             this.lblPassword.Size = new System.Drawing.Size(67, 17);
-            this.lblPassword.TabIndex = 5;
+            this.lblPassword.TabIndex = 7;
             this.lblPassword.Text = "Password:";
             // 
             // txtUserID
@@ -67,7 +69,7 @@ namespace DbExport.UI.Controls
             this.txtUserID.Margin = new System.Windows.Forms.Padding(4);
             this.txtUserID.Name = "txtUserID";
             this.txtUserID.Size = new System.Drawing.Size(206, 25);
-            this.txtUserID.TabIndex = 4;
+            this.txtUserID.TabIndex = 6;
             // 
             // lblUserID
             // 
@@ -76,7 +78,7 @@ namespace DbExport.UI.Controls
             this.lblUserID.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblUserID.Name = "lblUserID";
             this.lblUserID.Size = new System.Drawing.Size(54, 17);
-            this.lblUserID.TabIndex = 3;
+            this.lblUserID.TabIndex = 5;
             this.lblUserID.Text = "User ID:";
             // 
             // lblHost
@@ -107,14 +109,37 @@ namespace DbExport.UI.Controls
             this.btnBrowse.Margin = new System.Windows.Forms.Padding(4);
             this.btnBrowse.Name = "btnBrowse";
             this.btnBrowse.Size = new System.Drawing.Size(88, 30);
-            this.btnBrowse.TabIndex = 2;
+            this.btnBrowse.TabIndex = 4;
             this.btnBrowse.Text = "Browse";
             this.btnBrowse.UseVisualStyleBackColor = true;
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
+            // cboInstance
+            // 
+            this.cboInstance.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cboInstance.FormattingEnabled = true;
+            this.cboInstance.Location = new System.Drawing.Point(83, 97);
+            this.cboInstance.Margin = new System.Windows.Forms.Padding(4);
+            this.cboInstance.Name = "cboInstance";
+            this.cboInstance.Size = new System.Drawing.Size(110, 25);
+            this.cboInstance.TabIndex = 3;
+            // 
+            // lblInstance
+            // 
+            this.lblInstance.AutoSize = true;
+            this.lblInstance.Location = new System.Drawing.Point(17, 101);
+            this.lblInstance.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblInstance.Name = "lblInstance";
+            this.lblInstance.Size = new System.Drawing.Size(58, 17);
+            this.lblInstance.TabIndex = 2;
+            this.lblInstance.Text = "Instance:";
+            // 
             // DataFileConnectionPane
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.Controls.Add(this.cboInstance);
+            this.Controls.Add(this.lblInstance);
             this.Controls.Add(this.btnBrowse);
             this.Controls.Add(this.txtDataFile);
             this.Controls.Add(this.txtPassword);
@@ -140,5 +165,7 @@ namespace DbExport.UI.Controls
         private System.Windows.Forms.Label lblHost;
         private System.Windows.Forms.TextBox txtDataFile;
         private System.Windows.Forms.Button btnBrowse;
+        private System.Windows.Forms.ComboBox cboInstance;
+        private System.Windows.Forms.Label lblInstance;
     }
 }

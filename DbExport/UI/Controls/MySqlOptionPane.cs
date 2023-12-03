@@ -17,15 +17,12 @@ namespace DbExport.UI.Controls
         [Browsable(false)]
         public MySqlOptions Options
         {
-            get
-            {
-                return new MySqlOptions
-                           {
-                               StorageEngine = cboStorageEngine.Text,
-                               CharacterSet = cboCharSet.Text,
-                               SortOrder = cboSortOrder.Text
-                           };
-            }
+            get => new MySqlOptions
+                {
+                    StorageEngine = cboStorageEngine.Text,
+                    CharacterSet = cboCharSet.Text,
+                    SortOrder = cboSortOrder.Text
+                };
             set
             {
                 if (value == null)

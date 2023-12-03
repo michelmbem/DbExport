@@ -128,7 +128,7 @@ namespace DbExport
                 case "System.Data.SqlClient":
                     ExecuteSqlScript(script);
                     break;
-                case "System.Data.OracleClient":
+                case "Oracle.ManagedDataAccess.Client":
                     ExecuteOracleScript(script);
                     break;
                 default:

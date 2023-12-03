@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using System.Windows.Forms;
@@ -20,7 +19,7 @@ namespace DbExport.UI.Controls
         [Browsable(false)]
         public string ProviderName
         {
-            get { return providerName; }
+            get => providerName;
             set
             {
                 if (providerName == value) return;
@@ -30,10 +29,7 @@ namespace DbExport.UI.Controls
         }
 
         [Browsable(false)]
-        public string ConnectionString
-        {
-            get { return GetConnectionString(true); }
-        }
+        public string ConnectionString => GetConnectionString(true);
 
         public void Reset()
         {
@@ -48,12 +44,9 @@ namespace DbExport.UI.Controls
 
         private void OnProviderNameChanged()
         {
-            var notOracle = !providerName.Contains("Oracle");
-
-            lblDatabase.Visible = notOracle;
-            cboDatabase.Visible = notOracle;
-            
-            if (providerName.Contains("MySql") || providerName.Equals("Npgsql"))
+            if (providerName.Contains("Oracle") ||
+                providerName.Contains("MySql") ||
+                providerName.Equals("Npgsql"))
             {
                 chkTrustedCnx.Checked = false;
                 chkTrustedCnx.Enabled = false;
@@ -77,23 +70,36 @@ namespace DbExport.UI.Controls
 
             var sb = new StringBuilder();
 
-            sb.Append("Server=").Append(txtHost.Text);
+            if (providerName.Contains("Oracle"))
+            {
+                sb.Append("Data Source=").Append(txtHost.Text);
+                if (txtPort.Text.Trim().Length > 0)
+                    sb.Append(":").Append(txtPort.Text);
+                sb.Append("/").Append(cboDatabase.Text);
 
-            if (txtPort.Text.Trim().Length > 0)
-                sb.Append(";Port=").Append(txtPort.Text);
-
-            if (chkTrustedCnx.Checked)
-                sb.Append(";Integrated Security=YES");
+                sb.Append(";User Id=").Append(txtUserID.Text);
+                sb.Append(";Password=").Append(txtPassword.Text);
+            }
             else
             {
-                sb.Append(";UID=").Append(txtUserID.Text);
-                sb.Append(";PWD=").Append(txtPassword.Text);
-            }
+                sb.Append("Server=").Append(txtHost.Text);
 
-            if (includeDatabase && cboDatabase.Visible)
-                sb.Append(";Database=").Append(cboDatabase.Text);
-            else if (providerName == "Npgsql")
-                sb.Append(";Database=postgres");
+                if (txtPort.Text.Trim().Length > 0)
+                    sb.Append(";Port=").Append(txtPort.Text);
+
+                if (chkTrustedCnx.Checked)
+                    sb.Append(";Integrated Security=YES");
+                else
+                {
+                    sb.Append(";UID=").Append(txtUserID.Text);
+                    sb.Append(";PWD=").Append(txtPassword.Text);
+                }
+
+                if (includeDatabase)
+                    sb.Append(";Database=").Append(cboDatabase.Text);
+                else if (providerName == "Npgsql")
+                    sb.Append(";Database=postgres");
+            }
 
             return sb.ToString();
         }
@@ -131,10 +137,8 @@ namespace DbExport.UI.Controls
             {
                 using (var helper = new SqlHelper(providerName, conStr))
                 {
-                    var list = helper.Query<List<object>>(sql, SqlHelper.FetchList);
-
-                    foreach (object item in list)
-                        cboDatabase.Items.Add(item);
+                    helper.Query(sql, SqlHelper.FetchList)
+                          .ForEach(item => cboDatabase.Items.Add(item));
                 }
             }
             catch (Exception ex)

@@ -1,7 +1,5 @@
-﻿using System;
+﻿using DbExport.Providers.SQLite.SqlParser;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DbExport.Providers.SQLite.SqlParser;
-using System.Collections.Generic;
 
 namespace DbExportTest
 {

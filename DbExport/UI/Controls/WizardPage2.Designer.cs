@@ -133,7 +133,7 @@ namespace DbExport.UI.Controls
             // lblProvider
             // 
             this.lblProvider.AutoSize = true;
-            this.lblProvider.Location = new System.Drawing.Point(9, 24);
+            this.lblProvider.Location = new System.Drawing.Point(17, 24);
             this.lblProvider.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblProvider.Name = "lblProvider";
             this.lblProvider.Size = new System.Drawing.Size(60, 17);

@@ -434,10 +434,30 @@ namespace DbExport.UI.Forms
             }
 
             var settings = Utility.ParseConnectionString(ConnectionString);
-            var svr = settings["server"];
-            var uid = settings.ContainsKey("uid") ? settings["uid"] : string.Empty;
-            var pwd = settings.ContainsKey("pwd") ? settings["pwd"] : string.Empty;
-            var dbName = settings.ContainsKey("database") ? settings["database"] : string.Empty;
+
+            var svr = string.Empty;
+            if (settings.ContainsKey("data source"))
+                svr = settings["data source"];
+            else if (settings.ContainsKey("server"))
+                svr = settings["server"];
+            
+            var uid = string.Empty;
+            if (settings.ContainsKey("user id"))
+                uid = settings["user id"];
+            else if (settings.ContainsKey("uid"))
+                uid = settings["uid"];
+
+            var pwd = string.Empty;
+            if (settings.ContainsKey("password"))
+                pwd = settings["password"];
+            else if (settings.ContainsKey("pwd"))
+                pwd = settings["pwd"];
+
+            var dbName = string.Empty;
+            if (settings.ContainsKey("initial catalog"))
+                dbName = settings["initial catalog"];
+            else if (settings.ContainsKey("database"))
+                dbName = settings["database"];
 
             var arguments = argsFormat.Replace("${server}", svr)
                 .Replace("${uid}", uid)
