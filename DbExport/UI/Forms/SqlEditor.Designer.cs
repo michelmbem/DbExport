@@ -41,13 +41,11 @@ namespace DbExport.UI.Forms
             this.tsbCopy = new System.Windows.Forms.ToolStripButton();
             this.tsbPaste = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.tscFind = new System.Windows.Forms.ToolStripComboBox();
             this.tsbFind = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.tsbConnect = new System.Windows.Forms.ToolStripButton();
             this.tsbRun = new System.Windows.Forms.ToolStripButton();
             this.pnlContent = new System.Windows.Forms.Panel();
-            this.sciEditor = new ScintillaNET.Scintilla();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusItemMain = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusItemCaretInfo = new System.Windows.Forms.ToolStripStatusLabel();
@@ -94,7 +92,6 @@ namespace DbExport.UI.Forms
             this.sQLHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip.SuspendLayout();
             this.pnlContent.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.sciEditor)).BeginInit();
             this.statusStrip.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -114,7 +111,6 @@ namespace DbExport.UI.Forms
             this.tsbCopy,
             this.tsbPaste,
             this.toolStripSeparator3,
-            this.tscFind,
             this.tsbFind,
             this.toolStripSeparator4,
             this.tsbConnect,
@@ -220,14 +216,6 @@ namespace DbExport.UI.Forms
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(6, 31);
             // 
-            // tscFind
-            // 
-            this.tscFind.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.tscFind.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.tscFind.Name = "tscFind";
-            this.tscFind.Size = new System.Drawing.Size(140, 31);
-            this.tscFind.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tscFind_KeyUp);
-            // 
             // tsbFind
             // 
             this.tsbFind.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -265,8 +253,7 @@ namespace DbExport.UI.Forms
             // 
             // pnlContent
             // 
-            this.pnlContent.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pnlContent.Controls.Add(this.sciEditor);
+            this.pnlContent.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pnlContent.Controls.Add(this.statusStrip);
             this.pnlContent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlContent.Location = new System.Drawing.Point(0, 56);
@@ -274,40 +261,6 @@ namespace DbExport.UI.Forms
             this.pnlContent.Name = "pnlContent";
             this.pnlContent.Size = new System.Drawing.Size(884, 605);
             this.pnlContent.TabIndex = 1;
-            // 
-            // sciEditor
-            // 
-            this.sciEditor.CaretLineBackColor = System.Drawing.Color.Lavender;
-            this.sciEditor.CaretLineVisible = true;
-            //this.sciEditor.ConfigurationManager.CustomLocation = "sql.xml";
-            //this.sciEditor.ConfigurationManager.Language = "sql";
-            this.sciEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            //this.sciEditor.Folding.IsEnabled = false;
-            //this.sciEditor.Indentation.SmartIndentType = ScintillaNet.SmartIndent.Simple;
-            //this.sciEditor.Indentation.TabWidth = 4;
-            //this.sciEditor.IsBraceMatching = true;
-            this.sciEditor.Location = new System.Drawing.Point(0, 0);
-            this.sciEditor.Margin = new System.Windows.Forms.Padding(4);
-            //this.sciEditor.Margins.Margin0.Width = 40;
-            //this.sciEditor.Margins.Margin1.Width = 0;
-            //this.sciEditor.Margins.Margin2.Width = 16;
-            this.sciEditor.Name = "sciEditor";
-            //this.sciEditor.Scrolling.HorizontalWidth = 1;
-            this.sciEditor.Size = new System.Drawing.Size(880, 572);
-            //this.sciEditor.Styles.Bits = 0;
-            //this.sciEditor.Styles.BraceBad.FontName = "Verdana";
-            //this.sciEditor.Styles.BraceLight.FontName = "Verdana";
-            //this.sciEditor.Styles.ControlChar.FontName = "Verdana";
-            //this.sciEditor.Styles.Default.FontName = "Verdana";
-            //this.sciEditor.Styles.IndentGuide.FontName = "Verdana";
-            //this.sciEditor.Styles.LastPredefined.FontName = "Verdana";
-            //this.sciEditor.Styles.LineNumber.FontName = "Verdana";
-            //this.sciEditor.Styles.LineNumber.IsChangeable = false;
-            //this.sciEditor.Styles.Max.FontName = "Verdana";
-            this.sciEditor.TabIndex = 1;
-            //this.sciEditor.TextInserted += new System.EventHandler<ScintillaNet.TextModifiedEventArgs>(this.sciEditor_TextLengthChanged);
-            //this.sciEditor.TextDeleted += new System.EventHandler<ScintillaNet.TextModifiedEventArgs>(this.sciEditor_TextLengthChanged);
-            //this.sciEditor.SelectionChanged += new System.EventHandler(this.sciEditor_SelectionChanged);
             // 
             // statusStrip
             // 
@@ -317,18 +270,18 @@ namespace DbExport.UI.Forms
             this.statusItemInsLock,
             this.statusItemCapsLock,
             this.statusItemNumLock});
-            this.statusStrip.Location = new System.Drawing.Point(0, 572);
+            this.statusStrip.Location = new System.Drawing.Point(0, 574);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Padding = new System.Windows.Forms.Padding(1, 0, 16, 0);
-            this.statusStrip.Size = new System.Drawing.Size(880, 29);
-            this.statusStrip.TabIndex = 0;
+            this.statusStrip.Size = new System.Drawing.Size(882, 29);
+            this.statusStrip.TabIndex = 2;
             this.statusStrip.Text = "statusStrip1";
             // 
             // statusItemMain
             // 
             this.statusItemMain.AutoSize = false;
             this.statusItemMain.Name = "statusItemMain";
-            this.statusItemMain.Size = new System.Drawing.Size(593, 24);
+            this.statusItemMain.Size = new System.Drawing.Size(595, 24);
             this.statusItemMain.Spring = true;
             this.statusItemMain.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -392,27 +345,27 @@ namespace DbExport.UI.Forms
             this.saveToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("saveToolStripMenuItem.Image")));
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "&Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveasToolStripMenuItem
             // 
             this.saveasToolStripMenuItem.Name = "saveasToolStripMenuItem";
-            this.saveasToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.saveasToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveasToolStripMenuItem.Text = "Save &as...";
             this.saveasToolStripMenuItem.Click += new System.EventHandler(this.saveasToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(138, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(177, 6);
             // 
             // pageSetupToolStripMenuItem
             // 
             this.pageSetupToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("pageSetupToolStripMenuItem.Image")));
             this.pageSetupToolStripMenuItem.Name = "pageSetupToolStripMenuItem";
-            this.pageSetupToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.pageSetupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pageSetupToolStripMenuItem.Text = "Page se&tup...";
             this.pageSetupToolStripMenuItem.Click += new System.EventHandler(this.pageSetupToolStripMenuItem_Click);
             // 
@@ -421,19 +374,19 @@ namespace DbExport.UI.Forms
             this.printToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("printToolStripMenuItem.Image")));
             this.printToolStripMenuItem.Name = "printToolStripMenuItem";
             this.printToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-            this.printToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.printToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.printToolStripMenuItem.Text = "&Print";
             this.printToolStripMenuItem.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(138, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
             // 
             // quitToolStripMenuItem
             // 
             this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.quitToolStripMenuItem.Text = "&Quit";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
             // 
@@ -460,7 +413,7 @@ namespace DbExport.UI.Forms
             // 
             this.undoToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("undoToolStripMenuItem.Image")));
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
-            this.undoToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.undoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.undoToolStripMenuItem.Text = "&Undo";
             this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
             // 
@@ -468,21 +421,21 @@ namespace DbExport.UI.Forms
             // 
             this.redoToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("redoToolStripMenuItem.Image")));
             this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
-            this.redoToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.redoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.redoToolStripMenuItem.Text = "&Redo";
             this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(155, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
             // 
             // cutToolStripMenuItem
             // 
             this.cutToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("cutToolStripMenuItem.Image")));
             this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
             this.cutToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.cutToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.cutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cutToolStripMenuItem.Text = "&Cut";
             this.cutToolStripMenuItem.Click += new System.EventHandler(this.cutToolStripMenuItem_Click);
             // 
@@ -491,7 +444,7 @@ namespace DbExport.UI.Forms
             this.copyToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("copyToolStripMenuItem.Image")));
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
             this.copyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.copyToolStripMenuItem.Text = "C&opy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
             // 
@@ -500,40 +453,40 @@ namespace DbExport.UI.Forms
             this.pasteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("pasteToolStripMenuItem.Image")));
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
             this.pasteToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.pasteToolStripMenuItem.Text = "&Paste";
             this.pasteToolStripMenuItem.Click += new System.EventHandler(this.pasteToolStripMenuItem_Click);
             // 
             // clearToolStripMenuItem
             // 
             this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
-            this.clearToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.clearToolStripMenuItem.Text = "&Delete";
             this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
             // 
             // toolStripMenuItem6
             // 
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(155, 6);
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(177, 6);
             // 
             // selectAllToolStripMenuItem
             // 
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.selectAllToolStripMenuItem.Text = "&Select all";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
             // 
             // toolStripMenuItem7
             // 
             this.toolStripMenuItem7.Name = "toolStripMenuItem7";
-            this.toolStripMenuItem7.Size = new System.Drawing.Size(155, 6);
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(177, 6);
             // 
             // findToolStripMenuItem
             // 
             this.findToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("findToolStripMenuItem.Image")));
             this.findToolStripMenuItem.Name = "findToolStripMenuItem";
             this.findToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.findToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.findToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.findToolStripMenuItem.Text = "&Find...";
             this.findToolStripMenuItem.Click += new System.EventHandler(this.findToolStripMenuItem_Click);
             // 
@@ -541,7 +494,7 @@ namespace DbExport.UI.Forms
             // 
             this.replaceToolStripMenuItem.Name = "replaceToolStripMenuItem";
             this.replaceToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
-            this.replaceToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.replaceToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.replaceToolStripMenuItem.Text = "R&eplace";
             this.replaceToolStripMenuItem.Click += new System.EventHandler(this.replaceToolStripMenuItem_Click);
             // 
@@ -654,7 +607,7 @@ namespace DbExport.UI.Forms
             this.helpToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("helpToolStripMenuItem.Image")));
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.helpToolStripMenuItem.Text = "&Help";
             this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
@@ -696,7 +649,6 @@ namespace DbExport.UI.Forms
             this.toolStrip.PerformLayout();
             this.pnlContent.ResumeLayout(false);
             this.pnlContent.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.sciEditor)).EndInit();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.menuStrip.ResumeLayout(false);
@@ -712,7 +664,6 @@ namespace DbExport.UI.Forms
         private System.Windows.Forms.Panel pnlContent;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.MenuStrip menuStrip;
-        private ScintillaNET.Scintilla sciEditor;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveasToolStripMenuItem;
@@ -759,7 +710,6 @@ namespace DbExport.UI.Forms
         private System.Windows.Forms.ToolStripButton tsbCut;
         private System.Windows.Forms.ToolStripButton tsbCopy;
         private System.Windows.Forms.ToolStripButton tsbPaste;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton tsbFind;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripButton tsbConnect;
@@ -767,9 +717,9 @@ namespace DbExport.UI.Forms
         private System.Windows.Forms.ToolStripStatusLabel statusItemMain;
         private System.Windows.Forms.ToolStripStatusLabel statusItemCaretInfo;
         private System.Windows.Forms.ToolStripStatusLabel statusItemInsLock;
-        private System.Windows.Forms.ToolStripComboBox tscFind;
         private System.Windows.Forms.ToolStripStatusLabel statusItemCapsLock;
         private System.Windows.Forms.ToolStripStatusLabel statusItemNumLock;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem10;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
     }
 }

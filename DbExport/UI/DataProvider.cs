@@ -6,7 +6,7 @@
             new DataProvider("System.Data.OleDb", "Access 2000 (.mdb files)"),
             new DataProvider("LocalDB", "SQL Server data file"),
             new DataProvider("System.Data.SqlClient", "SQL Server (2005 and above)"),
-            new DataProvider("System.Data.OracleClient", "Oracle (10g and above)"),
+            new DataProvider("Oracle.ManagedDataAccess.Client", "Oracle (10g and above)"),
             new DataProvider("MySql.Data.MySqlClient", "MySQL (5.0 and above)"),
             new DataProvider("Npgsql", "PostgreSQL (8.0 and above)"),
             new DataProvider("System.Data.SQLite", "SQLite 3")

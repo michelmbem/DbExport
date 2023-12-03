@@ -15,6 +15,8 @@ namespace DbExport.UI.Controls
         public WizardPage5()
         {
             InitializeComponent();
+
+            Stage = 5;
         }
 
         public string ProviderName { get; private set; }

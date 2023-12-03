@@ -37,7 +37,6 @@ namespace DbExport.UI.Controls
             this.cboProvider = new System.Windows.Forms.ComboBox();
             this.lblProvider = new System.Windows.Forms.Label();
             this.pnlContent.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).BeginInit();
             this.pnlCredentials.SuspendLayout();
             this.pnlConnectionPane.SuspendLayout();
             this.pnlProvider.SuspendLayout();
@@ -47,11 +46,6 @@ namespace DbExport.UI.Controls
             // 
             this.pnlContent.Controls.Add(this.pnlCredentials);
             this.pnlContent.Controls.Add(this.pnlProvider);
-            // 
-            // picBanner
-            // 
-            this.picBanner.Image = global::DbExport.Properties.Resources.Stage2;
-            this.picBanner.Margin = new System.Windows.Forms.Padding(5);
             // 
             // pnlCredentials
             // 
@@ -114,8 +108,6 @@ namespace DbExport.UI.Controls
             // 
             // pnlProvider
             // 
-            this.pnlProvider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlProvider.Controls.Add(this.cboProvider);
             this.pnlProvider.Controls.Add(this.lblProvider);
             this.pnlProvider.Dock = System.Windows.Forms.DockStyle.Top;
@@ -127,7 +119,7 @@ namespace DbExport.UI.Controls
             // 
             // cboProvider
             // 
-            this.cboProvider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.cboProvider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cboProvider.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboProvider.FormattingEnabled = true;
@@ -154,7 +146,6 @@ namespace DbExport.UI.Controls
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "WizardPage2";
             this.pnlContent.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).EndInit();
             this.pnlCredentials.ResumeLayout(false);
             this.pnlConnectionPane.ResumeLayout(false);
             this.pnlProvider.ResumeLayout(false);

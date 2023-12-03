@@ -37,7 +37,6 @@
             this.sqlServerConnectionPane = new DbExport.UI.Controls.SqlServerConnectionPane();
             this.btnTest = new System.Windows.Forms.Button();
             this.pnlContent.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).BeginInit();
             this.pnlProvider.SuspendLayout();
             this.pnlCredentials.SuspendLayout();
             this.pnlConnectionPane.SuspendLayout();
@@ -48,15 +47,8 @@
             this.pnlContent.Controls.Add(this.pnlCredentials);
             this.pnlContent.Controls.Add(this.pnlProvider);
             // 
-            // picBanner
-            // 
-            this.picBanner.Image = global::DbExport.Properties.Resources.Stage3;
-            this.picBanner.Margin = new System.Windows.Forms.Padding(5);
-            // 
             // pnlProvider
             // 
-            this.pnlProvider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.pnlProvider.Controls.Add(this.cboProvider);
             this.pnlProvider.Controls.Add(this.lblProvider);
             this.pnlProvider.Dock = System.Windows.Forms.DockStyle.Top;
@@ -68,7 +60,7 @@
             // 
             // cboProvider
             // 
-            this.cboProvider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.cboProvider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cboProvider.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboProvider.FormattingEnabled = true;
@@ -155,7 +147,6 @@
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "WizardPage3";
             this.pnlContent.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).EndInit();
             this.pnlProvider.ResumeLayout(false);
             this.pnlProvider.PerformLayout();
             this.pnlCredentials.ResumeLayout(false);

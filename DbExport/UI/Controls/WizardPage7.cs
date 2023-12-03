@@ -11,6 +11,8 @@ namespace DbExport.UI.Controls
         {
             InitializeComponent();
 
+            Stage = 7;
+
             cboEncoding.DataSource = Encoding.GetEncodings();
             cboEncoding.ValueMember = "CodePage";
             cboEncoding.DisplayMember = "Name";

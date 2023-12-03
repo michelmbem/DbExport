@@ -11,6 +11,8 @@ namespace DbExport.UI.Controls
         {
             InitializeComponent();
 
+            Stage = 2;
+
             cboProvider.DataSource = DataProvider.All;
             cboProvider.ValueMember = "Name";
             cboProvider.DisplayMember = "Description";

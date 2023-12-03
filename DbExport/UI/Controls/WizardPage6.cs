@@ -7,6 +7,8 @@ namespace DbExport.UI.Controls
         public WizardPage6()
         {
             InitializeComponent();
+
+            Stage = 6;
         }
 
         [Browsable(false)]

@@ -33,7 +33,6 @@ namespace DbExport.UI.Controls
             this.pnlTitle = new System.Windows.Forms.Panel();
             this.pnlSummary = new System.Windows.Forms.Panel();
             this.pnlContent.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).BeginInit();
             this.pnlTitle.SuspendLayout();
             this.pnlSummary.SuspendLayout();
             this.SuspendLayout();
@@ -43,11 +42,6 @@ namespace DbExport.UI.Controls
             this.pnlContent.Controls.Add(this.pnlSummary);
             this.pnlContent.Controls.Add(this.pnlTitle);
             this.pnlContent.Padding = new System.Windows.Forms.Padding(5);
-            // 
-            // picBanner
-            // 
-            this.picBanner.Image = global::DbExport.Properties.Resources.Stage5;
-            this.picBanner.Margin = new System.Windows.Forms.Padding(5);
             // 
             // lblTitle
             // 
@@ -101,7 +95,6 @@ namespace DbExport.UI.Controls
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "WizardPage6";
             this.pnlContent.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).EndInit();
             this.pnlTitle.ResumeLayout(false);
             this.pnlSummary.ResumeLayout(false);
             this.ResumeLayout(false);

@@ -31,17 +31,11 @@ namespace DbExport.UI.Controls
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WizardPage1));
             this.lblWelcomeMessage = new System.Windows.Forms.Label();
             this.pnlContent.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlContent
             // 
             this.pnlContent.Controls.Add(this.lblWelcomeMessage);
-            // 
-            // picBanner
-            // 
-            this.picBanner.Image = global::DbExport.Properties.Resources.Stage1;
-            this.picBanner.Margin = new System.Windows.Forms.Padding(5);
             // 
             // lblWelcomeMessage
             // 
@@ -61,7 +55,6 @@ namespace DbExport.UI.Controls
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "WizardPage1";
             this.pnlContent.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.picBanner)).EndInit();
             this.ResumeLayout(false);
 
         }

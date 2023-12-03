@@ -73,69 +73,9 @@ namespace DbExport.Properties {
         /// <summary>
         ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap DbConnect {
+        internal static System.Drawing.Bitmap data_connection {
             get {
-                object obj = ResourceManager.GetObject("DbConnect", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Stage1 {
-            get {
-                object obj = ResourceManager.GetObject("Stage1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Stage2 {
-            get {
-                object obj = ResourceManager.GetObject("Stage2", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Stage3 {
-            get {
-                object obj = ResourceManager.GetObject("Stage3", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Stage4 {
-            get {
-                object obj = ResourceManager.GetObject("Stage4", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Stage5 {
-            get {
-                object obj = ResourceManager.GetObject("Stage5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une ressource localisée de type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Stage6 {
-            get {
-                object obj = ResourceManager.GetObject("Stage6", resourceCulture);
+                object obj = ResourceManager.GetObject("data_connection", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

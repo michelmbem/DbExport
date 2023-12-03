@@ -5,6 +5,8 @@
         public WizardPage1()
         {
             InitializeComponent();
+
+            Stage = 1;
         }
     }
 }

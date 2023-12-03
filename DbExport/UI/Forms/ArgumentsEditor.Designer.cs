@@ -53,7 +53,7 @@
             this.pnlBottom.Controls.Add(this.btnOK);
             this.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlBottom.Location = new System.Drawing.Point(0, 219);
-            this.pnlBottom.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pnlBottom.Margin = new System.Windows.Forms.Padding(4);
             this.pnlBottom.Name = "pnlBottom";
             this.pnlBottom.Size = new System.Drawing.Size(334, 42);
             this.pnlBottom.TabIndex = 2;
@@ -62,7 +62,7 @@
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.Location = new System.Drawing.Point(167, 7);
-            this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(4);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(70, 30);
             this.btnCancel.TabIndex = 1;
@@ -72,7 +72,7 @@
             // btnOK
             // 
             this.btnOK.Location = new System.Drawing.Point(90, 7);
-            this.btnOK.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnOK.Margin = new System.Windows.Forms.Padding(4);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(70, 30);
             this.btnOK.TabIndex = 0;
@@ -118,7 +118,7 @@
             this.tsbUid.Image = ((System.Drawing.Image)(resources.GetObject("tsbUid.Image")));
             this.tsbUid.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbUid.Name = "tsbUid";
-            this.tsbUid.Size = new System.Drawing.Size(23, 22);
+            this.tsbUid.Size = new System.Drawing.Size(28, 28);
             this.tsbUid.Tag = "uid";
             this.tsbUid.Text = "Insert a placeholder  for the user\'s name";
             this.tsbUid.Click += new System.EventHandler(this.tsbServer_Click);
@@ -129,7 +129,7 @@
             this.tsbPwd.Image = ((System.Drawing.Image)(resources.GetObject("tsbPwd.Image")));
             this.tsbPwd.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbPwd.Name = "tsbPwd";
-            this.tsbPwd.Size = new System.Drawing.Size(23, 22);
+            this.tsbPwd.Size = new System.Drawing.Size(28, 28);
             this.tsbPwd.Tag = "pwd";
             this.tsbPwd.Text = "Insert a placeholder  for the user\'s password";
             this.tsbPwd.Click += new System.EventHandler(this.tsbServer_Click);
@@ -140,7 +140,7 @@
             this.tsbDbName.Image = ((System.Drawing.Image)(resources.GetObject("tsbDbName.Image")));
             this.tsbDbName.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbDbName.Name = "tsbDbName";
-            this.tsbDbName.Size = new System.Drawing.Size(23, 22);
+            this.tsbDbName.Size = new System.Drawing.Size(28, 28);
             this.tsbDbName.Tag = "dbName";
             this.tsbDbName.Text = "Insert a placeholder  for the database\'s name";
             this.tsbDbName.Click += new System.EventHandler(this.tsbServer_Click);
@@ -148,7 +148,7 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 31);
             // 
             // tsbFilePath
             // 
@@ -156,7 +156,7 @@
             this.tsbFilePath.Image = ((System.Drawing.Image)(resources.GetObject("tsbFilePath.Image")));
             this.tsbFilePath.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbFilePath.Name = "tsbFilePath";
-            this.tsbFilePath.Size = new System.Drawing.Size(23, 22);
+            this.tsbFilePath.Size = new System.Drawing.Size(28, 28);
             this.tsbFilePath.Tag = "filePath";
             this.tsbFilePath.Text = "Insert a placeholder  for the full file\'s path";
             this.tsbFilePath.Click += new System.EventHandler(this.tsbServer_Click);
@@ -167,7 +167,7 @@
             this.tsbFileName.Image = ((System.Drawing.Image)(resources.GetObject("tsbFileName.Image")));
             this.tsbFileName.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbFileName.Name = "tsbFileName";
-            this.tsbFileName.Size = new System.Drawing.Size(23, 22);
+            this.tsbFileName.Size = new System.Drawing.Size(28, 28);
             this.tsbFileName.Tag = "fileName";
             this.tsbFileName.Text = "Insert a placeholder  for the canonical file\'s name";
             this.tsbFileName.Click += new System.EventHandler(this.tsbServer_Click);
@@ -178,7 +178,7 @@
             this.tsbFileExt.Image = ((System.Drawing.Image)(resources.GetObject("tsbFileExt.Image")));
             this.tsbFileExt.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbFileExt.Name = "tsbFileExt";
-            this.tsbFileExt.Size = new System.Drawing.Size(23, 22);
+            this.tsbFileExt.Size = new System.Drawing.Size(28, 28);
             this.tsbFileExt.Tag = "fileExt";
             this.tsbFileExt.Text = "Insert a placeholder  for the file\'s extension";
             this.tsbFileExt.Click += new System.EventHandler(this.tsbServer_Click);
@@ -189,7 +189,7 @@
             this.tsbDirName.Image = ((System.Drawing.Image)(resources.GetObject("tsbDirName.Image")));
             this.tsbDirName.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbDirName.Name = "tsbDirName";
-            this.tsbDirName.Size = new System.Drawing.Size(23, 22);
+            this.tsbDirName.Size = new System.Drawing.Size(28, 28);
             this.tsbDirName.Tag = "dirName";
             this.tsbDirName.Text = "Insert a placeholder  for the directory\'s name";
             this.tsbDirName.Click += new System.EventHandler(this.tsbServer_Click);
@@ -198,7 +198,7 @@
             // 
             this.rtbArguments.Dock = System.Windows.Forms.DockStyle.Fill;
             this.rtbArguments.Location = new System.Drawing.Point(0, 31);
-            this.rtbArguments.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.rtbArguments.Margin = new System.Windows.Forms.Padding(4);
             this.rtbArguments.Name = "rtbArguments";
             this.rtbArguments.Size = new System.Drawing.Size(334, 188);
             this.rtbArguments.TabIndex = 4;
@@ -217,7 +217,7 @@
             this.Controls.Add(this.pnlBottom);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ArgumentsEditor";
