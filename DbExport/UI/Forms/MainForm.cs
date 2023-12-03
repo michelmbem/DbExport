@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -323,13 +325,11 @@ namespace DbExport.UI.Forms
         private void GenerateMdf(Database database)
         {
             var settings = Utility.ParseConnectionString(targetConnectionString);
-            var dbFilename = settings["attachdbfilename"];
 
-            using (var helper1 = new SqlHelper("System.Data.SqlClient", @"Data Source=(LocalDB)\v11.0"))
+            using (var helper1 = new SqlHelper("System.Data.SqlClient", @"Data Source=" + settings["data source"]))
             {
-                try { helper1.Execute(string.Format("DROP Database {0}", database.Name)); } catch { }
-                helper1.Execute(string.Format("CREATE Database {0} ON (Name= N'{0}', FileName='{1}')",
-                                              database.Name, dbFilename));
+                try { helper1.Execute($"DROP Database {database.Name}"); } catch { }
+                helper1.Execute($"CREATE Database {database.Name} ON (Name= N'{database.Name}', FileName='{settings["attachdbfilename"]}')");
             }
 
             var output = new StringWriter();
@@ -348,14 +348,26 @@ namespace DbExport.UI.Forms
 
         private void ShowSqlEditor()
         {
-            var sqlEditor = new SqlEditor(wizardPage7.FileName)
-                                {
-                                    ProviderName = targetProviderName,
-                                    ConnectionString = targetConnectionString
-                                };
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                var sqlEditor = new SqlEditor(wizardPage7.FileName)
+                {
+                    ProviderName = targetProviderName,
+                    ConnectionString = targetConnectionString
+                };
 
-            sqlEditor.FormClosed += (sender, e) => Close();
-            sqlEditor.Show();
+                sqlEditor.FormClosed += (sender, e) => Close();
+                sqlEditor.Show();
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("gedit", wizardPage7.FileName);
+                Close();
+            }
+            else
+            {
+                Close();
+            }
         }
 
         private bool ShouldSaveToFile()

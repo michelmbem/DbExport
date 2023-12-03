@@ -57,7 +57,7 @@ namespace DbExport.UI.Forms
         {
             sciEditor = new Scintilla
             {
-                Lexer = Lexer.Sql,
+                LexerName = "sql",
                 ScrollWidth = 1,
                 Dock = DockStyle.Fill,
                 BorderStyle = BorderStyle.None,
