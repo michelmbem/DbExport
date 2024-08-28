@@ -57,7 +57,7 @@ namespace DbExport.UI.Controls
                 switch (providerName)
                 {
                     case "System.Data.OleDb":
-                        sb.AppendFormat("Provider=Microsoft.Jet.OleDB.4.0;Data Source=\"{0}\"", txtDataFile.Text);
+                        sb.AppendFormat("Provider=Microsoft.Ace.OleDB.12.0;Data Source=\"{0}\"", txtDataFile.Text);
                         if (txtUserID.Text.Trim().Length > 0) sb.AppendFormat(";User ID={0}", txtUserID.Text);
                         if (txtPassword.Text.Trim().Length > 0) sb.AppendFormat(";Password={0}", txtPassword.Text);
                         break;

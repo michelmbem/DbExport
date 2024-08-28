@@ -3,7 +3,7 @@
     public class DataProvider
     {
         private static readonly DataProvider[] providers = {
-            new DataProvider("System.Data.OleDb", "Access (.mdb files)"),
+            new DataProvider("System.Data.OleDb", "Access (.mdb and .accdb files)"),
             new DataProvider("LocalDB", "SQL Server data file"),
             new DataProvider("System.Data.SqlClient", "SQL Server (2005 and above)"),
             new DataProvider("Oracle.ManagedDataAccess.Client", "Oracle (10g and above)"),
