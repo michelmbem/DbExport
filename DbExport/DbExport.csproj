@@ -73,7 +73,9 @@
       <HintPath>..\packages\ScintillaNET_FindReplaceDialog.1.5.5\lib\net45\ScintillaNET_FindReplaceDialog.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="System" />
+    <Reference Include="System">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />

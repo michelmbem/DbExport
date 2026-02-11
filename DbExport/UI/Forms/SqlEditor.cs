@@ -374,7 +374,7 @@ namespace DbExport.UI.Forms
                         Name = "mysql",
                         Description = "MySQL Command Line",
                         Command = "mysql",
-                        Arguments = "-h ${server} -u ${uid} –p ${pwd} < \"${filePath}\""
+                        Arguments = "-h ${server} -u ${uid} ï¿½p ${pwd} < \"${filePath}\""
                     };
                 customCommands.Add(row);
 
