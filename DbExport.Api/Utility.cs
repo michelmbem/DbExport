@@ -212,7 +212,7 @@ public static class Utility
                     break;
                 default:
                     if (b is >= 32 and < 127)
-                        sb.Append((char) b);
+                        sb.Append((char)b);
                     else
                         sb.Append(@"\\").Append(ToBaseN(b, 8).PadLeft(3, '0'));
                     break;

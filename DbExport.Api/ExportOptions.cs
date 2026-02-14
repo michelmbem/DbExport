@@ -22,4 +22,8 @@ public class ExportOptions
     public ExportFlags Flags { get; set; }
 
     public dynamic ProviderSpecific { get; set; }
+    
+    public void SetFlag(ExportFlags flag, bool value) => Flags = value ? Flags | flag : Flags & ~flag;
+    
+    public bool HasFlag(ExportFlags flag) => Flags.HasFlag(flag);
 }

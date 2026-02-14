@@ -5,11 +5,12 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using DbExport.Providers;
 using DbExport.Schema;
 
 namespace DbExport;
 
-public class SqlHelper(DbConnection connection) : IDisposable
+public sealed class SqlHelper(DbConnection connection) : IDisposable
 {
     private readonly bool disposeConnection;
 
@@ -29,7 +30,7 @@ public class SqlHelper(DbConnection connection) : IDisposable
         get
         {
             var fullName = connection.GetType().FullName;
-            var lastDot = fullName.LastIndexOf('.');
+            var lastDot = fullName!.LastIndexOf('.');
             return fullName[..lastDot];
         }
     }
@@ -40,7 +41,7 @@ public class SqlHelper(DbConnection connection) : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public TResult Query<TResult>(string sql, Func<DbDataReader, TResult> converter)
+    public TResult Query<TResult>(string sql, Func<DbDataReader, TResult> extractor)
     {
         TResult result;
 
@@ -52,7 +53,7 @@ public class SqlHelper(DbConnection connection) : IDisposable
             command.CommandText = sql;
 
             using var dataReader = command.ExecuteReader();
-            result = converter(dataReader);
+            result = extractor(dataReader);
         }
         finally
         {
@@ -106,10 +107,10 @@ public class SqlHelper(DbConnection connection) : IDisposable
     {
         switch (ProviderName)
         {
-            case "Microsoft.Data.SqlClient":
+            case ProviderNames.SQLSERVER:
                 ExecuteSqlScript(script);
                 break;
-            case "Oracle.ManagedDataAccess.Client":
+            case ProviderNames.ORACLE:
                 ExecuteOracleScript(script);
                 break;
             default:
@@ -121,17 +122,17 @@ public class SqlHelper(DbConnection connection) : IDisposable
     public static DbDataReader OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
     {
         var sb = new StringBuilder("SELECT ");
-        var comma = false;
 
-        foreach (var column in table.Columns.Where(column => (!skipIdentity || !column.IsIdentity) &&
-                                                             (!skipRowVersion || column.ColumnType != ColumnType.RowVersion)))
+        foreach (var column in table.Columns.Where(c => !((skipIdentity && c.IsIdentity) ||
+                                                          (skipRowVersion && c.ColumnType == ColumnType.RowVersion))))
         {
-            if (comma) sb.Append(", ");
-            sb.Append(Utility.Escape(column.Name, table.Database.ProviderName));
-            comma = true;
+            sb.Append(Utility.Escape(column.Name, table.Database.ProviderName))
+              .Append(", ");
         }
 
-        sb.Append(" FROM ").Append(Utility.Escape(table.Name, table.Database.ProviderName));
+        sb.Length -= 2;
+        sb.Append(" FROM ")
+          .Append(Utility.Escape(table.Name, table.Database.ProviderName));
 
         var connection = Utility.GetConnection(table.Database);
         connection.Open();
@@ -207,8 +208,8 @@ public class SqlHelper(DbConnection connection) : IDisposable
 
         return result;
     }
-    
-    protected virtual void Dispose(bool disposing)
+
+    private void Dispose(bool disposing)
     {
         if (disposing && disposeConnection)
             connection.Dispose();
@@ -225,7 +226,7 @@ public class SqlHelper(DbConnection connection) : IDisposable
             script = script[(match.Index + match.Length)..];
         }
 
-        script = Regex.Replace(script, @"[\r\n]GO[\r\n]", ";\n");
+        script = Regex.Replace(script, @"[\r\n]GO[\r\n]", ";\n", RegexOptions.IgnoreCase);
         Execute(script);
     }
 
@@ -233,6 +234,6 @@ public class SqlHelper(DbConnection connection) : IDisposable
         throw new InvalidOperationException(
             """
             The Oracle Data Provider for .NET does not support running commands in batch mode.
-            Please save the script to a file then run it using the "SQL*Plus" custom command from the "Tools" menu.
+            Please save the script to a file then run it using the "SQL*Plus" command line tool.
             """);
 }

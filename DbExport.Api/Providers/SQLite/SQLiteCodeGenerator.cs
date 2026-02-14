@@ -71,10 +71,12 @@ public class SQLiteCodeGenerator : CodeGenerator
     protected override void WriteDataMigrationPrefix()
     {
         WriteLine("PRAGMA foreign_keys = OFF;");
+        WriteLine();
     }
 
     protected override void WriteDataMigrationSuffix()
     {
+        WriteLine();
         WriteLine("PRAGMA foreign_keys = ON;");
     }
 
