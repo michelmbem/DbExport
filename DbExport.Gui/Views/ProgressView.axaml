@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DbExport.Gui.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="250"
+             x:Class="DbExport.Gui.Views.ProgressView"
+             x:DataType="vm:ProgressViewModel">
+
+  <Design.DataContext>
+    <vm:ProgressViewModel/>
+  </Design.DataContext>
+  
+  <StackPanel HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Spacing="10">
+    <ProgressBar IsIndeterminate="{Binding IsIndeterminate}"
+                 Minimum="{Binding Minimum}"
+                 Maximum="{Binding Maximum}"
+                 Value="{Binding Value}"
+                 Width="150" />
+    <TextBlock Text="{Binding Message}"
+               HorizontalAlignment="Center"/>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,80 @@
+@using System
+@using DbExport
+@using DbExport.Schema
+
+@{
+    string Bool2Str(bool value) => value ? "Yes" : "No";
+    
+    string FullColumnName(Column column)
+    {
+        return column.IsPKColumn ? $"{column.Name} \u26BF" : column.Name;
+    }
+    
+    string FullTypeName(Column column)
+    {
+        switch (column.ColumnType)
+        {
+            case ColumnType.Char:
+            case ColumnType.NChar:
+            case ColumnType.VarChar:
+            case ColumnType.NVarChar:
+                return $"{column.NativeType}({column.Size})";
+            case ColumnType.Decimal when column.Precision == 0:
+                return $"{column.NativeType}";
+            case ColumnType.Decimal when column.Scale == 0:
+                return $"{column.NativeType}({column.Precision})";
+            case ColumnType.Decimal:
+                return $"{column.NativeType}({column.Precision}, {column.Scale})";
+            default:
+                return column.NativeType;
+        }
+    }
+}
+
+## Source database
+
+| Attribute | Value |
+|----------|--------|
+| Provider | @Model.SourceProvider.Description |
+| Connection string | @Utility.SanitizeConnectionString(Model.SourceConnectionString) |
+
+## Target database
+
+| Attribute | Value |
+|----------|--------|
+| Provider | @Model.TargetProvider.Description |
+| Connection string | @Utility.SanitizeConnectionString(Model.TargetConnectionString) |
+
+## What is included in the migration?
+
+| Element | Included |
+|----------|---------|
+| Tables structure | @(Bool2Str(Model.ExportOptions.ExportSchema)) |
+| Tables contents | @(Bool2Str(Model.ExportOptions.ExportData)) |
+| Primary keys | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.ExportPrimaryKeys))) |
+| Foreign keys | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.ExportForeignKeys))) |
+| Indexes | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.ExportIndexes))) |
+| Default values | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.ExportDefaults))) |
+| Serial numbers | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.ExportIdentities))) |
+
+@if (Model.ExportOptions.ProviderSpecific != null)
+{
+    @("### Provider-specific options" + Environment.NewLine + Environment.NewLine)
+    @(Model.ExportOptions.ProviderSpecific.ToMarkdown() + Environment.NewLine)
+}
+
+## Exported items
+
+@foreach (var table in Model.Database.Tables.Where(t => t.IsChecked))
+{
+    @("### " + table.Name + Environment.NewLine + Environment.NewLine)
+
+    @("| Column | Type | Nullable | Default |" + Environment.NewLine)
+    @("|--------|------|----------|---------|" + Environment.NewLine)
+    
+    foreach (var column in table.Columns.Where(c => c.IsChecked))
+    {
+        @("| " + FullColumnName(column) + " | " + FullTypeName(column) + " | " + Bool2Str(!column.IsRequired) +
+        " | " + column.DefaultValue + " |" + Environment.NewLine)
+    }
+}

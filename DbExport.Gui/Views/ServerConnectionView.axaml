@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DbExport.Gui.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DbExport.Gui.Views.ServerConnectionView"
+             x:DataType="vm:ServerConnectionViewModel">
+
+  <Design.DataContext>
+    <vm:ServerConnectionViewModel/>
+  </Design.DataContext>
+  
+  <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto"
+        ColumnDefinitions="Auto, *"
+        RowSpacing="10"
+        ColumnSpacing="10">
+    <Label Grid.Row="0"
+           Grid.Column="0"
+           Content="Host :"
+           VerticalAlignment="Center"
+           Target="HostTextBox"/>
+    <TextBox Name="HostTextBox"
+             Grid.Row="0"
+             Grid.Column="1"
+             Text="{Binding Host}"/>
+    <Label Grid.Row="1"
+           Grid.Column="0"
+           Content="Port :"
+           VerticalAlignment="Center"
+           Target="PortTextBox"/>
+    <Grid Grid.Row="1"
+          Grid.Column="1"
+          ColumnDefinitions="Auto, *, Auto">
+      <TextBox Name="PortTextBox"
+               Grid.Column="0"
+               Text="{Binding Port}"
+               MinWidth="120"/>
+      <CheckBox Grid.Column="2"
+                Content="Use trusted connection"
+                IsChecked="{Binding TrustedConnection}"
+                IsEnabled="{Binding DataProvider.SupportsTrustedConnection}"/>
+    </Grid>
+    <Label Grid.Row="2"
+           Grid.Column="0"
+           Content="Username :"
+           VerticalAlignment="Center"
+           Target="UsernameTextBox"/>
+    <TextBox Name="UsernameTextBox"
+             Grid.Row="2"
+             Grid.Column="1"
+             Text="{Binding Username}"
+             IsEnabled="{Binding !TrustedConnection}"/>
+    <Label Grid.Row="3"
+           Grid.Column="0"
+           Content="Password :"
+           VerticalAlignment="Center"
+           Target="PasswordTextBox"/>
+    <TextBox Name="PasswordTextBox"
+             Grid.Row="3"
+             Grid.Column="1"
+             PasswordChar="*"
+             Text="{Binding Password}"
+             IsEnabled="{Binding !TrustedConnection}"/>
+    <Label Grid.Row="4"
+           Grid.Column="0"
+           Content="Database :"
+           VerticalAlignment="Center"
+           Target="DatabaseComboBox"/>
+    <ComboBox Name="DatabaseComboBox"
+             Grid.Row="4"
+             Grid.Column="1"
+             IsEditable="True"
+             HorizontalAlignment="Stretch"
+             ItemsSource="{Binding AllCatalogs}"
+             Text="{Binding Catalog}"
+             DropDownOpened="DatabaseComboBox_OnDropDownOpened"/>
+    <Button Grid.Row="5"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Content="Test connection"
+            HorizontalAlignment="Center"
+            Command="{Binding TestConnectionCommand}"/>
+  </Grid>
+</UserControl>

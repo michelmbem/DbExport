@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="https://github.com/projektanker/icons.avalonia"
+             xmlns:m="using:DbExport.Gui.Models"
+             xmlns:vm="using:DbExport.Gui.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DbExport.Gui.Views.WizardPage5View"
+             x:DataType="vm:WizardPage5ViewModel">
+
+  <Design.DataContext>
+    <vm:WizardPage5ViewModel/>
+  </Design.DataContext>
+  
+  <Grid RowDefinitions="Auto, *">
+    <Border Grid.Row="0"
+            BorderBrush="Gray"
+            BorderThickness="0, 0, 0, 1"
+            Padding="15">
+      <TextBlock Text="Items selection"
+                 FontSize="48"/>
+    </Border>
+    <ContentControl Grid.Row="1"
+                    Content="{Binding Progress}"
+                    IsVisible="{Binding IsBusy}"
+                    Background="#CC000000"
+                    ZIndex="100"/>
+    <TreeView Grid.Row="1"
+              ItemsSource="{Binding Roots}"
+              SelectionMode="Toggle">
+      <TreeView.Styles>
+        <Style Selector="TreeViewItem"  x:DataType="m:TreeNode">
+          <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+        </Style>
+      </TreeView.Styles>
+      <TreeView.ItemTemplate>
+        <TreeDataTemplate ItemsSource="{Binding Children}">
+          <StackPanel Orientation="Horizontal">
+            <CheckBox IsChecked="{Binding IsChecked}" />
+            <i:Icon Value="{Binding Icon}"
+                    Foreground="CadetBlue"/>
+            <TextBlock Text="{Binding Text}"
+                       VerticalAlignment="Center"
+                       Margin="5, 0, 0, 0"/>
+          </StackPanel>
+        </TreeDataTemplate>
+      </TreeView.ItemTemplate>
+    </TreeView>
+  </Grid>
+</UserControl>

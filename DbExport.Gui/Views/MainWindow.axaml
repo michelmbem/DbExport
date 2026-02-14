@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="https://github.com/projektanker/icons.avalonia"
+        xmlns:vm="using:DbExport.Gui.ViewModels"
+        x:Class="DbExport.Gui.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/DbExport.ico"
+        Title="Addy Database Migration Wizard"
+        Width="900"
+        Height="600"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+  
+    <Grid RowDefinitions="*, Auto"
+          ColumnDefinitions="Auto, *">
+      <ContentControl Grid.Row="0"
+                      Grid.Column="0"
+                      Content="{Binding Sidebar}"/>
+      <TransitioningContentControl Grid.Row="0"
+                                   Grid.Column="1"
+                                   Content="{Binding CurrentPage}">
+          <TransitioningContentControl.PageTransition>
+              <CompositePageTransition>
+                  <CompositePageTransition.PageTransitions>
+                      <PageSlide Duration="0:0:0.25" Orientation="Horizontal"/>
+                      <CrossFade Duration="0:0:0.25"/>
+                  </CompositePageTransition.PageTransitions>
+              </CompositePageTransition>
+          </TransitioningContentControl.PageTransition>
+      </TransitioningContentControl>
+      <Border  Grid.Row="1"
+               Grid.Column="0"
+               Grid.ColumnSpan="2"
+               BorderBrush="Gray"
+               BorderThickness="0, 1, 0, 0"
+               Padding="10">
+          <Grid ColumnDefinitions="Auto, *, Auto, Auto, Auto"
+                ColumnSpacing="5">
+              <Button Grid.Column="0"
+                      Foreground="White"
+                      Background="DodgerBlue"
+                      Command="{Binding OpenAboutDialogCommand}"
+                      CommandParameter="{Binding $parent[Window]}">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                      <i:Icon Value="fa-circle-info" />
+                      <TextBlock Text="About..." />
+                  </StackPanel>
+              </Button>
+              <Button Grid.Column="2"
+                      Command="{Binding NavigateToPreviousPageCommand}">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                      <i:Icon Value="fa-backward-step" />
+                      <TextBlock Text="Previous" />
+                  </StackPanel>
+              </Button>
+              <Button Grid.Column="3"
+                      Command="{Binding NavigateToNextPageCommand}">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                      <TextBlock Text="Next" />
+                      <i:Icon Value="fa-forward-step" />
+                  </StackPanel>
+              </Button>
+              <Button Grid.Column="4"
+                      Foreground="White"
+                      Background="Firebrick"
+                      Command="{Binding CloseCommand}"
+                      CommandParameter="{Binding $parent[Window]}"
+                      Margin="10, 0, 0, 0">
+                  <StackPanel Orientation="Horizontal" Spacing="5">
+                      <i:Icon Value="fa-right-from-bracket" />
+                      <TextBlock Text="Close" />
+                  </StackPanel>
+              </Button>
+          </Grid>
+      </Border>
+    </Grid>
+</Window>

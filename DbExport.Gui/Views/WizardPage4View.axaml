@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DbExport.Gui.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DbExport.Gui.Views.WizardPage4View"
+             x:DataType="vm:WizardPage4ViewModel">
+
+  <Design.DataContext>
+    <vm:WizardPage4ViewModel/>
+  </Design.DataContext>
+  
+  <Grid RowDefinitions="Auto, Auto, Auto, Auto">
+    <Border Grid.Row="0"
+            BorderBrush="Gray"
+            BorderThickness="0, 0, 0, 1"
+            Padding="15">
+      <TextBlock Text="Export options"
+                 FontSize="48"/>
+    </Border>
+    <HeaderedContentControl Grid.Row="1"
+                            Header="Export what?"
+                            Margin="15">
+      <WrapPanel ItemWidth="180">
+        <RadioButton Content="Structure"
+                     IsChecked="{Binding ExportSchema}"/>
+        <RadioButton Content="Data"
+                     IsChecked="{Binding ExportData}"/>
+        <RadioButton Content="Structure and data"
+                     IsChecked="{Binding ExportSchemaAndData}"/>
+      </WrapPanel>
+    </HeaderedContentControl>
+    <HeaderedContentControl Grid.Row="2"
+                            Header="Generate DDL for"
+                            Margin="15,0, 15, 15">
+      <WrapPanel ItemWidth="180">
+        <CheckBox Content="Primary keys"
+                  IsChecked="{Binding ExportPrimaryKeys}"/>
+        <CheckBox Content="Foreign keys"
+                  IsChecked="{Binding ExportForeignKeys}"/>
+        <CheckBox Content="Indexes"
+                  IsChecked="{Binding ExportIndexes}"/>
+        <CheckBox Content="Serial numbers"
+                  IsChecked="{Binding ExportIdentities}"/>
+        <CheckBox Content="Default values"
+                  IsChecked="{Binding ExportDefaults}"/>
+      </WrapPanel>
+    </HeaderedContentControl>
+    <HeaderedContentControl Grid.Row="3"
+                            IsVisible="{Binding ProviderHasOptions}"
+                            Header="{Binding ProviderOptions.Title}"
+                            Margin="15,0, 15, 15">
+      <ContentControl Content="{Binding ProviderOptions}"/>
+    </HeaderedContentControl>
+  </Grid>
+</UserControl>

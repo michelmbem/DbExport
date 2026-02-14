@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
+             xmlns:vm="using:DbExport.Gui.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DbExport.Gui.Views.WizardPage6View"
+             x:DataType="vm:WizardPage6ViewModel">
+
+  <Design.DataContext>
+    <vm:WizardPage6ViewModel/>
+  </Design.DataContext>
+  
+  <Grid RowDefinitions="Auto, *">
+    <Border Grid.Row="0"
+            BorderBrush="Gray"
+            BorderThickness="0, 0, 0, 1"
+            Padding="15">
+      <TextBlock Text="Migration summary"
+                 FontSize="48"/>
+    </Border>
+    <ContentControl Grid.Row="1"
+                    Content="{Binding Progress}"
+                    IsVisible="{Binding IsBusy}"
+                    Background="#CC000000"
+                    ZIndex="100"/>
+    <md:MarkdownScrollViewer Grid.Row="1"
+                             Markdown="{Binding SummaryText}"
+                             Margin="15"/>
+  </Grid>
+</UserControl>

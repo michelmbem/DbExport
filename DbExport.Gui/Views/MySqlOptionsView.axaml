@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DbExport.Gui.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DbExport.Gui.Views.MySqlOptionsView"
+             x:DataType="vm:MySqlOptionsViewModel">
+
+  <Design.DataContext>
+    <vm:MySqlOptionsViewModel/>
+  </Design.DataContext>
+  
+  <Grid RowDefinitions="Auto, Auto, Auto"
+        ColumnDefinitions="Auto, *"
+        RowSpacing="10"
+        ColumnSpacing="10">
+    <Label Grid.Row="0"
+           Grid.Column="0"
+           Content="Storage engine :"
+           VerticalAlignment="Center"
+           Target="StorageEngineComboBox"/>
+    <ComboBox Name="StorageEngineComboBox"
+              Grid.Row="0"
+              Grid.Column="1"
+              HorizontalAlignment="Stretch"
+              Margin="10, 0, 0, 0"
+              ItemsSource="{Binding StorageEngines}"
+              SelectedItem="{Binding StorageEngine}" />
+    <Label Grid.Row="1"
+           Grid.Column="0"
+           Content="Character set :"
+           VerticalAlignment="Center"
+           Target="CharacterSetComboBox"/>
+    <ComboBox Name="CharacterSetComboBox"
+              Grid.Row="1"
+              Grid.Column="1"
+              HorizontalAlignment="Stretch"
+              Margin="10, 0, 0, 0"
+              ItemsSource="{Binding CharacterSets}"
+              SelectedItem="{Binding CharacterSet}" />
+    <Label Grid.Row="2"
+           Grid.Column="0"
+           Content="Sort order :"
+           VerticalAlignment="Center"
+           Target="SortOrderComboBox"/>
+    <ComboBox Name="SortOrderComboBox"
+              Grid.Row="2"
+              Grid.Column="1"
+              HorizontalAlignment="Stretch"
+              Margin="10, 0, 0, 0"
+              ItemsSource="{Binding SortOrders}"
+              SelectedItem="{Binding SortOrder}" />
+  </Grid>
+</UserControl>

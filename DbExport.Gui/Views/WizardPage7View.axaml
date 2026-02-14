@@ -1,0 +1,83 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="https://github.com/projektanker/icons.avalonia"
+             xmlns:ae="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:vm="using:DbExport.Gui.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DbExport.Gui.Views.WizardPage7View"
+             x:DataType="vm:WizardPage7ViewModel"
+             AttachedToVisualTree="OnAttachedToVisualTree"
+             DetachedFromVisualTree="OnDetachedFromVisualTree">
+
+  <Design.DataContext>
+    <vm:WizardPage7ViewModel/>
+  </Design.DataContext>
+  
+  <Grid RowDefinitions="Auto, *">
+    <Border Grid.Row="0"
+            BorderBrush="Gray"
+            BorderThickness="0, 0, 0, 1"
+            Padding="15">
+      <TextBlock Text="Proceed to migration"
+                 FontSize="48"/>
+    </Border>
+    <ContentControl Grid.Row="1"
+                    Content="{Binding Progress}"
+                    IsVisible="{Binding IsBusy}"
+                    Background="#CC000000"
+                    ZIndex="100"/>
+    <DockPanel Grid.Row="1">
+      <Border DockPanel.Dock="Top"
+              Background="#33777777"
+              Padding="5">
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="5">
+          <Button i:Attached.Icon="fa-play"
+                  ToolTip.Tip="Execute the script"
+                  Foreground="LimeGreen"
+                  Command="{Binding ExecuteScriptCommand}"/>
+          <Button i:Attached.Icon="fa-floppy-disk"
+                  ToolTip.Tip="Save the script to a file"
+                  Foreground="DodgerBlue"
+                  Command="{Binding SaveScriptCommand}"
+                  CommandParameter="{Binding $parent[UserControl]}"/>
+        </StackPanel>
+      </Border>
+      <ae:TextEditor Name="SqlEditor"
+                     ShowLineNumbers="True"
+                     FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+                     FontSize="13"
+                     TextChanged="OnSqlEditorTextChanged">
+        <ae:TextEditor.ContextMenu>
+          <ContextMenu>
+            <MenuItem Name="UndoMenuItem"
+                      Header="Undo"
+                      i:MenuItem.Icon="fa-rotate-left" />
+            <MenuItem Name="RedoMenuItem"
+                      Header="Redo"
+                      i:MenuItem.Icon="fa-rotate-right" />
+            <Separator />
+            <MenuItem Name="CutMenuItem"
+                      Header="Cut"
+                      i:MenuItem.Icon="fa-scissors" />
+            <MenuItem Name="CopyMenuItem"
+                      Header="Copy"
+                      i:MenuItem.Icon="fa-copy" />
+            <MenuItem Name="PasteMenuItem"
+                      Header="Paste"
+                      i:MenuItem.Icon="fa-paste" />
+            <MenuItem Name="DeleteMenuItem"
+                      Header="Delete"
+                      i:MenuItem.Icon="fa-trash" />
+            <Separator />
+            <MenuItem Name="SelectAllMenuItem"
+                      Header="Select all" />
+          </ContextMenu>
+        </ae:TextEditor.ContextMenu>
+      </ae:TextEditor>
+    </DockPanel>
+  </Grid>
+</UserControl>
