@@ -16,8 +16,11 @@ public partial class WizardPage5ViewModel : WizardPageViewModel
 
     public WizardPage5ViewModel()
     {
+        Header.Title = "Items selection";
+        Header.Description = "Select the database items to migrate.";
+        
         Progress.IsIndeterminate = true;
-        Progress.Message = "Loading database schema...";
+        Progress.Message = "Analyzing database schema...";
     }
 
     public ObservableCollection<TreeNode> Roots { get; private set; } = [];

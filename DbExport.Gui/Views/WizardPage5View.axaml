@@ -14,13 +14,8 @@
   </Design.DataContext>
   
   <Grid RowDefinitions="Auto, *">
-    <Border Grid.Row="0"
-            BorderBrush="Gray"
-            BorderThickness="0, 0, 0, 1"
-            Padding="15">
-      <TextBlock Text="Items selection"
-                 FontSize="48"/>
-    </Border>
+    <ContentControl Grid.Row="0"
+                    Content="{Binding Header}"/>
     <ContentControl Grid.Row="1"
                     Content="{Binding Progress}"
                     IsVisible="{Binding IsBusy}"

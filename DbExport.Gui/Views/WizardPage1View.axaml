@@ -14,7 +14,7 @@
   
   <Border HorizontalAlignment="Center"
           VerticalAlignment="Center">
-    <md:MarkdownScrollViewer Markdown="{Binding WelcomeMessage}"
+    <md:MarkdownScrollViewer Markdown="{Binding Header.Description}"
                              Margin="30"/>
   </Border>
 </UserControl>

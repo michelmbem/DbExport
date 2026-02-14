@@ -1,13 +1,25 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using DbExport.Providers;
 
 namespace DbExport.Gui.Models;
 
+[Flags]
+public enum ProviderFeatures
+{
+    None = 0,
+    IsFileProvider = 1,
+    SupportsTrustedConnection = 2,
+    SupportsDatabaseCreation = 4,
+    FileDatabase = IsFileProvider | SupportsDatabaseCreation,
+    SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation,
+}
+
 public sealed class DataProvider(
     string name,
     string description,
-    bool supportsTrustedConnection,
-    ConnectionStringBuilder connectionStringBuilder,
+    ProviderFeatures features,
+    IConnectionStringBuilder connectionStringBuilder,
     string? databaseListQuery = null)
 {
 #if WINDOWS
@@ -21,24 +33,26 @@ public sealed class DataProvider(
     public static DataProvider[] All { get; } =
     [
 #if WINDOWS
-        new(ProviderNames.ACCESS, "Microsoft Access", false, new OleDbConnectionStringBuilder(), ACCESS_DATABASE_FILE_PATTERN),
+        new(ProviderNames.ACCESS, "Microsoft Access", ProviderFeatures.FileDatabase, new OleDbConnectionStringBuilder(), ACCESS_DATABASE_FILE_PATTERN),
 #endif
-        new(ProviderNames.SQLSERVER, "Microsoft SQL Server", true, new SqlConnectionStringBuilder(), SQLSERVER_DATABASE_LIST_QUERY),
-        new(ProviderNames.ORACLE, "Oracle Database", true, new OracleConnectionStringBuilder()),
-        new(ProviderNames.MYSQL, "MySQL", false, new MySqlConnectionStringBuilder(), MYSQL_DATABASE_LIST_QUERY),
-        new(ProviderNames.POSTGRESQL, "PostgreSQL", false, new NpgsqlConnectionStringBuilder(), POSTGRESQL_DATABASE_LIST_QUERY),
-        new(ProviderNames.SQLITE, "SQLite 3", false, new SQLiteConnectionStringBuilder(), SQLITE_DATABASE_FILE_PATTERN)
+        new(ProviderNames.SQLSERVER, "Microsoft SQL Server", ProviderFeatures.SqlServer, new SqlConnectionStringBuilder(), SQLSERVER_DATABASE_LIST_QUERY),
+        new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.SupportsTrustedConnection, new OracleConnectionStringBuilder()),
+        new(ProviderNames.MYSQL, "MySQL", ProviderFeatures.SupportsDatabaseCreation, new MySqlConnectionStringBuilder(), MYSQL_DATABASE_LIST_QUERY),
+        new(ProviderNames.POSTGRESQL, "PostgreSQL", ProviderFeatures.None, new NpgsqlConnectionStringBuilder(), POSTGRESQL_DATABASE_LIST_QUERY),
+        new(ProviderNames.SQLITE, "SQLite 3", ProviderFeatures.FileDatabase, new SQLiteConnectionStringBuilder(), SQLITE_DATABASE_FILE_PATTERN)
     ];
 
     public string Name { get; } = name;
     
     public string Description { get; } = description;
     
-    public bool SupportsTrustedConnection { get; } = supportsTrustedConnection;
+    public ProviderFeatures Features { get; } = features;
     
-    public ConnectionStringBuilder ConnectionStringBuilder { get; } = connectionStringBuilder;
+    public IConnectionStringBuilder ConnectionStringBuilder { get; } = connectionStringBuilder;
     
     public string? DatabaseListQuery { get; } = databaseListQuery;
 
     public static DataProvider? Get(string name) => All.FirstOrDefault(provider => provider.Name == name);
+    
+    public bool HasFeature(ProviderFeatures feature) => Features.HasFlag(feature);
 }

@@ -5,7 +5,7 @@ namespace DbExport.Gui.ViewModels;
 
 public partial class WizardPage4ViewModel : WizardPageViewModel
 {
-    private readonly MySqlOptionsViewModel mysqlOptionsViewModel = new();
+    private readonly MySqlOptionsViewModel mysqlOptions = new();
     
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ProviderOptions))]
@@ -35,12 +35,18 @@ public partial class WizardPage4ViewModel : WizardPageViewModel
     
     [ObservableProperty]
     private bool exportIdentities;
-    
+
+    public WizardPage4ViewModel()
+    {
+        Header.Title = "Migration options";
+        Header.Description = "Configure the migration process.";
+    }
+
     public bool ProviderHasOptions => ProviderOptions is not null;
     
     public ProviderOptionsViewModel? ProviderOptions => ProviderName switch
     {
-        ProviderNames.MYSQL => mysqlOptionsViewModel,
+        ProviderNames.MYSQL => mysqlOptions,
         _ => null
     };
     

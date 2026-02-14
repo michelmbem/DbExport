@@ -39,7 +39,7 @@
       <CheckBox Grid.Column="2"
                 Content="Use trusted connection"
                 IsChecked="{Binding TrustedConnection}"
-                IsEnabled="{Binding DataProvider.SupportsTrustedConnection}"/>
+                IsEnabled="{Binding SupportsTrustedConnection}"/>
     </Grid>
     <Label Grid.Row="2"
            Grid.Column="0"
@@ -74,7 +74,7 @@
              HorizontalAlignment="Stretch"
              ItemsSource="{Binding AllCatalogs}"
              Text="{Binding Catalog}"
-             DropDownOpened="DatabaseComboBox_OnDropDownOpened"/>
+             DropDownOpened="OnDatabaseComboBoxDropDownOpened"/>
     <Button Grid.Row="5"
             Grid.Column="0"
             Grid.ColumnSpan="2"

@@ -19,13 +19,13 @@ public enum TreeNodeType
 public partial class TreeNode : ObservableObject
 {
     private static bool cascadingCheckState;
-    private readonly ICheckable checkable;
+    private readonly ICheckable? checkable;
     
     [ObservableProperty]
     private bool? isChecked = false;
     
     [ObservableProperty]
-    private bool? isExpanded = false;
+    private bool isExpanded;
 
     public TreeNode(TreeNode? parent, string text, TreeNodeType type)
     {
@@ -75,7 +75,7 @@ public partial class TreeNode : ObservableObject
     
     public TreeNodeType Type { get; }
 
-    public string? Icon => Type switch
+    public string Icon => Type switch
     {
         TreeNodeType.Group => "fa-folder",
         TreeNodeType.Table => "fa-table",
@@ -83,7 +83,7 @@ public partial class TreeNode : ObservableObject
         TreeNodeType.PrimaryKey => "fa-key",
         TreeNodeType.ForeignKey => "fa-link",
         TreeNodeType.Index => "fa-sort",
-        _ => null
+        _ => string.Empty
     };
     
     public List<TreeNode> Children { get; } = [];

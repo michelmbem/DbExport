@@ -99,6 +99,9 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         }
 
         if (visitData)
+        {
+            WriteDataMigrationPrefix();
+            
             foreach (var table in database.Tables.Where(table => table.IsChecked))
             {
                 using var dr = SqlHelper.OpenTable(table, visitIdent, SupportsRowVersion);
@@ -113,6 +116,9 @@ public abstract class CodeGenerator : IVisitor, IDisposable
                 dr.Close();
                 if (rowsInserted) WriteLine();
             }
+            
+            WriteDataMigrationSuffix();
+        }
 
         if (!visitSchema || !visitFKs || RequireInlineConstraints) return;
         
@@ -325,6 +331,10 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     }
 
     protected virtual void WriteTableCreationSuffix(Table table) { }
+
+    protected virtual void WriteDataMigrationPrefix() { }
+
+    protected virtual void WriteDataMigrationSuffix() { }
 
     protected virtual void WriteUpdateRule(ForeignKeyRule updateRule)
     {

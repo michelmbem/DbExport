@@ -18,6 +18,9 @@ public partial class WizardPage6ViewModel : WizardPageViewModel
 
     public WizardPage6ViewModel()
     {
+        Header.Title = "Migration summary";
+        Header.Description = "Review the migration summary and make any necessary adjustments.";
+        
         Progress.IsIndeterminate = true;
         Progress.Message = "Generating migration summary...";
     }

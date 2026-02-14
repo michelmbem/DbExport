@@ -29,8 +29,8 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
     
     public ObservableCollection<string> AllCatalogs { get; } = [];
 
-    public override string? ConnectionString =>
-        DataProvider?.ConnectionStringBuilder.Build(Host, Port, Catalog, TrustedConnection, Username, Password);
+    public override string ConnectionString =>
+        DataProvider?.ConnectionStringBuilder.Build(Host, Port, Catalog, TrustedConnection, Username, Password) ?? string.Empty;
 
     public void ReloadCatalogs()
     {

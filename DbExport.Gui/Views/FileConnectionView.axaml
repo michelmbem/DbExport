@@ -32,7 +32,7 @@
             Grid.ColumnSpan="2"
             HorizontalAlignment="Right"
             Command="{Binding ChooseFileCommand}"
-            CommandParameter="{Binding $parent[UserControl]}">
+            CommandParameter="{Binding $parent[Window]}">
       <StackPanel Orientation="Horizontal" Spacing="5">
         <i:Icon Value="fa-folder-open"></i:Icon>
         <TextBlock Text="Choose a database file"/>

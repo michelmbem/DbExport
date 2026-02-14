@@ -2,19 +2,17 @@ using System.Text;
 
 namespace DbExport.Gui.Models;
 
-public abstract class ConnectionStringBuilder
+public interface IConnectionStringBuilder
 {
-    public abstract string Build(string dataSource, int? port, string? database,
-                                 bool trustedConnection, string? username,
-                                 string? password);
+    string Build(string dataSource, int? portNumber, string? database,
+                 bool trustedConnection, string? username, string? password);
 }
 
 #if WINDOWS
-public class OleDbConnectionStringBuilder : ConnectionStringBuilder
+public class OleDbConnectionStringBuilder : IConnectionStringBuilder
 {
-    public override string Build(string dataSource, int? port, string? database,
-                                 bool trustedConnection, string? username,
-                                 string? password)
+    public string Build(string dataSource, int? portNumber, string? database,
+                        bool trustedConnection, string? username, string? password)
     {
         var sb = new StringBuilder(dataSource.EndsWith(".mdb", StringComparison.OrdinalIgnoreCase)
                                        ? "Provider=Microsoft.Jet.OLEDB.4.0"
@@ -34,15 +32,18 @@ public class OleDbConnectionStringBuilder : ConnectionStringBuilder
 }
 #endif
 
-public class SqlConnectionStringBuilder : ConnectionStringBuilder
+public class SqlConnectionStringBuilder : IConnectionStringBuilder
 {
-    public override string Build(string dataSource, int? port, string? database,
-                                 bool trustedConnection, string? username,
-                                 string? password)
+    public string Build(string dataSource, int? portNumber, string? database,
+                        bool trustedConnection, string? username, string? password)
     {
         var sb = new StringBuilder($"Data Source={dataSource}");
-        if (port.HasValue) sb.Append($",{port.Value}");
-        if (!string.IsNullOrWhiteSpace(database)) sb.Append($";Initial Catalog={database}");
+        
+        if (portNumber.HasValue)
+            sb.Append($",{portNumber.Value}");
+        
+        if (!string.IsNullOrWhiteSpace(database))
+            sb.Append($";Initial Catalog={database}");
         
         if (trustedConnection)
             sb.Append(";Trusted_Connection=True");
@@ -58,15 +59,18 @@ public class SqlConnectionStringBuilder : ConnectionStringBuilder
     }
 }
 
-public class OracleConnectionStringBuilder : ConnectionStringBuilder
+public class OracleConnectionStringBuilder : IConnectionStringBuilder
 {
-    public override string Build(string dataSource, int? port, string? database,
-                                 bool trustedConnection, string? username,
-                                 string? password)
+    public string Build(string dataSource, int? portNumber, string? database,
+                        bool trustedConnection, string? username, string? password)
     {
         var sb = new StringBuilder($"Data Source={dataSource}");
-        if (port.HasValue) sb.Append($":{port.Value}");
-        if (!string.IsNullOrWhiteSpace(database)) sb.Append($"/{database}");
+        
+        if (portNumber.HasValue)
+            sb.Append($":{portNumber.Value}");
+        
+        if (!string.IsNullOrWhiteSpace(database))
+            sb.Append($"/{database}");
         
         if (trustedConnection)
             sb.Append(";User ID=/");
@@ -80,14 +84,13 @@ public class OracleConnectionStringBuilder : ConnectionStringBuilder
     }
 }
 
-public class MySqlConnectionStringBuilder : ConnectionStringBuilder
+public class MySqlConnectionStringBuilder : IConnectionStringBuilder
 {
-    public override string Build(string dataSource, int? port, string? database,
-                                 bool trustedConnection, string? username,
-                                 string? password)
+    public string Build(string dataSource, int? portNumber, string? database,
+                        bool trustedConnection, string? username, string? password)
     {
         var sb = new StringBuilder($"Server={dataSource}");
-        if (port.HasValue) sb.Append($";Port={port.Value}");
+        if (portNumber.HasValue) sb.Append($";Port={portNumber.Value}");
         if (!string.IsNullOrWhiteSpace(database)) sb.Append($";Database={database}");
         if (!string.IsNullOrWhiteSpace(username)) sb.Append($";Uid={username}");
         if (!string.IsNullOrWhiteSpace(password)) sb.Append($";Pwd={password}");
@@ -96,14 +99,13 @@ public class MySqlConnectionStringBuilder : ConnectionStringBuilder
     }
 }
 
-public class NpgsqlConnectionStringBuilder : ConnectionStringBuilder
+public class NpgsqlConnectionStringBuilder : IConnectionStringBuilder
 {
-    public override string Build(string dataSource, int? port, string? database,
-                                 bool trustedConnection, string? username,
-                                 string? password)
+    public string Build(string dataSource, int? portNumber, string? database,
+                        bool trustedConnection, string? username, string? password)
     {
         var sb = new StringBuilder($"Host={dataSource}");
-        if (port.HasValue) sb.Append($";Port={port.Value}");
+        if (portNumber.HasValue) sb.Append($";Port={portNumber.Value}");
         if (!string.IsNullOrWhiteSpace(database)) sb.Append($";Database={database}");
         if (!string.IsNullOrWhiteSpace(username)) sb.Append($";Username={username}");
         if (!string.IsNullOrWhiteSpace(password)) sb.Append($";Password={password}");
@@ -112,11 +114,10 @@ public class NpgsqlConnectionStringBuilder : ConnectionStringBuilder
     }
 }
 
-public class SQLiteConnectionStringBuilder : ConnectionStringBuilder
+public class SQLiteConnectionStringBuilder : IConnectionStringBuilder
 {
-    public override string Build(string dataSource, int? port, string? database,
-                                 bool trustedConnection, string? username,
-                                 string? password)
+    public string Build(string dataSource, int? portNumber, string? database,
+                        bool trustedConnection, string? username, string? password)
     {
         var sb = new StringBuilder($"Data Source={dataSource};Version=3");
         if (!string.IsNullOrWhiteSpace(password)) sb.Append($";Password={password}");

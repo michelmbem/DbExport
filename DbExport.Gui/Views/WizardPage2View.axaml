@@ -12,13 +12,8 @@
   </Design.DataContext>
   
   <Grid RowDefinitions="Auto, Auto, Auto">
-    <Border Grid.Row="0"
-            BorderBrush="Gray"
-            BorderThickness="0, 0, 0, 1"
-            Padding="15">
-      <TextBlock Text="Source database"
-                 FontSize="48"/>
-    </Border>
+    <ContentControl Grid.Row="0"
+                    Content="{Binding Header}"/>
     <HeaderedContentControl Grid.Row="1"
                             Header="Provider"
                             Margin="15">
@@ -44,7 +39,7 @@
     <HeaderedContentControl Grid.Row="2"
                             Header="Connection settings"
                             Margin="15,0, 15, 15">
-      <ContentControl Content="{Binding ConnectionPane}"/>
+      <ContentControl Content="{Binding Connection}"/>
     </HeaderedContentControl>
   </Grid>
 </UserControl>

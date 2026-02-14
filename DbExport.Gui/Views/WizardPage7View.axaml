@@ -16,13 +16,8 @@
   </Design.DataContext>
   
   <Grid RowDefinitions="Auto, *">
-    <Border Grid.Row="0"
-            BorderBrush="Gray"
-            BorderThickness="0, 0, 0, 1"
-            Padding="15">
-      <TextBlock Text="Proceed to migration"
-                 FontSize="48"/>
-    </Border>
+    <ContentControl Grid.Row="0"
+                    Content="{Binding Header}"/>
     <ContentControl Grid.Row="1"
                     Content="{Binding Progress}"
                     IsVisible="{Binding IsBusy}"
@@ -43,7 +38,7 @@
                   ToolTip.Tip="Save the script to a file"
                   Foreground="DodgerBlue"
                   Command="{Binding SaveScriptCommand}"
-                  CommandParameter="{Binding $parent[UserControl]}"/>
+                  CommandParameter="{Binding $parent[Window]}"/>
         </StackPanel>
       </Border>
       <ae:TextEditor Name="SqlEditor"

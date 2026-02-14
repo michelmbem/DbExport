@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Common;
 using System.IO;
 using DbExport.Schema;
 
@@ -69,10 +68,13 @@ public class SQLiteCodeGenerator : CodeGenerator
             WriteDeleteRule(foreignKey.DeleteRule);
     }
 
-    protected override void WriteInsertDirective(Table table, DbDataReader dr)
+    protected override void WriteDataMigrationPrefix()
     {
         WriteLine("PRAGMA foreign_keys = OFF;");
-        base.WriteInsertDirective(table, dr);
+    }
+
+    protected override void WriteDataMigrationSuffix()
+    {
         WriteLine("PRAGMA foreign_keys = ON;");
     }
 

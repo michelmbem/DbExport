@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -21,19 +20,16 @@ public partial class FileConnectionViewModel : ConnectionViewModel
     [ObservableProperty]
     private string? password;
 
-    public override string? ConnectionString =>
-        DataProvider?.ConnectionStringBuilder.Build(FilePath, null, null, false, Username, Password);
+    public override string ConnectionString =>
+        DataProvider?.ConnectionStringBuilder.Build(FilePath, null, null, false, Username, Password) ?? string.Empty;
 
     [RelayCommand]
-    private async Task ChooseFile(Visual? view)
+    private async Task ChooseFile(Window window)
     {
-        var topLevel = TopLevel.GetTopLevel(view);
-        if (topLevel == null) return;
-        
         var fileTypes = ToFileTypeList(DataProvider?.DatabaseListQuery);
         var file = IsDestination
-            ? await GetSaveFileName(topLevel, "Save database as...", fileTypes)
-            : (await GetOpenFileNames(topLevel, "Open database file", fileTypes)).FirstOrDefault();
+            ? await GetSaveFileName(window, "Save database as...", fileTypes)
+            : (await GetOpenFileNames(window, "Open database file", fileTypes)).FirstOrDefault();
         
         if (file is null) return;
         
@@ -63,9 +59,9 @@ public partial class FileConnectionViewModel : ConnectionViewModel
     }
 
     private static async Task<IEnumerable<string>> GetOpenFileNames(
-        TopLevel topLevel, string title, IReadOnlyList<FilePickerFileType> fileTypes, bool allowMultiple = false)
+        Window window, string title, IReadOnlyList<FilePickerFileType> fileTypes, bool allowMultiple = false)
     {
-        var files = await topLevel.StorageProvider.OpenFilePickerAsync(
+        var files = await window.StorageProvider.OpenFilePickerAsync(
             new FilePickerOpenOptions
             {
                 Title = title,
@@ -77,9 +73,9 @@ public partial class FileConnectionViewModel : ConnectionViewModel
     }
 
     private static async Task<string?> GetSaveFileName(
-        TopLevel topLevel, string title, IReadOnlyList<FilePickerFileType> fileTypes)
+        Window window, string title, IReadOnlyList<FilePickerFileType> fileTypes)
     {
-        var file = await topLevel.StorageProvider.SaveFilePickerAsync(
+        var file = await window.StorageProvider.SaveFilePickerAsync(
             new FilePickerSaveOptions
             {
                 Title = title,

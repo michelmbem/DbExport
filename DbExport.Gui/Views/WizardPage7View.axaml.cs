@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using AvaloniaEdit.TextMate;
 using DbExport.Gui.ViewModels;
+using Serilog;
 using TextMateSharp.Grammars;
 
 namespace DbExport.Gui.Views;

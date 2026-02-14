@@ -11,9 +11,9 @@ public partial class ServerConnectionView : UserControl
         InitializeComponent();
     }
 
-    private ServerConnectionViewModel? ViewModel => DataContext as ServerConnectionViewModel;
+    private ServerConnectionViewModel? ViewModel => (ServerConnectionViewModel?)DataContext;
     
-    private void DatabaseComboBox_OnDropDownOpened(object? sender, EventArgs e)
+    private void OnDatabaseComboBoxDropDownOpened(object? sender, EventArgs e)
     {
         ViewModel?.ReloadCatalogs();
     }

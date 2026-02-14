@@ -90,7 +90,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    partial void OnCurrentPageChanging(WizardPageViewModel oldValue, WizardPageViewModel newValue)
+    partial void OnCurrentPageChanging(WizardPageViewModel? oldValue, WizardPageViewModel? newValue)
     {
         if (oldValue == wizardPage3 && newValue == wizardPage4)
         {
@@ -109,7 +109,7 @@ public partial class MainWindowViewModel : ViewModelBase
                                                        wizardPage3.SelectedProvider,
                                                        wizardPage3.ConnectionString,
                                                        wizardPage4.ExportOptions,
-                                                       wizardPage5.Database);
+                                                       wizardPage5.Database!);
         }
         else if (oldValue == wizardPage6 && newValue == wizardPage7)
         {

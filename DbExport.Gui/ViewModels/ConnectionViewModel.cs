@@ -12,12 +12,16 @@ namespace DbExport.Gui.ViewModels;
 public partial class ConnectionViewModel : ViewModelBase
 {
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SupportsTrustedConnection))]
     private DataProvider? dataProvider;
 
     [ObservableProperty]
     private bool isDestination;
 
-    public virtual string? ConnectionString { get; }
+    public virtual string ConnectionString => string.Empty;
+    
+    public bool SupportsTrustedConnection =>
+        DataProvider?.HasFeature(ProviderFeatures.SupportsTrustedConnection) ?? false;
 
     [RelayCommand]
     private async Task TestConnection()

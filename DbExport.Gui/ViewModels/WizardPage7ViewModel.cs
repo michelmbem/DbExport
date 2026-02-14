@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -28,6 +27,12 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
 
     public WizardPage7ViewModel()
     {
+        Header.Title = "Proceed with migration";
+        Header.Description = """
+                             Below is the SQL script that was generated to migrate your database.
+                             You can run it directly from this wizard, or save it to a file and load it in a dedicated tool.
+                             """;
+        
         Progress.IsIndeterminate = true;
     }
 
@@ -53,7 +58,7 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         if (summary == null) return string.Empty;
         
         using var sqlWriter = new StringWriter();
-        var codegen = CodeGenerator.Get(summary.TargetProvider?.Name, sqlWriter);
+        var codegen = CodeGenerator.Get(summary.TargetProvider.Name, sqlWriter);
         codegen.ExportOptions = summary.ExportOptions;
 
         if (codegen is NpgsqlCodeGenerator npgsqlCodeGen)
@@ -63,9 +68,11 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
                 npgsqlCodeGen.DbOwner = username;
         }
         
+        Utility.Encoding = Encoding.UTF8;
+
         try
         {
-            summary.Database?.AcceptVisitor(codegen);
+            summary.Database.AcceptVisitor(codegen);
         }
         catch (Exception e)
         {
@@ -87,7 +94,7 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         
         try
         {
-            summary.Database?.AcceptVisitor(builder);
+            summary.Database.AcceptVisitor(builder);
         }
         catch (Exception e)
         {
@@ -108,12 +115,9 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     }
 
     [RelayCommand(CanExecute = nameof(ScriptIsReady))]
-    private async Task SaveScript(Visual visual)
+    private async Task SaveScript(Window window)
     {
-        var topLevel = TopLevel.GetTopLevel(visual);
-        if (topLevel == null) return;
-        
-        var file = await topLevel.StorageProvider.SaveFilePickerAsync(
+        var file = await window.StorageProvider.SaveFilePickerAsync(
             new FilePickerSaveOptions
             {
                 Title = "Save migration script as",
@@ -127,8 +131,6 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
 
         if (file is null) return;
         
-        Utility.Encoding = Encoding.UTF8;
-
         await using var output = new StreamWriter(file.Path.LocalPath, false, Utility.Encoding);
         await output.WriteAsync(SqlScript);
         await output.FlushAsync();

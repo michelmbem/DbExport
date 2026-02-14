@@ -7,35 +7,34 @@ namespace DbExport.Gui.ViewModels;
 
 public partial class WizardPage2ViewModel : WizardPageViewModel
 {
-    protected readonly FileConnectionViewModel fileConnection;
-    protected readonly ServerConnectionViewModel serverConnection;
+    protected readonly FileConnectionViewModel fileConnection = new();
+    protected readonly ServerConnectionViewModel serverConnection = new();
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ConnectionPane))]
+    [NotifyPropertyChangedFor(nameof(Connection))]
     private DataProvider selectedProvider;
-
-    public ObservableCollection<DataProvider> AllProviders { get; }
-
-    public ConnectionViewModel? ConnectionPane => SelectedProvider.Name switch
-    {
-        ProviderNames.ACCESS or ProviderNames.SQLITE => fileConnection,
-        ProviderNames.SQLSERVER or ProviderNames.ORACLE or ProviderNames.MYSQL or ProviderNames.POSTGRESQL =>
-            serverConnection,
-        _ => null
-    };
-    
-    public string? ConnectionString => ConnectionPane?.ConnectionString;
 
     public WizardPage2ViewModel()
     {
-        fileConnection = new FileConnectionViewModel();
-        serverConnection = new ServerConnectionViewModel();
         AllProviders = new ObservableCollection<DataProvider>(DataProvider.All);
         SelectedProvider = AllProviders[0];
+        
+        Header.Title = "Source database";
+        Header.Description = "Select the database you want to migrate from.";
     }
+
+    public ObservableCollection<DataProvider> AllProviders { get; }
+
+    public ConnectionViewModel Connection => SelectedProvider.Name switch
+    {
+        ProviderNames.ACCESS or ProviderNames.SQLITE => fileConnection,
+        _ => serverConnection
+    };
+    
+    public string ConnectionString => Connection.ConnectionString;
 
     partial void OnSelectedProviderChanged(DataProvider value)
     {
-        ConnectionPane?.DataProvider = value;
+        Connection.DataProvider = value;
     }
 }

@@ -12,13 +12,8 @@
   </Design.DataContext>
   
   <Grid RowDefinitions="Auto, Auto, Auto, Auto">
-    <Border Grid.Row="0"
-            BorderBrush="Gray"
-            BorderThickness="0, 0, 0, 1"
-            Padding="15">
-      <TextBlock Text="Export options"
-                 FontSize="48"/>
-    </Border>
+    <ContentControl Grid.Row="0"
+                    Content="{Binding Header}"/>
     <HeaderedContentControl Grid.Row="1"
                             Header="Export what?"
                             Margin="15">
