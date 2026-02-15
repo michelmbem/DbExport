@@ -30,7 +30,7 @@
             <TextBlock.Effect>
               <DropShadowEffect Color="Gray"
                                 BlurRadius="5"
-                                Opacity="0.5"/>
+                                Opacity="0.6"/>
             </TextBlock.Effect>
           </TextBlock>
           <TextBlock HorizontalAlignment="Right"
@@ -45,7 +45,7 @@
           RowDefinitions="Auto, *, Auto, Auto"
           Margin="15">
       <TextBlock Grid.Row="0">
-        <Run Text="version "/>
+        <Run Text="Version "/>
         <Run Text="{x:Static util:AssemblyInfo.Version}"/>
       </TextBlock>
       <StackPanel Grid.Row="1" VerticalAlignment="Center">
