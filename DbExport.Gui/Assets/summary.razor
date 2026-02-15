@@ -3,6 +3,8 @@
 @using DbExport.Schema
 
 @{
+    int count;
+    
     string Bool2Str(bool value) => value ? "Yes" : "No";
     
     string FullColumnName(Column column)
@@ -77,4 +79,34 @@
         @("| " + FullColumnName(column) + " | " + FullTypeName(column) + " | " + Bool2Str(!column.IsRequired) +
         " | " + column.DefaultValue + " |" + Environment.NewLine)
     }
+    
+    @(Environment.NewLine + "**Indexes**" + Environment.NewLine + Environment.NewLine)
+
+    count = 0;
+    foreach (var index in table.Indexes.Where(i => !i.MatchesKey && i.IsChecked))
+    {
+        @("* " + index.Name + Environment.NewLine)
+        count++;
+    }
+
+    if (count == 0)
+    {
+        @("* (None)" + Environment.NewLine)
+    }
+
+    @(Environment.NewLine + "**Foreign keys**" + Environment.NewLine + Environment.NewLine)
+    
+    count = 0;
+    foreach (var fk in table.ForeignKeys.Where(fk => fk.IsChecked))
+    {
+        @("* " + fk.Name + " \u2192 " + fk.RelatedTableName + Environment.NewLine)
+        count++;
+    }
+
+    if (count == 0)
+    {
+        @("* (None)" + Environment.NewLine)
+    }
+    
+    @(Environment.NewLine)
 }

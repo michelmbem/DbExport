@@ -8,6 +8,10 @@
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
+             
+    <Application.Resources>
+        <FontFamily x:Key="Bauhaus">avares://dbexport/Assets/Bauhaus.ttf#Bauhaus-Heavy-Bold</FontFamily>
+    </Application.Resources>
   
     <Application.Styles>
         <FluentTheme />

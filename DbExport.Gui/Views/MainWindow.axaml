@@ -39,38 +39,51 @@
                Padding="10">
           <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto"
                 ColumnSpacing="5">
+              <Grid.Styles>
+                  <Style Selector="Button">
+                      <Setter Property="Width" Value="100"/>
+                      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                      <Setter Property="VerticalContentAlignment" Value="Center"/>
+                  </Style>
+                  <Style Selector="Button > StackPanel">
+                      <Setter Property="Orientation" Value="Horizontal"/>
+                      <Setter Property="Spacing" Value="5"/>
+                  </Style>
+              </Grid.Styles>
               <Button Grid.Column="0"
+                      Foreground="White"
+                      Background="Firebrick"
+                      Classes="colored"
+                      IsCancel="True"
+                      Command="{Binding CloseCommand}"
+                      CommandParameter="{Binding $parent[Window]}">
+                  <StackPanel>
+                      <i:Icon Value="fa-right-from-bracket" />
+                      <TextBlock Text="Close" />
+                  </StackPanel>
+              </Button>
+              <Button Grid.Column="1"
                       Foreground="White"
                       Background="DodgerBlue"
                       Classes="colored"
                       Command="{Binding OpenAboutDialogCommand}"
                       CommandParameter="{Binding $parent[Window]}">
-                  <StackPanel Orientation="Horizontal" Spacing="5">
+                  <StackPanel>
                       <i:Icon Value="fa-circle-info" />
                       <TextBlock Text="About..." />
                   </StackPanel>
               </Button>
-              <Button Grid.Column="1"
-                      Foreground="White"
-                      Background="Firebrick"
-                      Classes="colored"
-                      Command="{Binding CloseCommand}"
-                      CommandParameter="{Binding $parent[Window]}">
-                  <StackPanel Orientation="Horizontal" Spacing="5">
-                      <i:Icon Value="fa-right-from-bracket" />
-                      <TextBlock Text="Close" />
-                  </StackPanel>
-              </Button>
               <Button Grid.Column="3"
                       Command="{Binding NavigateToPreviousPageCommand}">
-                  <StackPanel Orientation="Horizontal" Spacing="5">
+                  <StackPanel>
                       <i:Icon Value="fa-backward-step" />
                       <TextBlock Text="Previous" />
                   </StackPanel>
               </Button>
               <Button Grid.Column="4"
+                      IsDefault="True"
                       Command="{Binding NavigateToNextPageCommand}">
-                  <StackPanel Orientation="Horizontal" Spacing="5">
+                  <StackPanel>
                       <TextBlock Text="Next" />
                       <i:Icon Value="fa-forward-step" />
                   </StackPanel>

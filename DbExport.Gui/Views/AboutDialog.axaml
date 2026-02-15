@@ -1,0 +1,67 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DbExport.Gui.ViewModels"
+        x:Class="DbExport.Gui.Views.AboutDialog"
+        x:DataType="vm:AboutDialogViewModel"
+        Icon="/Assets/DbExport.ico"
+        Title="About DbExport"
+        Width="500"
+        Height="275"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+
+  <Design.DataContext>
+    <vm:AboutDialogViewModel/>
+  </Design.DataContext>
+  
+  <Grid RowDefinitions="Auto, *">
+    <Border Grid.Row="0"
+            Background="LightBlue"
+            Height="100"
+            Padding="5">
+      <StackPanel Orientation="Horizontal" Spacing="15">
+        <Image Source="/Assets/connection.png" Stretch="Uniform"/>
+        <StackPanel>
+          <TextBlock Text="{Binding Title}"
+                     Foreground="Black"
+                     FontFamily="{StaticResource Bauhaus}"
+                     FontSize="64">
+            <TextBlock.Effect>
+              <DropShadowEffect Color="Gray"
+                                BlurRadius="5"
+                                Opacity="0.5"/>
+            </TextBlock.Effect>
+          </TextBlock>
+          <TextBlock HorizontalAlignment="Right"
+                     Foreground="Black">
+            <Run Text="by"/>
+            <Run Text="{Binding Company}"/>
+          </TextBlock>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+    <Grid Grid.Row="1"
+          RowDefinitions="Auto, *, Auto, Auto"
+          Margin="15">
+      <TextBlock Grid.Row="0">
+        <Run Text="version "/>
+        <Run Text="{Binding Version}"/>
+      </TextBlock>
+      <StackPanel Grid.Row="1" VerticalAlignment="Center">
+        <TextBlock Text="{Binding Description}"/>
+        <HyperlinkButton Content="View on GitHub" Command="{Binding OpenGitHubRepoCommand}"/>
+      </StackPanel>
+      <TextBlock Grid.Row="2" Text="{Binding Copyright}"/>
+      <StackPanel Grid.Row="3"
+                  HorizontalAlignment="Right"
+                  Margin="0, 15, 0, 0">
+        <Button Content="OK"
+                HorizontalContentAlignment="Center"
+                Width="100"
+                IsDefault="True"
+                Command="{Binding CloseCommand}"
+                CommandParameter="{Binding $parent[Window]}"/>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>

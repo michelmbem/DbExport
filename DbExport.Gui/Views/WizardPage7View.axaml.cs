@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
-using AvaloniaEdit.Search;
 using AvaloniaEdit.TextMate;
 using DbExport.Gui.ViewModels;
 using TextMateSharp.Grammars;
@@ -11,8 +10,6 @@ namespace DbExport.Gui.Views;
 
 public partial class WizardPage7View : UserControl
 {
-    private SearchPanel? searchPanel;
-    
     public WizardPage7View()
     {
         InitializeComponent();

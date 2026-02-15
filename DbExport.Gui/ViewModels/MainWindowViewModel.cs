@@ -6,9 +6,8 @@ using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DbExport.Gui.Models;
+using DbExport.Gui.Views;
 using DbExport.Providers;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Enums;
 using Serilog;
 
 namespace DbExport.Gui.ViewModels;
@@ -38,6 +37,19 @@ public partial class MainWindowViewModel : ViewModelBase
     
     public SidebarViewModel Sidebar { get; } = new();
 
+    [RelayCommand]
+    private static void Close(Window window)
+    {
+        window.Close();
+    }
+
+    [RelayCommand]
+    private static async Task OpenAboutDialog(Window window)
+    {
+        var aboutDialog = new AboutDialog { DataContext = new AboutDialogViewModel() };
+        await aboutDialog.ShowDialog<bool>(window);
+    }
+
     [RelayCommand(CanExecute = nameof(CanNavigateToPreviousPage))]
     private void NavigateToPreviousPage()
     {
@@ -50,23 +62,6 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var currentIndex = Array.IndexOf(wizardPages, CurrentPage);
         CurrentPage = wizardPages[currentIndex + 1];
-    }
-
-    [RelayCommand]
-    private static void Close(Window window)
-    {
-        window.Close();
-    }
-
-    [RelayCommand]
-    private static async Task OpenAboutDialog(Window window)
-    {
-        await MessageBoxManager
-              .GetMessageBoxStandard("About DbExport",
-                                     "DbExport is a tool for exporting database schemas to various formats.",
-                                     ButtonEnum.Ok,
-                                     Icon.Info)
-              .ShowAsync();
     }
 
     private bool CanNavigateToPreviousPage() => CurrentPage is { CanMoveBackward: true };
