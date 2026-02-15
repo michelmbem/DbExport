@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Styling;
 using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -36,9 +38,23 @@ public partial class MainWindowViewModel : ViewModelBase
         wizardPages = [ wizardPage1, wizardPage2, wizardPage3, wizardPage4, wizardPage5, wizardPage6, wizardPage7 ];
         Sidebar.Items.AddRange(wizardPages.Select(p => new SidebarItem(p.Header.Title)));
         CurrentPage = wizardPages[0];
+        
+        Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
     }
     
+    public static string ThemeSwitchIcon =>
+        Application.Current?.ActualThemeVariant == ThemeVariant.Dark ? "fa-sun" : "fa-moon";
+
     public SidebarViewModel Sidebar { get; } = new();
+
+    [RelayCommand]
+    private static void SwitchTheme()
+    {
+        var app = Application.Current!;
+        app.RequestedThemeVariant = app.ActualThemeVariant == ThemeVariant.Dark
+            ? ThemeVariant.Light
+            : ThemeVariant.Dark;
+    }
 
     [RelayCommand]
     private static void Close(Window window)
@@ -93,6 +109,11 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             wizardPage5.IsBusy = false;
         }
+    }
+
+    private void OnThemeChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(ThemeSwitchIcon));
     }
 
     partial void OnCurrentPageChanging(WizardPageViewModel? oldValue, WizardPageViewModel? newValue)

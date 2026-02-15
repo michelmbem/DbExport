@@ -38,13 +38,18 @@
                BorderBrush="Gray"
                BorderThickness="0, 1, 0, 0"
                Padding="10">
-          <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto"
+          <Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto"
                 ColumnSpacing="5">
               <Grid.Styles>
                   <Style Selector="Button">
-                      <Setter Property="Width" Value="100"/>
                       <Setter Property="HorizontalContentAlignment" Value="Center"/>
                       <Setter Property="VerticalContentAlignment" Value="Center"/>
+                  </Style>
+                  <Style Selector="Button.glyph">
+                      <Setter Property="Background" Value="Transparent"/>
+                  </Style>
+                  <Style Selector="Button:not(.glyph)">
+                      <Setter Property="Width" Value="100"/>
                   </Style>
                   <Style Selector="Button > StackPanel">
                       <Setter Property="Orientation" Value="Horizontal"/>
@@ -74,14 +79,19 @@
                       <TextBlock Text="About..." />
                   </StackPanel>
               </Button>
-              <Button Grid.Column="3"
+              <Button Grid.Column="2"
+                      Classes="glyph"
+                      i:Attached.Icon="{Binding ThemeSwitchIcon}"
+                      ToolTip.Tip="Switch theme"
+                      Command="{Binding SwitchThemeCommand}"/>
+              <Button Grid.Column="4"
                       Command="{Binding NavigateToPreviousPageCommand}">
                   <StackPanel>
                       <i:Icon Value="fa-backward-step" />
                       <TextBlock Text="Previous" />
                   </StackPanel>
               </Button>
-              <Button Grid.Column="4"
+              <Button Grid.Column="5"
                       IsDefault="True"
                       Command="{Binding NavigateToNextPageCommand}">
                   <StackPanel>
