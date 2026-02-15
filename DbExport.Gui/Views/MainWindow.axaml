@@ -21,11 +21,12 @@
                       Content="{Binding Sidebar}"/>
       <TransitioningContentControl Grid.Row="0"
                                    Grid.Column="1"
-                                   Content="{Binding CurrentPage}">
+                                   Content="{Binding CurrentPage}"
+                                   IsTransitionReversed="{Binding IsPageTransitionReversed}">
           <TransitioningContentControl.PageTransition>
               <CompositePageTransition>
                   <CompositePageTransition.PageTransitions>
-                      <PageSlide Duration="0:0:0.25" Orientation="Horizontal"/>
+                      <PageSlide Duration="0:0:0.25"/>
                       <CrossFade Duration="0:0:0.25"/>
                   </CompositePageTransition.PageTransitions>
               </CompositePageTransition>

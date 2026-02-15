@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("DbExport")]
 [assembly: AssemblyDescription("A relational database migration wizard")]
 [assembly: AssemblyCompany("Addy")]
-[assembly: AssemblyCopyright("Copyright © Addy 2014-2026")]
+[assembly: AssemblyCopyright("Copyright \u00A9 Addy 2014-2026")]
 [assembly: AssemblyVersion("3.0.0")]
 [assembly: AssemblyFileVersion("3.0.0.0")]
 [assembly: AssemblyMetadata("GitHubRepoUrl", "https://github.com/michelmbem/DbExport")]
@@ -27,17 +28,16 @@ public static class AssemblyInfo
     
     public static string? Version => ExecutingAssembly.GetName().Version?.ToString();
 
-    public static string? GitHubRepoUrl => GetAssemblyMetadata("GitHubRepoUrl");
+    public static string? GitHubRepoUrl => GetAssemblyMetadata();
 
     private static Assembly ExecutingAssembly => Assembly.GetExecutingAssembly();
 
-    private static T? GetAssemblyAttribute<T>() where T : Attribute =>
-        ExecutingAssembly.GetCustomAttribute<T>();
+    private static T? GetAssemblyAttribute<T>() where T : Attribute => ExecutingAssembly.GetCustomAttribute<T>();
 
     private static IEnumerable<T> GetAssemblyAttributes<T>() where T : Attribute =>
         ExecutingAssembly.GetCustomAttributes<T>();
 
-    private static string? GetAssemblyMetadata(string key) =>
+    private static string? GetAssemblyMetadata([CallerMemberName] string? key = null) =>
         GetAssemblyAttributes<AssemblyMetadataAttribute>()
             .FirstOrDefault(a => a.Key == key)
             ?.Value;

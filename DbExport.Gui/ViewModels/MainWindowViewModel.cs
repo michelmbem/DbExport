@@ -27,6 +27,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(NavigateToPreviousPageCommand))]
     [NotifyCanExecuteChangedFor(nameof(NavigateToNextPageCommand))]
     private WizardPageViewModel? currentPage;
+    
+    [ObservableProperty]
+    private bool isPageTransitionReversed;
 
     public MainWindowViewModel()
     {
@@ -53,6 +56,8 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(CanNavigateToPreviousPage))]
     private void NavigateToPreviousPage()
     {
+        IsPageTransitionReversed = true;
+        
         var currentIndex = Array.IndexOf(wizardPages, CurrentPage);
         CurrentPage = wizardPages[currentIndex - 1];
     }
@@ -60,6 +65,8 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(CanNavigateToNextPage))]
     private void NavigateToNextPage()
     {
+        IsPageTransitionReversed = false;
+        
         var currentIndex = Array.IndexOf(wizardPages, CurrentPage);
         CurrentPage = wizardPages[currentIndex + 1];
     }

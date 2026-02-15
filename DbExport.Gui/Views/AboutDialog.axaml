@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:DbExport.Gui.ViewModels"
+        xmlns:util="using:DbExport.Gui.Utilities"
         x:Class="DbExport.Gui.Views.AboutDialog"
         x:DataType="vm:AboutDialogViewModel"
         Icon="/Assets/DbExport.ico"
@@ -22,7 +23,7 @@
       <StackPanel Orientation="Horizontal" Spacing="15">
         <Image Source="/Assets/connection.png" Stretch="Uniform"/>
         <StackPanel>
-          <TextBlock Text="{Binding Title}"
+          <TextBlock Text="{x:Static util:AssemblyInfo.Title}"
                      Foreground="Black"
                      FontFamily="{StaticResource Bauhaus}"
                      FontSize="64">
@@ -35,7 +36,7 @@
           <TextBlock HorizontalAlignment="Right"
                      Foreground="Black">
             <Run Text="by"/>
-            <Run Text="{Binding Company}"/>
+            <Run Text="{x:Static util:AssemblyInfo.Company}"/>
           </TextBlock>
         </StackPanel>
       </StackPanel>
@@ -45,13 +46,15 @@
           Margin="15">
       <TextBlock Grid.Row="0">
         <Run Text="version "/>
-        <Run Text="{Binding Version}"/>
+        <Run Text="{x:Static util:AssemblyInfo.Version}"/>
       </TextBlock>
       <StackPanel Grid.Row="1" VerticalAlignment="Center">
-        <TextBlock Text="{Binding Description}"/>
-        <HyperlinkButton Content="View on GitHub" Command="{Binding OpenGitHubRepoCommand}"/>
+        <TextBlock Text="{x:Static util:AssemblyInfo.Description}"/>
+        <HyperlinkButton Content="View on GitHub"
+                         Command="{Binding OpenGitHubRepoCommand}"
+                         CommandParameter="{x:Static util:AssemblyInfo.GitHubRepoUrl}"/>
       </StackPanel>
-      <TextBlock Grid.Row="2" Text="{Binding Copyright}"/>
+      <TextBlock Grid.Row="2" Text="{x:Static util:AssemblyInfo.Copyright}"/>
       <StackPanel Grid.Row="3"
                   HorizontalAlignment="Right"
                   Margin="0, 15, 0, 0">
