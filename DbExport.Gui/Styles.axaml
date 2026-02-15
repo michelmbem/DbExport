@@ -38,4 +38,20 @@
       </ControlTemplate>
     </Setter>
   </Style>
+  
+  <Style Selector="Button.colored:pointerover /template/ ContentPresenter">
+    <Setter Property="Foreground"
+            Value="{Binding Foreground, RelativeSource={RelativeSource Self}}"/>
+    <Setter Property="Background"
+            Value="{Binding Background, RelativeSource={RelativeSource Self}}"/>
+    <Setter Property="OpacityMask" Value="#99FFFFFF"/>
+  </Style>
+  
+  <Style Selector="Button.colored:pressed /template/ ContentPresenter">
+    <Setter Property="Foreground"
+            Value="{Binding Foreground, RelativeSource={RelativeSource Self}}"/>
+    <Setter Property="Background"
+            Value="{Binding Background, RelativeSource={RelativeSource Self}}"/>
+    <Setter Property="OpacityMask" Value="#CCFFFFFF"/>
+  </Style>
 </Styles>

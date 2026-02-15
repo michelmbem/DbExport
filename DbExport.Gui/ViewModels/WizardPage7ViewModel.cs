@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using AvaloniaEdit;
+using AvaloniaEdit.Search;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DbExport.Gui.Models;
@@ -19,6 +20,7 @@ namespace DbExport.Gui.ViewModels;
 public partial class WizardPage7ViewModel : WizardPageViewModel
 {
     private bool hadError;
+    private SearchPanel? searchPanel;
     
     [ObservableProperty]
     private MigrationSummary? summary;
@@ -33,10 +35,9 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     public WizardPage7ViewModel()
     {
         Header.Title = "Proceed with migration";
-        Header.Description = """
-                             Below is the SQL script that was generated to migrate your database.
-                             You can run it directly from this wizard, or save it to a file and load it in a dedicated tool.
-                             """;
+        Header.Description = "Below is the SQL script that was generated to migrate your database. " +
+                             "Depending on the target database, you can run it directly from this wizard, " +
+                             "or save it to a file and load it in a dedicated tool.";
         
         Progress.IsIndeterminate = true;
     }
@@ -88,6 +89,26 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         await output.FlushAsync();
     }
     
+    [RelayCommand]
+    private void ReloadScript()
+    {
+        OnSummaryChanged(Summary);
+    }
+
+    [RelayCommand]
+    private void FindReplace(TextEditor editor)
+    {
+        if (searchPanel == null)
+        {
+            editor.SearchPanel.Uninstall();
+            searchPanel = SearchPanel.Install(editor);
+        }
+        
+        var selection = editor.TextArea.Selection;
+        searchPanel.SearchPattern = selection.IsEmpty || selection.IsMultiline ? string.Empty : selection.GetText();
+        searchPanel.Open();
+    }
+    
     [RelayCommand(CanExecute = nameof(CanUndo))]
     private void Undo(TextEditor editor) => editor.Undo();
     
@@ -108,30 +129,6 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     
     [RelayCommand]
     private void SelectAll(TextEditor editor) => editor.SelectAll();
-    
-    private static bool CanUndo(TextEditor editor) => editor.CanUndo;
-    
-    private static bool CanRedo(TextEditor editor) => editor.CanRedo;
-    
-    private static bool CanCut(TextEditor editor) => editor.CanCut;
-    
-    private static bool CanCopy(TextEditor editor) => editor.CanCopy;
-    
-    private static bool CanPaste(TextEditor editor) => editor.CanPaste;
-    
-    private static bool CanDelete(TextEditor editor) => editor.CanDelete;
-
-    private bool CanExecuteScript() =>
-        Summary != null &&
-        Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsScriptExecution) &&
-        ScriptIsReady();
-
-    private bool CanSaveScript() =>
-        Summary != null &&
-        Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsDDL) &&
-        ScriptIsReady();
-
-    private bool ScriptIsReady() => !(IsBusy || string.IsNullOrWhiteSpace(SqlScript));
     
     private static string GenerateSqlScript(MigrationSummary? summary)
     {
@@ -197,6 +194,30 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
             Log.Error(e, "Failed to execute SQL script");
         }
     }
+
+    private bool CanExecuteScript() =>
+        Summary != null &&
+        Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsScriptExecution) &&
+        ScriptIsReady();
+
+    private bool CanSaveScript() =>
+        Summary != null &&
+        Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsDDL) &&
+        ScriptIsReady();
+
+    private bool ScriptIsReady() => !(IsBusy || string.IsNullOrWhiteSpace(SqlScript));
+    
+    private static bool CanUndo(TextEditor editor) => editor.CanUndo;
+    
+    private static bool CanRedo(TextEditor editor) => editor.CanRedo;
+    
+    private static bool CanCut(TextEditor editor) => editor.CanCut;
+    
+    private static bool CanCopy(TextEditor editor) => editor.CanCopy;
+    
+    private static bool CanPaste(TextEditor editor) => editor.CanPaste;
+    
+    private static bool CanDelete(TextEditor editor) => editor.CanDelete;
 
     partial void OnSummaryChanged(MigrationSummary? value)
     {

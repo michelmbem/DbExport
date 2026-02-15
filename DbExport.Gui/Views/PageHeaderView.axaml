@@ -17,7 +17,8 @@
     <StackPanel Spacing="10">
       <TextBlock Text="{Binding Title}"
                  FontSize="36"/>
-      <TextBlock Text="{Binding Description}"/>
+      <TextBlock Text="{Binding Description}"
+                 TextWrapping="Wrap"/>
     </StackPanel>
   </Border>
 </UserControl>

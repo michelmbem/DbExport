@@ -49,7 +49,7 @@
              Source="/Assets/connection.png"
              Stretch="Uniform"/>
       <TextBlock Grid.Row="4"
-                 Text="Copyright (&#x00A9;) Addy 2014-2026"
+                 Text="Copyright &#x00A9; Addy 2014-2026"
                  Foreground="White"
                  FontSize="11"
                  Margin="0, 5, 0, 0"/>
