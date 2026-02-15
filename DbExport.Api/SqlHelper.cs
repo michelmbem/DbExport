@@ -105,18 +105,10 @@ public sealed class SqlHelper(DbConnection connection) : IDisposable
 
     public void ExecuteScript(string script)
     {
-        switch (ProviderName)
-        {
-            case ProviderNames.SQLSERVER:
-                ExecuteSqlScript(script);
-                break;
-            case ProviderNames.ORACLE:
-                ExecuteOracleScript(script);
-                break;
-            default:
-                Execute(script);
-                break;
-        }
+        if (ProviderName == ProviderNames.SQLSERVER)
+            ExecuteSqlScript(script);
+        else
+            Execute(script);
     }
 
     public static DbDataReader OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
@@ -229,11 +221,4 @@ public sealed class SqlHelper(DbConnection connection) : IDisposable
         script = Regex.Replace(script, @"[\r\n]GO[\r\n]", ";\n", RegexOptions.IgnoreCase);
         Execute(script);
     }
-
-    private void ExecuteOracleScript(string script) =>
-        throw new InvalidOperationException(
-            """
-            The Oracle Data Provider for .NET does not support running commands in batch mode.
-            Please save the script to a file then run it using the "SQL*Plus" command line tool.
-            """);
 }

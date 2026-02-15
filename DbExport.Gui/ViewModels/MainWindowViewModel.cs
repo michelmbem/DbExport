@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DbExport.Gui.Models;
@@ -30,6 +32,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         wizardPages = [ wizardPage1, wizardPage2, wizardPage3, wizardPage4, wizardPage5, wizardPage6, wizardPage7 ];
+        Sidebar.Items.AddRange(wizardPages.Select(p => new SidebarItem(p.Header.Title)));
         CurrentPage = wizardPages[0];
     }
     
@@ -115,5 +118,11 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             wizardPage7.Summary = wizardPage6.Summary;
         }
+    }
+
+    partial void OnCurrentPageChanged(WizardPageViewModel? value)
+    {
+        var currentIndex = Array.IndexOf(wizardPages, value);
+        Sidebar.SelectedIndex = currentIndex;
     }
 }

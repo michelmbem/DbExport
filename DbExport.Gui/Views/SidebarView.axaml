@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Svg.Controls.Avalonia"
              xmlns:vm="using:DbExport.Gui.ViewModels"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -12,9 +13,46 @@
     <vm:SidebarViewModel/>
   </Design.DataContext>
   
-  <Border>
+  <Border Padding="10">
     <Border.Background>
       <ImageBrush Source="/Assets/banner.jpg" Stretch="Fill" />
     </Border.Background>
+    <Grid RowDefinitions="Auto, Auto, *, Auto, Auto">
+      <TextBlock Grid.Row="0"
+                 Text="Steps"
+                 Foreground="White"
+                 FontSize="24"
+                 FontWeight="Bold"
+                 Margin="0, 0, 0, 10"/>
+      <ItemsControl Grid.Row="1"
+                    ItemsSource="{Binding Items}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Orientation="Horizontal">
+              <svg:Svg Width="32"
+                       Height="32"
+                       Path="/Assets/unselected-item.svg"
+                       IsVisible="{Binding !IsSelected}"/>
+              <svg:Svg Width="32"
+                       Height="32"
+                       Path="/Assets/selected-item.svg"
+                       IsVisible="{Binding IsSelected}"/>
+              <TextBlock Text="{Binding Title}"
+                         Foreground="{Binding Foreground}"
+                         FontSize="16"
+                         VerticalAlignment="Center"/>
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <Image Grid.Row="3"
+             Source="/Assets/connection.png"
+             Stretch="Uniform"/>
+      <TextBlock Grid.Row="4"
+                 Text="Copyright (&#x00A9;) Addy 2014-2026"
+                 Foreground="White"
+                 FontSize="11"
+                 Margin="0, 5, 0, 0"/>
+    </Grid>
   </Border>
 </UserControl>

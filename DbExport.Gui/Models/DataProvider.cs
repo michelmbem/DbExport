@@ -8,11 +8,18 @@ namespace DbExport.Gui.Models;
 public enum ProviderFeatures
 {
     None = 0,
-    IsFileProvider = 1,
+    IsFileBased = 1,
     SupportsTrustedConnection = 2,
     SupportsDatabaseCreation = 4,
-    FileDatabase = IsFileProvider | SupportsDatabaseCreation,
-    SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation,
+    SupportsDDL = 8,
+    SupportsScriptExecution = 16,
+    
+    Access = IsFileBased | SupportsDatabaseCreation | SupportsScriptExecution,
+    SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation | SupportsDDL| SupportsScriptExecution,
+    Oracle = SupportsTrustedConnection | SupportsDDL,
+    MySql = SupportsDatabaseCreation | SupportsDDL| SupportsScriptExecution,
+    PostgreSql = SupportsDDL | SupportsScriptExecution,
+    SQLite = IsFileBased | SupportsDatabaseCreation | SupportsDDL | SupportsScriptExecution ,
 }
 
 public sealed class DataProvider(
@@ -33,13 +40,13 @@ public sealed class DataProvider(
     public static DataProvider[] All { get; } =
     [
 #if WINDOWS
-        new(ProviderNames.ACCESS, "Microsoft Access", ProviderFeatures.FileDatabase, new OleDbConnectionStringBuilder(), ACCESS_DATABASE_FILE_PATTERN),
+        new(ProviderNames.ACCESS, "Microsoft Access", ProviderFeatures.Access, new OleDbConnectionStringBuilder(), ACCESS_DATABASE_FILE_PATTERN),
 #endif
         new(ProviderNames.SQLSERVER, "Microsoft SQL Server", ProviderFeatures.SqlServer, new SqlConnectionStringBuilder(), SQLSERVER_DATABASE_LIST_QUERY),
-        new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.SupportsTrustedConnection, new OracleConnectionStringBuilder()),
-        new(ProviderNames.MYSQL, "MySQL", ProviderFeatures.SupportsDatabaseCreation, new MySqlConnectionStringBuilder(), MYSQL_DATABASE_LIST_QUERY),
-        new(ProviderNames.POSTGRESQL, "PostgreSQL", ProviderFeatures.None, new NpgsqlConnectionStringBuilder(), POSTGRESQL_DATABASE_LIST_QUERY),
-        new(ProviderNames.SQLITE, "SQLite 3", ProviderFeatures.FileDatabase, new SQLiteConnectionStringBuilder(), SQLITE_DATABASE_FILE_PATTERN)
+        new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.Oracle, new OracleConnectionStringBuilder()),
+        new(ProviderNames.MYSQL, "MySQL", ProviderFeatures.MySql, new MySqlConnectionStringBuilder(), MYSQL_DATABASE_LIST_QUERY),
+        new(ProviderNames.POSTGRESQL, "PostgreSQL", ProviderFeatures.PostgreSql, new NpgsqlConnectionStringBuilder(), POSTGRESQL_DATABASE_LIST_QUERY),
+        new(ProviderNames.SQLITE, "SQLite 3", ProviderFeatures.SQLite, new SQLiteConnectionStringBuilder(), SQLITE_DATABASE_FILE_PATTERN)
     ];
 
     public string Name { get; } = name;

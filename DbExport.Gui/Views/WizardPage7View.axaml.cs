@@ -1,10 +1,10 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using AvaloniaEdit.TextMate;
 using DbExport.Gui.ViewModels;
-using Serilog;
 using TextMateSharp.Grammars;
 
 namespace DbExport.Gui.Views;
@@ -33,7 +33,10 @@ public partial class WizardPage7View : UserControl
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         InitializeSqlEditor();
-        
+
+        foreach (var menuItem in SqlEditor.ContextMenu!.Items.Where(i => i is MenuItem).Cast<MenuItem>())
+            menuItem.CommandParameter = SqlEditor;
+
         ViewModel?.PropertyChanged += OnViewModelPropertyChanged;
     }
 

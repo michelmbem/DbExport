@@ -4,17 +4,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using AvaloniaEdit;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DbExport.Gui.Models;
 using DbExport.Providers;
 using DbExport.Providers.Npgsql;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using Serilog;
 
 namespace DbExport.Gui.ViewModels;
 
 public partial class WizardPage7ViewModel : WizardPageViewModel
 {
+    private bool hadError;
+    
     [ObservableProperty]
     private MigrationSummary? summary;
 
@@ -36,22 +41,97 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         Progress.IsIndeterminate = true;
     }
 
-    partial void OnSummaryChanged(MigrationSummary? value)
+    [RelayCommand(CanExecute = nameof(CanExecuteScript))]
+    private void ExecuteScript()
     {
-        if (value == null) return;
-        
-        Progress.Message = "Generating migration script...";
+        Progress.Message = "Executing SQL script...";
         IsBusy = true;
+        hadError = false;
         
-        Task.Run(() => SqlScript = GenerateSqlScript(value))
+        Task.Run(RunSql)
             .GetAwaiter()
             .OnCompleted(() =>
                          {
                              IsBusy = false;
-                             ExecuteScriptCommand.NotifyCanExecuteChanged();
-                             SaveScriptCommand.NotifyCanExecuteChanged();
+                             if (hadError)
+                                 _ = MessageBoxManager
+                                     .GetMessageBoxStandard("Something went wrong",
+                                                            """
+                                                            An error occurred while executing the migration script.
+                                                            Check the logs for more details.
+                                                            """,
+                                                            ButtonEnum.Ok,
+                                                            Icon.Error)
+                                     .ShowAsync();
                          });
     }
+
+    [RelayCommand(CanExecute = nameof(CanSaveScript))]
+    private async Task SaveScript(Window window)
+    {
+        var file = await window.StorageProvider.SaveFilePickerAsync(
+            new FilePickerSaveOptions
+            {
+                Title = "Save migration script as",
+                DefaultExtension = ".sql",
+                FileTypeChoices =
+                [
+                    new FilePickerFileType("SQL Script") { Patterns = ["*.sql"] },
+                    FilePickerFileTypes.All
+                ]
+            });
+
+        if (file is null) return;
+        
+        await using var output = new StreamWriter(file.Path.LocalPath, false, Utility.Encoding);
+        await output.WriteAsync(SqlScript);
+        await output.FlushAsync();
+    }
+    
+    [RelayCommand(CanExecute = nameof(CanUndo))]
+    private void Undo(TextEditor editor) => editor.Undo();
+    
+    [RelayCommand(CanExecute = nameof(CanRedo))]
+    private void Redo(TextEditor editor) => editor.Redo();
+    
+    [RelayCommand(CanExecute = nameof(CanCut))]
+    private void Cut(TextEditor editor) => editor.Cut();
+    
+    [RelayCommand(CanExecute = nameof(CanCopy))]
+    private void Copy(TextEditor editor) => editor.Copy();
+    
+    [RelayCommand(CanExecute = nameof(CanPaste))]
+    private void Paste(TextEditor editor) => editor.Paste();
+    
+    [RelayCommand(CanExecute = nameof(CanDelete))]
+    private void Delete(TextEditor editor) => editor.Delete();
+    
+    [RelayCommand]
+    private void SelectAll(TextEditor editor) => editor.SelectAll();
+    
+    private static bool CanUndo(TextEditor editor) => editor.CanUndo;
+    
+    private static bool CanRedo(TextEditor editor) => editor.CanRedo;
+    
+    private static bool CanCut(TextEditor editor) => editor.CanCut;
+    
+    private static bool CanCopy(TextEditor editor) => editor.CanCopy;
+    
+    private static bool CanPaste(TextEditor editor) => editor.CanPaste;
+    
+    private static bool CanDelete(TextEditor editor) => editor.CanDelete;
+
+    private bool CanExecuteScript() =>
+        Summary != null &&
+        Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsScriptExecution) &&
+        ScriptIsReady();
+
+    private bool CanSaveScript() =>
+        Summary != null &&
+        Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsDDL) &&
+        ScriptIsReady();
+
+    private bool ScriptIsReady() => !(IsBusy || string.IsNullOrWhiteSpace(SqlScript));
     
     private static string GenerateSqlScript(MigrationSummary? summary)
     {
@@ -103,42 +183,9 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     }
 #endif
 
-    [RelayCommand(CanExecute = nameof(ScriptIsReady))]
-    private void ExecuteScript()
-    {
-        Progress.Message = "Executing SQL script...";
-        IsBusy = true;
-        
-        Task.Run(RunSql)
-            .GetAwaiter()
-            .OnCompleted(() => IsBusy = false);
-    }
-
-    [RelayCommand(CanExecute = nameof(ScriptIsReady))]
-    private async Task SaveScript(Window window)
-    {
-        var file = await window.StorageProvider.SaveFilePickerAsync(
-            new FilePickerSaveOptions
-            {
-                Title = "Save migration script as",
-                DefaultExtension = ".sql",
-                FileTypeChoices =
-                [
-                    new FilePickerFileType("SQL Script") { Patterns = ["*.sql"] },
-                    FilePickerFileTypes.All
-                ]
-            });
-
-        if (file is null) return;
-        
-        await using var output = new StreamWriter(file.Path.LocalPath, false, Utility.Encoding);
-        await output.WriteAsync(SqlScript);
-        await output.FlushAsync();
-    }
-
     private void RunSql()
     {
-        using var helper = new SqlHelper(Summary?.TargetProvider?.Name, Summary?.TargetConnectionString);
+        using var helper = new SqlHelper(Summary?.TargetProvider.Name, Summary?.TargetConnectionString);
 
         try
         {
@@ -146,9 +193,25 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         }
         catch (Exception e)
         {
+            hadError = true;
             Log.Error(e, "Failed to execute SQL script");
         }
     }
 
-    private bool ScriptIsReady() => !(IsBusy || string.IsNullOrWhiteSpace(SqlScript));
+    partial void OnSummaryChanged(MigrationSummary? value)
+    {
+        if (value == null) return;
+        
+        Progress.Message = "Generating migration script...";
+        IsBusy = true;
+        
+        Task.Run(() => SqlScript = GenerateSqlScript(value))
+            .GetAwaiter()
+            .OnCompleted(() =>
+                         {
+                             IsBusy = false;
+                             ExecuteScriptCommand.NotifyCanExecuteChanged();
+                             SaveScriptCommand.NotifyCanExecuteChanged();
+                         });
+    }
 }

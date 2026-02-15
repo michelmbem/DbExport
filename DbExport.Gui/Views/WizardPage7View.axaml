@@ -48,28 +48,28 @@
                      TextChanged="OnSqlEditorTextChanged">
         <ae:TextEditor.ContextMenu>
           <ContextMenu>
-            <MenuItem Name="UndoMenuItem"
-                      Header="Undo"
-                      i:MenuItem.Icon="fa-rotate-left" />
-            <MenuItem Name="RedoMenuItem"
-                      Header="Redo"
-                      i:MenuItem.Icon="fa-rotate-right" />
+            <MenuItem Header="Undo"
+                      i:MenuItem.Icon="fa-rotate-left"
+                      Command="{Binding UndoCommand}"/>
+            <MenuItem Header="Redo"
+                      i:MenuItem.Icon="fa-rotate-right"
+                      Command="{Binding RedoCommand}"/>
             <Separator />
-            <MenuItem Name="CutMenuItem"
-                      Header="Cut"
-                      i:MenuItem.Icon="fa-scissors" />
-            <MenuItem Name="CopyMenuItem"
-                      Header="Copy"
-                      i:MenuItem.Icon="fa-copy" />
-            <MenuItem Name="PasteMenuItem"
-                      Header="Paste"
-                      i:MenuItem.Icon="fa-paste" />
-            <MenuItem Name="DeleteMenuItem"
-                      Header="Delete"
-                      i:MenuItem.Icon="fa-trash" />
+            <MenuItem Header="Cut"
+                      i:MenuItem.Icon="fa-scissors"
+                      Command="{Binding CutCommand}"/>
+            <MenuItem Header="Copy"
+                      i:MenuItem.Icon="fa-copy"
+                      Command="{Binding CopyCommand}"/>
+            <MenuItem Header="Paste"
+                      i:MenuItem.Icon="fa-paste"
+                      Command="{Binding PasteCommand}"/>
+            <MenuItem Header="Delete"
+                      i:MenuItem.Icon="fa-trash"
+                      Command="{Binding DeleteCommand}"/>
             <Separator />
-            <MenuItem Name="SelectAllMenuItem"
-                      Header="Select all" />
+            <MenuItem Header="Select all"
+                      Command="{Binding SelectAllCommand}"/>
           </ContextMenu>
         </ae:TextEditor.ContextMenu>
       </ae:TextEditor>
