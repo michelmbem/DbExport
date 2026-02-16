@@ -30,7 +30,7 @@ public sealed class DataProvider(
     string? databaseListQuery = null)
 {
 #if WINDOWS
-    private const string ACCESS_DATABASE_FILE_PATTERN = "Microsoft Access Database File (*.mdb;*.accdb)|*.mdb;*.accdb|All Files (*.*)|*.*";
+    private const string ACCESS_DATABASE_FILE_PATTERN = "Microsoft Access Database File (*.accdb;*.mdb)|*.accdb;*.mdb|All Files (*.*)|*.*";
 #endif
     private const string SQLITE_DATABASE_FILE_PATTERN = "SQLite Database (*.db)|*.db|All Files (*.*)|*.*";
     private const string SQLSERVER_DATABASE_LIST_QUERY = "EXEC sp_databases";

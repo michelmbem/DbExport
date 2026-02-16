@@ -200,7 +200,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
             ColumnType.SinglePrecision => "single",
             ColumnType.DoublePrecision or ColumnType.Interval => "double",
             ColumnType.Currency => "currency",
-            ColumnType.Decimal when column.Precision == 0 => "decimal",
+            ColumnType.Decimal when column.Precision == 0 || column.Precision > 28 => "decimal",
             ColumnType.Decimal when column.Scale == 0 => $"decimal({column.Precision})",
             ColumnType.Decimal => $"decimal({column.Precision}, {column.Scale})",
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "datetime",

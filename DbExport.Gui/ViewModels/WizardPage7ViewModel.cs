@@ -54,16 +54,7 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
             .OnCompleted(() =>
                          {
                              IsBusy = false;
-                             if (hadError)
-                                 _ = MessageBoxManager
-                                     .GetMessageBoxStandard("Something went wrong",
-                                                            """
-                                                            An error occurred while executing the migration script.
-                                                            Check the logs for more details.
-                                                            """,
-                                                            ButtonEnum.Ok,
-                                                            Icon.Error)
-                                     .ShowAsync();
+                             ShowScriptExecutionMessage(hadError);
                          });
     }
 
@@ -160,7 +151,7 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     }
 
 #if WINDOWS
-    private static void GenerateMdb(MigrationSummary? summary)
+    private static void GenerateAccessDb(MigrationSummary? summary)
     {
         if (summary == null) return;
         
@@ -180,13 +171,46 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     }
 #endif
 
+    private static void ShowScriptExecutionMessage(bool hadError)
+    {
+        string title, message;
+        Icon icon;
+
+        if (hadError)
+        {
+            title = "Migration completed with errors";
+            message = """
+                The migration process has completed,
+                but some errors occurred while executing the migration script.
+                Please check the logs for more details.
+                """;
+            icon = Icon.Error;
+        }
+        else
+        {
+            title = "Migration completed successfully";
+            message = """
+                The migration process has completed successfully.
+                You can now close this wizard.
+                """;
+            icon = Icon.Success;
+        }
+
+        _ = MessageBoxManager.GetMessageBoxStandard(title, message, ButtonEnum.Ok, icon)
+                             .ShowAsync();
+    }
+
     private void RunSql()
     {
-        using var helper = new SqlHelper(Summary?.TargetProvider.Name, Summary?.TargetConnectionString);
-
-        try
+       try
         {
-            helper.ExecuteScript(SqlScript);
+            if (ProviderNames.ACCESS == Summary?.TargetProvider.Name)
+                GenerateAccessDb(Summary);
+            else
+            {
+                using var helper = new SqlHelper(Summary?.TargetProvider.Name, Summary?.TargetConnectionString);
+                helper.ExecuteScript(SqlScript);
+            }
         }
         catch (Exception e)
         {
@@ -198,7 +222,7 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     private bool CanExecuteScript() =>
         Summary != null &&
         Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsScriptExecution) &&
-        ScriptIsReady();
+        (ScriptIsReady() || !Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsDDL));
 
     private bool CanSaveScript() =>
         Summary != null &&
@@ -222,6 +246,21 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     partial void OnSummaryChanged(MigrationSummary? value)
     {
         if (value == null) return;
+
+        if (!value.TargetProvider.HasFeature(ProviderFeatures.SupportsDDL))
+        {
+            SqlScript = """
+                /*
+                The target database provider does not support DDL statements,
+                so no migration script can be generated.
+                You can proceed with the migration by clicking the "Execute" button above,
+                which will run the necessary operations directly against the target database.
+                */
+                """;
+            
+            ExecuteScriptCommand.NotifyCanExecuteChanged();
+            return;
+        }
         
         Progress.Message = "Generating migration script...";
         IsBusy = true;
