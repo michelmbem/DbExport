@@ -11,15 +11,19 @@ public partial class MySqlOptionsViewModel : ProviderOptionsViewModel
 {
     public MySqlOptionsViewModel()
     {
+        StorageEngines = [..MySqlOptions.StorageEngines];
+        CharacterSets = [..MySqlOptions.CharacterSets];
+        SortOrders = [];
+
         StorageEngine = StorageEngines.FirstOrDefault();
         CharacterSet = CharacterSets.LastOrDefault();
     }
 
-    public ObservableCollection<string> StorageEngines { get; } = [..MySqlOptions.StorageEngines];
+    public ObservableCollection<string> StorageEngines { get; }
 
-    public ObservableCollection<string> CharacterSets { get; } = [..MySqlOptions.CharacterSets];
+    public ObservableCollection<string> CharacterSets { get; }
 
-    public ObservableCollection<string> SortOrders { get; } = [];
+    public ObservableCollection<string> SortOrders { get; }
 
     [ObservableProperty]
     private string? storageEngine;
