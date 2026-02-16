@@ -34,7 +34,7 @@ public partial class ConnectionViewModel : ViewModelBase
             await using var connection = Utility.GetConnection(DataProvider?.Name, ConnectionString);
             await connection.OpenAsync();
             message = "Test succeeded!";
-            icon = Icon.Info;
+            icon = Icon.Success;
         }
         catch (Exception e)
         {
