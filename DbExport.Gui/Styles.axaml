@@ -19,7 +19,7 @@
                   Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
                   Padding="5,0"
                   Margin="5,0,0,0">
-            <TextBlock Text="{TemplateBinding Header}" FontWeight="Bold" />
+            <TextBlock Text="{TemplateBinding Header}" FontWeight="Bold"/>
           </Border>
 
           <!-- Content Area -->
@@ -32,7 +32,7 @@
                   BorderThickness="1">
             <ContentPresenter Name="PART_ContentPresenter"
                               Padding="10"
-                              Content="{TemplateBinding Content}" />
+                              Content="{TemplateBinding Content}"/>
           </Border>
         </Grid>
       </ControlTemplate>

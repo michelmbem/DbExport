@@ -10,12 +10,12 @@ public class MySqlOptions
 
     public static string[] StorageEngines =>
     [
-        "", "InnoDB", "MyISAM", "Memory", "CSV", "Archive", "Blackhole", "Federated", "Partitioned"
+        "InnoDB", "MyISAM", "Memory", "CSV", "Archive", "Blackhole", "Federated", "Partitioned"
     ];
 
     public static string[] CharacterSets =>
     [
-        "", "armscii8", "ascii", "big5", "binary", "cp1250", "cp1251", "cp1256", "cp1257", "cp850",
+        "armscii8", "ascii", "big5", "binary", "cp1250", "cp1251", "cp1256", "cp1257", "cp850",
         "cp852", "cp866", "cp932", "dec8", "eucjpms", "euckr", "gb2312", "gbk", "geostd8", "greek",
         "hebrew", "hp8", "keybcs2", "koi8r", "koi8u", "latin1", "latin2", "latin5", "latin7",
         "macce", "macroman", "sjis", "swe7", "tis620", "ucs2", "ujis", "utf8"
@@ -87,7 +87,7 @@ public class MySqlOptions
                 "utf8_slovak_ci", "utf8_slovenian_ci", "utf8_spanish2_ci", "utf8_spanish_ci", "utf8_swedish_ci",
                 "utf8_turkish_ci", "utf8_unicode_ci"
             ],
-            _ => [""]
+            _ => []
         };
     
     public string ToMarkdown() => $"""

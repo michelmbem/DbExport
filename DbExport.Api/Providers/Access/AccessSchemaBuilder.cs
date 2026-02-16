@@ -200,7 +200,8 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
             ColumnType.SinglePrecision => "single",
             ColumnType.DoublePrecision or ColumnType.Interval => "double",
             ColumnType.Currency => "currency",
-            ColumnType.Decimal when column.Precision == 0 || column.Precision > 28 => "decimal",
+            ColumnType.Decimal when column.Precision == 0 => "decimal",
+            ColumnType.Decimal when column.Precision > 28 => $"decimal(28, {column.Scale})",
             ColumnType.Decimal when column.Scale == 0 => $"decimal({column.Precision})",
             ColumnType.Decimal => $"decimal({column.Precision}, {column.Scale})",
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "datetime",
@@ -236,7 +237,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
                 return "0x" + Utility.BinToHex(bytes);
             }
             default:
-                return Convert.ToString(value, CultureInfo.GetCultureInfo("en-US"));
+                return Convert.ToString(value, CultureInfo.InvariantCulture);
         }
     }
 
@@ -264,7 +265,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
     private void ExecuteQuery()
     {
         connection.Execute(queryBuilder.ToString(), out _);
-        queryBuilder.Remove(0, queryBuilder.Length);
+        queryBuilder.Clear();
     }
 
     private void ImportRecord(Table table, DbDataReader dr)

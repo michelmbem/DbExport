@@ -1,4 +1,7 @@
+using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DbExport.Providers.MySqlClient;
 
@@ -6,23 +9,39 @@ namespace DbExport.Gui.ViewModels;
 
 public partial class MySqlOptionsViewModel : ProviderOptionsViewModel
 {
+    public MySqlOptionsViewModel()
+    {
+        StorageEngine = StorageEngines.FirstOrDefault();
+        CharacterSet = CharacterSets.LastOrDefault();
+    }
+
     public ObservableCollection<string> StorageEngines { get; } = [..MySqlOptions.StorageEngines];
 
     public ObservableCollection<string> CharacterSets { get; } = [..MySqlOptions.CharacterSets];
 
-    [ObservableProperty] private string? storageEngine;
+    public ObservableCollection<string> SortOrders { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SortOrders))]
+    private string? storageEngine;
+
+    [ObservableProperty]
     private string? characterSet;
 
-    [ObservableProperty] private string? sortOrder;
-
-    public string[] SortOrders => MySqlOptions.GetSortOrders(CharacterSet);
+    [ObservableProperty]
+    private string? sortOrder;
     
     partial void OnCharacterSetChanged(string? value)
     {
-        SortOrder = null;
+        SortOrders.Clear();
+        
+        if (value is null)
+            SortOrder = null;
+        else
+        {
+            SortOrders.AddRange(MySqlOptions.GetSortOrders(value));
+            SortOrder = SortOrders.FirstOrDefault(so => so.EndsWith("general_ci", StringComparison.OrdinalIgnoreCase)) ??
+                        SortOrders.FirstOrDefault();
+        }
     }
 
     public override string Title => "MySQL Options";

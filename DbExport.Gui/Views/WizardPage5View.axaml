@@ -26,13 +26,13 @@
               SelectionMode="Toggle">
       <TreeView.Styles>
         <Style Selector="TreeViewItem"  x:DataType="m:TreeNode">
-          <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+          <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
         </Style>
       </TreeView.Styles>
       <TreeView.ItemTemplate>
         <TreeDataTemplate ItemsSource="{Binding Children}">
           <StackPanel Orientation="Horizontal">
-            <CheckBox IsChecked="{Binding IsChecked}" />
+            <CheckBox IsChecked="{Binding IsChecked}"/>
             <i:Icon Value="{Binding Icon}"
                     Foreground="CadetBlue"/>
             <TextBlock Text="{Binding Text}"

@@ -16,7 +16,7 @@
   
   <Border Padding="10">
     <Border.Background>
-      <ImageBrush Source="/Assets/banner.jpg" Stretch="Fill" />
+      <ImageBrush Source="/Assets/banner.jpg" Stretch="Fill"/>
     </Border.Background>
     <Grid RowDefinitions="Auto, Auto, *, Auto, Auto">
       <TextBlock Grid.Row="0"

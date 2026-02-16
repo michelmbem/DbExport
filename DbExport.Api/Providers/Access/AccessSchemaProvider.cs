@@ -204,7 +204,8 @@ public class AccessSchemaProvider : ISchemaProvider
             ADOX.DataTypeEnum.adCurrency => ColumnType.Currency,
             ADOX.DataTypeEnum.adDecimal or ADOX.DataTypeEnum.adNumeric or
             ADOX.DataTypeEnum.adVarNumeric => ColumnType.Decimal,
-            ADOX.DataTypeEnum.adDate or ADOX.DataTypeEnum.adDBTimeStamp => ColumnType.DateTime,
+            ADOX.DataTypeEnum.adDate or ADOX.DataTypeEnum.adDBTime or
+            ADOX.DataTypeEnum.adDBTimeStamp => ColumnType.DateTime,
             ADOX.DataTypeEnum.adVarChar or ADOX.DataTypeEnum.adVarWChar => ColumnType.NVarChar,
             ADOX.DataTypeEnum.adLongVarChar or ADOX.DataTypeEnum.adLongVarWChar => ColumnType.NText,
             ADOX.DataTypeEnum.adLongVarBinary => ColumnType.Blob,
