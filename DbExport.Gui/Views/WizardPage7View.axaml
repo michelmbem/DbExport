@@ -21,7 +21,7 @@
     <ContentControl Grid.Row="1"
                     Content="{Binding Progress}"
                     IsVisible="{Binding IsBusy}"
-                    Background="#CC000000"
+                    Background="#CC777777"
                     ZIndex="100"/>
     <DockPanel Grid.Row="1">
       <Border DockPanel.Dock="Top"

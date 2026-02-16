@@ -78,8 +78,8 @@ public class MySqlCodeGenerator : CodeGenerator
         if (MySqlOptions != null)
         {
             engine = MySqlOptions.StorageEngine;
-            charset = MySqlOptions.CharacterSet;
-            sortOrder = MySqlOptions.SortOrder;
+            charset = MySqlOptions.CharacterSet.Name;
+            sortOrder = MySqlOptions.Collation;
         }
 
         if (!string.IsNullOrEmpty(engine))

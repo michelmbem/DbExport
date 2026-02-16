@@ -17,15 +17,21 @@
     <HeaderedContentControl Grid.Row="1"
                             Header="Provider"
                             Margin="15">
-      <Grid ColumnDefinitions="Auto, *">
+      <Grid ColumnDefinitions="Auto, *"
+            ColumnSpacing="10">
+        <Grid.Styles>
+	        <Style Selector="Label">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style Selector="ComboBox">
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            </Style>
+        </Grid.Styles>
         <Label Grid.Column="0"
                Content="Select a RDBMS :"
-               VerticalAlignment="Center"
                Target="ProviderComboBox"/>
         <ComboBox Name="ProviderComboBox"
                   Grid.Column="1"
-                  HorizontalAlignment="Stretch"
-                  Margin="10, 0, 0, 0"
                   ItemsSource="{Binding AllProviders}"
                   SelectedItem="{Binding SelectedProvider}">
           <ComboBox.ItemTemplate>

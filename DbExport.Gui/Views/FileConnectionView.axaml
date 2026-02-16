@@ -16,10 +16,23 @@
         ColumnDefinitions="Auto, *"
         RowSpacing="10"
         ColumnSpacing="10">
+    <Grid.Styles>
+	    <Style Selector="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10, 5"/>
+        </Style>
+        <Style Selector="Button > StackPanel">
+            <Setter Property="Orientation" Value="Horizontal"/>
+            <Setter Property="Spacing" Value="5"/>
+        </Style>
+    </Grid.Styles>
     <Label Grid.Row="0"
            Grid.Column="0"
            Content="File path :"
-           VerticalAlignment="Center"
            Target="FilePathTextBox"/>
     <TextBox Name="FilePathTextBox"
              Grid.Row="0"
@@ -33,7 +46,7 @@
             HorizontalAlignment="Right"
             Command="{Binding ChooseFileCommand}"
             CommandParameter="{Binding $parent[Window]}">
-      <StackPanel Orientation="Horizontal" Spacing="5">
+      <StackPanel>
         <i:Icon Value="fa-folder-open"></i:Icon>
         <TextBlock Text="Choose a database file"/>
       </StackPanel>
@@ -41,7 +54,6 @@
     <Label Grid.Row="2"
            Grid.Column="0"
            Content="Username :"
-           VerticalAlignment="Center"
            Target="UsernameTextBox"/>
     <TextBox Name="UsernameTextBox"
              Grid.Row="2"
@@ -50,7 +62,6 @@
     <Label Grid.Row="3"
            Grid.Column="0"
            Content="Password :"
-           VerticalAlignment="Center"
            Target="PasswordTextBox"/>
     <TextBox Name="PasswordTextBox"
              Grid.Row="3"

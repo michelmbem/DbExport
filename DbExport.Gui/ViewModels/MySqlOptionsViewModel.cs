@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using AvaloniaEdit.Utils;
@@ -9,51 +8,50 @@ namespace DbExport.Gui.ViewModels;
 
 public partial class MySqlOptionsViewModel : ProviderOptionsViewModel
 {
-    public MySqlOptionsViewModel()
-    {
-        StorageEngines = [..MySqlOptions.StorageEngines];
-        CharacterSets = [..MySqlOptions.CharacterSets];
-        SortOrders = [];
-
-        StorageEngine = StorageEngines.FirstOrDefault();
-        CharacterSet = CharacterSets.LastOrDefault();
-    }
-
-    public ObservableCollection<string> StorageEngines { get; }
-
-    public ObservableCollection<string> CharacterSets { get; }
-
-    public ObservableCollection<string> SortOrders { get; }
-
     [ObservableProperty]
     private string? storageEngine;
 
     [ObservableProperty]
-    private string? characterSet;
+    private CharacterSet? characterSet;
 
     [ObservableProperty]
-    private string? sortOrder;
-    
-    partial void OnCharacterSetChanged(string? value)
+    private string? collation;
+
+    public MySqlOptionsViewModel()
     {
-        SortOrders.Clear();
-        
-        if (value is null)
-            SortOrder = null;
-        else
-        {
-            SortOrders.AddRange(MySqlOptions.GetSortOrders(value));
-            SortOrder = SortOrders.FirstOrDefault(so => so.EndsWith("general_ci", StringComparison.OrdinalIgnoreCase)) ??
-                        SortOrders.FirstOrDefault();
-        }
+        StorageEngines = [..MySqlOptions.StorageEngines];
+        CharacterSets = [..MySqlOptions.CharacterSets];
+        Collations = [];
+
+        StorageEngine = StorageEngines.FirstOrDefault();
+        CharacterSet = CharacterSets.FirstOrDefault(cs => cs.Name == "utf8mb3");
     }
 
+    public ObservableCollection<string> StorageEngines { get; }
+
+    public ObservableCollection<CharacterSet> CharacterSets { get; }
+
+    public ObservableCollection<string> Collations { get; }
+
     public override string Title => "MySQL Options";
-    
+
     public override object Options => new MySqlOptions
     {
         StorageEngine = StorageEngine,
         CharacterSet = CharacterSet,
-        SortOrder = SortOrder
+        Collation = Collation
     };
+
+    partial void OnCharacterSetChanged(CharacterSet? value)
+    {
+        Collations.Clear();
+        
+        if (value is null)
+            Collation = null;
+        else
+        {
+            Collations.AddRange(value.Collations);
+            Collation = value.DefaultCollation;
+        }
+    }
 }

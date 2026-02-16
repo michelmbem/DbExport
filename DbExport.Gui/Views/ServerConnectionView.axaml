@@ -15,10 +15,26 @@
         ColumnDefinitions="Auto, *"
         RowSpacing="10"
         ColumnSpacing="10">
+    <Grid.Styles>
+	    <Style Selector="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10, 5"/>
+        </Style>
+        <Style Selector="Button > StackPanel">
+            <Setter Property="Orientation" Value="Horizontal"/>
+            <Setter Property="Spacing" Value="5"/>
+        </Style>
+    </Grid.Styles>
     <Label Grid.Row="0"
            Grid.Column="0"
            Content="Host :"
-           VerticalAlignment="Center"
            Target="HostTextBox"/>
     <TextBox Name="HostTextBox"
              Grid.Row="0"
@@ -27,7 +43,6 @@
     <Label Grid.Row="1"
            Grid.Column="0"
            Content="Port :"
-           VerticalAlignment="Center"
            Target="PortTextBox"/>
     <Grid Grid.Row="1"
           Grid.Column="1"
@@ -44,7 +59,6 @@
     <Label Grid.Row="2"
            Grid.Column="0"
            Content="Username :"
-           VerticalAlignment="Center"
            Target="UsernameTextBox"/>
     <TextBox Name="UsernameTextBox"
              Grid.Row="2"
@@ -54,7 +68,6 @@
     <Label Grid.Row="3"
            Grid.Column="0"
            Content="Password :"
-           VerticalAlignment="Center"
            Target="PasswordTextBox"/>
     <TextBox Name="PasswordTextBox"
              Grid.Row="3"
@@ -65,13 +78,11 @@
     <Label Grid.Row="4"
            Grid.Column="0"
            Content="Database :"
-           VerticalAlignment="Center"
            Target="DatabaseComboBox"/>
     <ComboBox Name="DatabaseComboBox"
              Grid.Row="4"
              Grid.Column="1"
              IsEditable="True"
-             HorizontalAlignment="Stretch"
              ItemsSource="{Binding AllCatalogs}"
              Text="{Binding Catalog}"
              DropDownOpened="OnDatabaseComboBoxDropDownOpened"/>
