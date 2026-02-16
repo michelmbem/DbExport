@@ -14,9 +14,7 @@ public class OleDbConnectionStringBuilder : IConnectionStringBuilder
     public string Build(string dataSource, int? portNumber, string? database,
                         bool trustedConnection, string? username, string? password)
     {
-        var sb = new StringBuilder(dataSource.EndsWith(".mdb", StringComparison.OrdinalIgnoreCase)
-                                       ? "Provider=Microsoft.Jet.OLEDB.4.0"
-                                       : "Provider=Microsoft.ACE.OLEDB.12.0");
+        var sb = new StringBuilder("Provider=Microsoft.ACE.OLEDB.12.0");
 
         sb.Append($";Data Source={dataSource}");
         

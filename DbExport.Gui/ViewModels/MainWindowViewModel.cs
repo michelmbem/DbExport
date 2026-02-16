@@ -93,11 +93,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void LoadDatabaseSchema()
     {
-        var schemaProvider = SchemaProvider.GetProvider(wizardPage2.SelectedProvider.Name,
-                                                        wizardPage2.ConnectionString);
-        
         try
         {
+            var schemaProvider = SchemaProvider.GetProvider(wizardPage2.SelectedProvider.Name,
+                                                            wizardPage2.ConnectionString);
+
             wizardPage5.IsBusy = true;
             wizardPage5.Database = SchemaProvider.GetDatabase(schemaProvider);
         }

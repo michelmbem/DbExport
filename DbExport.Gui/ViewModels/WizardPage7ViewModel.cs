@@ -164,7 +164,7 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     {
         if (summary == null) return;
         
-        var builder = new AccessSchemaBuilder(summary.TargetConnectionString)
+        var builder = new Providers.Access.AccessSchemaBuilder(summary.TargetConnectionString)
         {
             ExportOptions = summary.ExportOptions
         };

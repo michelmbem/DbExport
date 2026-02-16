@@ -19,7 +19,12 @@ public static class Utility
     public static void RegisterDbProviderFactories()
     {
         SQLitePCL.Batteries.Init();
-        
+
+#if WINDOWS
+#pragma warning disable CA1416 // Verify platform compatibility
+        DbProviderFactories.RegisterFactory(ProviderNames.ACCESS, System.Data.OleDb.OleDbFactory.Instance);
+#pragma warning restore CA1416 // Verify platform compatibility
+#endif
         DbProviderFactories.RegisterFactory(ProviderNames.SQLSERVER, Microsoft.Data.SqlClient.SqlClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.ORACLE, Oracle.ManagedDataAccess.Client.OracleClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.MYSQL, MySql.Data.MySqlClient.MySqlClientFactory.Instance);
@@ -32,9 +37,8 @@ public static class Utility
         const StringSplitOptions splitOptions = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
         
         var properties = new Dictionary<string, string>();
-        var settings = connectionString.Split(';', splitOptions);
 
-        foreach (var setting in settings)
+        foreach (var setting in connectionString.Split(';', splitOptions))
         {
             var members = setting.Split('=', splitOptions);
             var (key, value) = (members[0], members.Length > 1 ? members[1] : string.Empty);
@@ -51,9 +55,8 @@ public static class Utility
         const StringSplitOptions splitOptions = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
         
         var sb = new StringBuilder();
-        var settings = connectionString.Split(';', splitOptions);
 
-        foreach (var setting in settings)
+        foreach (var setting in connectionString.Split(';', splitOptions))
         {
             var members = setting.Split('=', splitOptions);
             var (key, value) = (members[0], members.Length > 1 ? members[1] : string.Empty);
@@ -70,13 +73,11 @@ public static class Utility
 
     public static DbConnection GetConnection(string providerName, string connectionString)
     {
-        var factory = DbProviderFactories.GetFactory(providerName);
-        var connection = factory.CreateConnection();
-        
-        if (connection == null)
+        var connection = DbProviderFactories.GetFactory(providerName).CreateConnection() ??
             throw new InvalidOperationException($"Cannot create connection for provider '{providerName}'");
-        
+
         connection.ConnectionString = connectionString;
+
         return connection;
     }
 
