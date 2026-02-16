@@ -1,58 +1,58 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Nullable>disable</Nullable>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <RootNamespace>DbExport</RootNamespace>
-    <OutputPath>..\Bin\$(Configuration)\</OutputPath>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Nullable>disable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <RootNamespace>DbExport</RootNamespace>
+        <OutputPath>..\Bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-    <TargetFramework>net10.0-windows</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+        <TargetFramework>net10.0-windows</TargetFramework>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(OS)' == 'Unix'">
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.100" />
-    <PackageReference Include="MySql.Data" Version="9.6.0" />
-    <PackageReference Include="Npgsql" Version="10.0.1" />
-    <PackageReference Include="System.Data.SQLite" Version="2.0.2" />
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.2" />
-  </ItemGroup>
+    <PropertyGroup Condition="'$(OS)' == 'Unix'">
+        <TargetFramework>net10.0</TargetFramework>
+    </PropertyGroup>
 
-    <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
-		<PackageReference Include="System.Data.OleDb" Version="10.0.3" />
-		<COMReference Include="ADODB">
-			<WrapperTool>tlbimp</WrapperTool>
-			<VersionMinor>1</VersionMinor>
-			<VersionMajor>6</VersionMajor>
-			<Guid>b691e011-1797-432e-907a-4d8c69339129</Guid>
-			<Lcid>0</Lcid>
-			<Isolated>false</Isolated>
-			<EmbedInteropTypes>true</EmbedInteropTypes>
-		</COMReference>
-	    <COMReference Include="ADOX">
-		    <WrapperTool>tlbimp</WrapperTool>
-		    <VersionMinor>0</VersionMinor>
-		    <VersionMajor>6</VersionMajor>
-		    <Guid>00000600-0000-0010-8000-00aa006d2ea4</Guid>
-		    <Lcid>0</Lcid>
-		    <Isolated>false</Isolated>
-		    <EmbedInteropTypes>true</EmbedInteropTypes>
-	    </COMReference>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4"/>
+        <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.100"/>
+        <PackageReference Include="MySql.Data" Version="9.6.0"/>
+        <PackageReference Include="Npgsql" Version="10.0.1"/>
+        <PackageReference Include="System.Data.SQLite" Version="2.0.2"/>
+        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.2"/>
     </ItemGroup>
 
-  <ItemGroup Condition="'$(OS)' == 'Unix'">
-    <Compile Remove="Providers\Access\*.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Using Include="DbExport.Schema.Index" Alias="Index" />
-  </ItemGroup>
+    <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+        <PackageReference Include="System.Data.OleDb" Version="10.0.3"/>
+        <COMReference Include="ADODB">
+            <WrapperTool>tlbimp</WrapperTool>
+            <VersionMinor>1</VersionMinor>
+            <VersionMajor>6</VersionMajor>
+            <Guid>b691e011-1797-432e-907a-4d8c69339129</Guid>
+            <Lcid>0</Lcid>
+            <Isolated>false</Isolated>
+            <EmbedInteropTypes>true</EmbedInteropTypes>
+        </COMReference>
+        <COMReference Include="ADOX">
+            <WrapperTool>tlbimp</WrapperTool>
+            <VersionMinor>0</VersionMinor>
+            <VersionMajor>6</VersionMajor>
+            <Guid>00000600-0000-0010-8000-00aa006d2ea4</Guid>
+            <Lcid>0</Lcid>
+            <Isolated>false</Isolated>
+            <EmbedInteropTypes>true</EmbedInteropTypes>
+        </COMReference>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(OS)' == 'Unix'">
+        <Compile Remove="Providers\Access\*.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="DbExport.Schema.Index" Alias="Index"/>
+    </ItemGroup>
 
 </Project>

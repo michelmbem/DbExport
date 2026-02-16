@@ -203,20 +203,22 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     private void RunSql()
     {
        try
-        {
-            if (ProviderNames.ACCESS == Summary?.TargetProvider.Name)
-                GenerateAccessDb(Summary);
-            else
-            {
-                using var helper = new SqlHelper(Summary?.TargetProvider.Name, Summary?.TargetConnectionString);
-                helper.ExecuteScript(SqlScript);
-            }
-        }
-        catch (Exception e)
-        {
-            hadError = true;
-            Log.Error(e, "Failed to execute SQL script");
-        }
+       {
+#if WINDOWS
+           if (ProviderNames.ACCESS == Summary?.TargetProvider.Name) 
+           {
+               GenerateAccessDb(Summary);
+               return;
+           }
+#endif
+           using var helper = new SqlHelper(Summary?.TargetProvider.Name, Summary?.TargetConnectionString);
+           helper.ExecuteScript(SqlScript);
+       }
+       catch (Exception e)
+       {
+           hadError = true;
+           Log.Error(e, "Failed to execute SQL script");
+       }
     }
 
     private bool CanExecuteScript() =>
