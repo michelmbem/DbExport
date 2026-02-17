@@ -11,58 +11,58 @@
         CanResize="False"
         WindowStartupLocation="CenterOwner">
 
-  <Design.DataContext>
-    <vm:AboutDialogViewModel/>
-  </Design.DataContext>
-  
-  <Grid RowDefinitions="Auto, *">
-    <Border Grid.Row="0"
-            Background="#550099FF"
-            Height="100"
-            Padding="5">
-      <StackPanel Orientation="Horizontal" Spacing="15">
-        <Image Source="/Assets/Images/connection.png" Stretch="Uniform"/>
-        <StackPanel>
-          <TextBlock Text="{x:Static util:AssemblyInfo.Title}"
-                     FontFamily="{StaticResource Bauhaus}"
-                     FontSize="64">
-            <TextBlock.Effect>
-              <DropShadowEffect Color="Gray"
-                                BlurRadius="5"
-                                Opacity="0.6"/>
-            </TextBlock.Effect>
-          </TextBlock>
-          <TextBlock HorizontalAlignment="Right">
-            <Run Text="by"/>
-            <Run Text="{x:Static util:AssemblyInfo.Company}"/>
-          </TextBlock>
-        </StackPanel>
-      </StackPanel>
-    </Border>
-    <Grid Grid.Row="1"
-          RowDefinitions="Auto, *, Auto, Auto"
-          Margin="15">
-      <TextBlock Grid.Row="0">
-        <Run Text="Version "/>
-        <Run Text="{x:Static util:AssemblyInfo.Version}"/>
-      </TextBlock>
-      <StackPanel Grid.Row="1" VerticalAlignment="Center">
-        <TextBlock Text="{x:Static util:AssemblyInfo.Description}"/>
-        <HyperlinkButton Content="View on GitHub"
-                         Command="{Binding OpenGitHubRepoCommand}"
-                         CommandParameter="{x:Static util:AssemblyInfo.GitHubRepoUrl}"/>
-      </StackPanel>
-      <TextBlock Grid.Row="2" Text="{x:Static util:AssemblyInfo.Copyright}"/>
-      <StackPanel Grid.Row="3"
-                  HorizontalAlignment="Right"
-                  Margin="0, 15, 0, 0">
-        <Button Content="OK"
-                HorizontalContentAlignment="Center"
-                Width="100"
-                IsDefault="True"
-                Command="{Binding CloseCommand}"
-                CommandParameter="{Binding $parent[Window]}"/>
-      </StackPanel>
+    <Design.DataContext>
+        <vm:AboutDialogViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto, *">
+        <Border Grid.Row="0"
+                Background="#550099FF"
+                Height="100"
+                Padding="5">
+            <StackPanel Orientation="Horizontal" Spacing="15">
+                <Image Source="/Assets/Images/connection.png" Stretch="Uniform" />
+                <StackPanel>
+                    <TextBlock Text="{x:Static util:AssemblyInfo.Title}"
+                               FontFamily="{StaticResource Bauhaus}"
+                               FontSize="64">
+                        <TextBlock.Effect>
+                            <DropShadowEffect Color="Gray"
+                                              BlurRadius="5"
+                                              Opacity="0.6" />
+                        </TextBlock.Effect>
+                    </TextBlock>
+                    <TextBlock HorizontalAlignment="Right">
+                        <Run Text="by" />
+                        <Run Text="{x:Static util:AssemblyInfo.Company}" />
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <Grid Grid.Row="1"
+              RowDefinitions="Auto, *, Auto, Auto"
+              Margin="15">
+            <TextBlock Grid.Row="0">
+                <Run Text="Version " />
+                <Run Text="{x:Static util:AssemblyInfo.Version}" />
+            </TextBlock>
+            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                <TextBlock Text="{x:Static util:AssemblyInfo.Description}" />
+                <HyperlinkButton Content="View on GitHub"
+                                 Command="{Binding OpenGitHubRepoCommand}"
+                                 CommandParameter="{x:Static util:AssemblyInfo.GitHubRepoUrl}" />
+            </StackPanel>
+            <TextBlock Grid.Row="2" Text="{x:Static util:AssemblyInfo.Copyright}" />
+            <StackPanel Grid.Row="3"
+                        HorizontalAlignment="Right"
+                        Margin="0, 15, 0, 0">
+                <Button Content="OK"
+                        HorizontalContentAlignment="Center"
+                        Width="100"
+                        IsDefault="True"
+                        Command="{Binding CloseCommand}"
+                        CommandParameter="{Binding $parent[Window]}" />
+            </StackPanel>
+        </Grid>
     </Grid>
-  </Grid>
 </Window>

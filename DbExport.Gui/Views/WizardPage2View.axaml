@@ -7,45 +7,45 @@
              x:Class="DbExport.Gui.Views.WizardPage2View"
              x:DataType="vm:WizardPage2ViewModel">
 
-  <Design.DataContext>
-    <vm:WizardPage2ViewModel/>
-  </Design.DataContext>
-  
-  <Grid RowDefinitions="Auto, Auto, Auto">
-    <ContentControl Grid.Row="0"
-                    Content="{Binding Header}"/>
-    <HeaderedContentControl Grid.Row="1"
-                            Header="Provider"
-                            Margin="15">
-      <Grid ColumnDefinitions="Auto, *"
-            ColumnSpacing="10">
-        <Grid.Styles>
-	        <Style Selector="Label">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-            <Style Selector="ComboBox">
-                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            </Style>
-        </Grid.Styles>
-        <Label Grid.Column="0"
-               Content="Select a RDBMS :"
-               Target="ProviderComboBox"/>
-        <ComboBox Name="ProviderComboBox"
-                  Grid.Column="1"
-                  ItemsSource="{Binding AllProviders}"
-                  SelectedItem="{Binding SelectedProvider}">
-          <ComboBox.ItemTemplate>
-            <DataTemplate>
-              <TextBlock Text="{Binding Description}"/>
-            </DataTemplate>
-          </ComboBox.ItemTemplate>
-        </ComboBox>
-      </Grid>
-    </HeaderedContentControl>
-    <HeaderedContentControl Grid.Row="2"
-                            Header="Connection settings"
-                            Margin="15,0, 15, 15">
-      <ContentControl Content="{Binding Connection}"/>
-    </HeaderedContentControl>
-  </Grid>
+    <Design.DataContext>
+        <vm:WizardPage2ViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto, Auto, Auto">
+        <ContentControl Grid.Row="0"
+                        Content="{Binding Header}" />
+        <HeaderedContentControl Grid.Row="1"
+                                Header="Provider"
+                                Margin="15">
+            <Grid ColumnDefinitions="Auto, *"
+                  ColumnSpacing="10">
+                <Grid.Styles>
+                    <Style Selector="Label">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                    <Style Selector="ComboBox">
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    </Style>
+                </Grid.Styles>
+                <Label Grid.Column="0"
+                       Content="Select a RDBMS :"
+                       Target="ProviderComboBox" />
+                <ComboBox Name="ProviderComboBox"
+                          Grid.Column="1"
+                          ItemsSource="{Binding AllProviders}"
+                          SelectedItem="{Binding SelectedProvider}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Description}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </Grid>
+        </HeaderedContentControl>
+        <HeaderedContentControl Grid.Row="2"
+                                Header="Connection settings"
+                                Margin="15,0, 15, 15">
+            <ContentControl Content="{Binding Connection}" />
+        </HeaderedContentControl>
+    </Grid>
 </UserControl>

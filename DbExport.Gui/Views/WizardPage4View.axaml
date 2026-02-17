@@ -7,55 +7,55 @@
              x:Class="DbExport.Gui.Views.WizardPage4View"
              x:DataType="vm:WizardPage4ViewModel">
 
-  <Design.DataContext>
-    <vm:WizardPage4ViewModel/>
-  </Design.DataContext>
-  
-  <Grid RowDefinitions="Auto, Auto, Auto, Auto">
-    <Grid.Styles>
-	    <Style Selector="HeaderedContentControl.first-child">
-            <Setter Property="Margin" Value="15"/>
-        </Style>
-	    <Style Selector="HeaderedContentControl:not(.first-child)">
-            <Setter Property="Margin" Value="15, 0, 15, 15"/>
-        </Style>
-	    <Style Selector="WrapPanel">
-            <Setter Property="ItemWidth" Value="185"/>
-        </Style>
-    </Grid.Styles>
-    <ContentControl Grid.Row="0"
-                    Content="{Binding Header}"/>
-    <HeaderedContentControl Grid.Row="1"
-                            Header="Export what?"
-                            Classes="first-child">
-      <WrapPanel>
-        <RadioButton Content="Structure"
-                     IsChecked="{Binding ExportSchema}"/>
-        <RadioButton Content="Data"
-                     IsChecked="{Binding ExportData}"/>
-        <RadioButton Content="Structure and data"
-                     IsChecked="{Binding ExportSchemaAndData}"/>
-      </WrapPanel>
-    </HeaderedContentControl>
-    <HeaderedContentControl Grid.Row="2"
-                            Header="Generate DDL for">
-      <WrapPanel>
-        <CheckBox Content="Primary keys"
-                  IsChecked="{Binding ExportPrimaryKeys}"/>
-        <CheckBox Content="Foreign keys"
-                  IsChecked="{Binding ExportForeignKeys}"/>
-        <CheckBox Content="Indexes"
-                  IsChecked="{Binding ExportIndexes}"/>
-        <CheckBox Content="Serial numbers"
-                  IsChecked="{Binding ExportIdentities}"/>
-        <CheckBox Content="Default values"
-                  IsChecked="{Binding ExportDefaults}"/>
-      </WrapPanel>
-    </HeaderedContentControl>
-    <HeaderedContentControl Grid.Row="3"
-                            IsVisible="{Binding ProviderHasOptions}"
-                            Header="{Binding ProviderOptions.Title}">
-      <ContentControl Content="{Binding ProviderOptions}"/>
-    </HeaderedContentControl>
-  </Grid>
+    <Design.DataContext>
+        <vm:WizardPage4ViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto">
+        <Grid.Styles>
+            <Style Selector="HeaderedContentControl.first-child">
+                <Setter Property="Margin" Value="15" />
+            </Style>
+            <Style Selector="HeaderedContentControl:not(.first-child)">
+                <Setter Property="Margin" Value="15, 0, 15, 15" />
+            </Style>
+            <Style Selector="WrapPanel">
+                <Setter Property="ItemWidth" Value="185" />
+            </Style>
+        </Grid.Styles>
+        <ContentControl Grid.Row="0"
+                        Content="{Binding Header}" />
+        <HeaderedContentControl Grid.Row="1"
+                                Header="Export what?"
+                                Classes="first-child">
+            <WrapPanel>
+                <RadioButton Content="Structure"
+                             IsChecked="{Binding ExportSchema}" />
+                <RadioButton Content="Data"
+                             IsChecked="{Binding ExportData}" />
+                <RadioButton Content="Structure and data"
+                             IsChecked="{Binding ExportSchemaAndData}" />
+            </WrapPanel>
+        </HeaderedContentControl>
+        <HeaderedContentControl Grid.Row="2"
+                                Header="Generate DDL for">
+            <WrapPanel>
+                <CheckBox Content="Primary keys"
+                          IsChecked="{Binding ExportPrimaryKeys}" />
+                <CheckBox Content="Foreign keys"
+                          IsChecked="{Binding ExportForeignKeys}" />
+                <CheckBox Content="Indexes"
+                          IsChecked="{Binding ExportIndexes}" />
+                <CheckBox Content="Serial numbers"
+                          IsChecked="{Binding ExportIdentities}" />
+                <CheckBox Content="Default values"
+                          IsChecked="{Binding ExportDefaults}" />
+            </WrapPanel>
+        </HeaderedContentControl>
+        <HeaderedContentControl Grid.Row="3"
+                                IsVisible="{Binding ProviderHasOptions}"
+                                Header="{Binding ProviderOptions.Title}">
+            <ContentControl Content="{Binding ProviderOptions}" />
+        </HeaderedContentControl>
+    </Grid>
 </UserControl>

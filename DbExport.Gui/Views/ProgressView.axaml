@@ -7,20 +7,20 @@
              x:Class="DbExport.Gui.Views.ProgressView"
              x:DataType="vm:ProgressViewModel">
 
-  <Design.DataContext>
-    <vm:ProgressViewModel IsIndeterminate="True"
-                          Message="A task is in progress"/>
-  </Design.DataContext>
-  
-  <StackPanel HorizontalAlignment="Center"
-              VerticalAlignment="Center"
-              Spacing="10">
-    <ProgressBar IsIndeterminate="{Binding IsIndeterminate}"
-                 Minimum="{Binding Minimum}"
-                 Maximum="{Binding Maximum}"
-                 Value="{Binding Value}"
-                 Width="150"/>
-    <TextBlock Text="{Binding Message}"
-               HorizontalAlignment="Center"/>
-  </StackPanel>
+    <Design.DataContext>
+        <vm:ProgressViewModel IsIndeterminate="True"
+                              Message="A task is in progress" />
+    </Design.DataContext>
+
+    <StackPanel HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="10">
+        <ProgressBar IsIndeterminate="{Binding IsIndeterminate}"
+                     Minimum="{Binding Minimum}"
+                     Maximum="{Binding Maximum}"
+                     Value="{Binding Value}"
+                     Width="150" />
+        <TextBlock Text="{Binding Message}"
+                   HorizontalAlignment="Center" />
+    </StackPanel>
 </UserControl>

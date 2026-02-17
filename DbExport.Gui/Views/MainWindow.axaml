@@ -11,97 +11,97 @@
         WindowStartupLocation="CenterScreen">
 
     <Design.DataContext>
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
-  
+
     <Grid RowDefinitions="*, Auto"
           ColumnDefinitions="Auto, *">
-      <ContentControl Grid.Row="0"
-                      Grid.Column="0"
-                      Content="{Binding Sidebar}"/>
-      <TransitioningContentControl Grid.Row="0"
-                                   Grid.Column="1"
-                                   Content="{Binding CurrentPage}"
-                                   IsTransitionReversed="{Binding IsPageTransitionReversed}">
-          <TransitioningContentControl.PageTransition>
-              <CompositePageTransition>
-                  <CompositePageTransition.PageTransitions>
-                      <PageSlide Duration="0:0:0.25"/>
-                      <CrossFade Duration="0:0:0.25"/>
-                  </CompositePageTransition.PageTransitions>
-              </CompositePageTransition>
-          </TransitioningContentControl.PageTransition>
-      </TransitioningContentControl>
-      <Border  Grid.Row="1"
-               Grid.Column="0"
-               Grid.ColumnSpan="2"
-               BorderBrush="Gray"
-               BorderThickness="0, 1, 0, 0"
-               Padding="10">
-          <Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto"
-                ColumnSpacing="5">
-              <Grid.Styles>
-                  <Style Selector="Button">
-                      <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                      <Setter Property="VerticalContentAlignment" Value="Center"/>
-                  </Style>
-                  <Style Selector="Button:not(.round)">
-                      <Setter Property="Width" Value="100"/>
-                  </Style>
-                  <Style Selector="Button.round /template/ ContentPresenter">
-                      <Setter Property="Width" Value="30"/>
-                      <Setter Property="Height" Value="30"/>
-                      <Setter Property="CornerRadius" Value="15"/>
-                  </Style>
-                  <Style Selector="Button > StackPanel">
-                      <Setter Property="Orientation" Value="Horizontal"/>
-                      <Setter Property="Spacing" Value="5"/>
-                  </Style>
-              </Grid.Styles>
-              <Button Grid.Column="0"
-                      Foreground="White"
-                      Background="Firebrick"
-                      Classes="colored"
-                      IsCancel="True"
-                      Command="{Binding CloseCommand}"
-                      CommandParameter="{Binding $parent[Window]}">
-                  <StackPanel>
-                      <i:Icon Value="fa-right-from-bracket"/>
-                      <TextBlock Text="Close"/>
-                  </StackPanel>
-              </Button>
-              <Button Grid.Column="1"
-                      Foreground="White"
-                      Background="DodgerBlue"
-                      Classes="colored"
-                      Command="{Binding OpenAboutDialogCommand}"
-                      CommandParameter="{Binding $parent[Window]}">
-                  <StackPanel>
-                      <i:Icon Value="fa-circle-info"/>
-                      <TextBlock Text="About"/>
-                  </StackPanel>
-              </Button>
-              <Button Grid.Column="2"
-                      Classes="round"
-                      i:Attached.Icon="{Binding ThemeSwitchIcon}"
-                      ToolTip.Tip="Switch theme"
-                      Command="{Binding SwitchThemeCommand}"/>
-              <Button Grid.Column="4"
-                      Command="{Binding NavigateToPreviousPageCommand}">
-                  <StackPanel>
-                      <i:Icon Value="fa-backward-step"/>
-                      <TextBlock Text="Previous"/>
-                  </StackPanel>
-              </Button>
-              <Button Grid.Column="5"
-                      IsDefault="True"
-                      Command="{Binding NavigateToNextPageCommand}">
-                  <StackPanel>
-                      <TextBlock Text="Next"/>
-                      <i:Icon Value="fa-forward-step"/>
-                  </StackPanel>
-              </Button>
-          </Grid>
-      </Border>
+        <ContentControl Grid.Row="0"
+                        Grid.Column="0"
+                        Content="{Binding Sidebar}" />
+        <TransitioningContentControl Grid.Row="0"
+                                     Grid.Column="1"
+                                     Content="{Binding CurrentPage}"
+                                     IsTransitionReversed="{Binding IsPageTransitionReversed}">
+            <TransitioningContentControl.PageTransition>
+                <CompositePageTransition>
+                    <CompositePageTransition.PageTransitions>
+                        <PageSlide Duration="0:0:0.25" />
+                        <CrossFade Duration="0:0:0.25" />
+                    </CompositePageTransition.PageTransitions>
+                </CompositePageTransition>
+            </TransitioningContentControl.PageTransition>
+        </TransitioningContentControl>
+        <Border Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                BorderBrush="Gray"
+                BorderThickness="0, 1, 0, 0"
+                Padding="10">
+            <Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto"
+                  ColumnSpacing="5">
+                <Grid.Styles>
+                    <Style Selector="Button">
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                    </Style>
+                    <Style Selector="Button:not(.round)">
+                        <Setter Property="Width" Value="100" />
+                    </Style>
+                    <Style Selector="Button.round /template/ ContentPresenter">
+                        <Setter Property="Width" Value="30" />
+                        <Setter Property="Height" Value="30" />
+                        <Setter Property="CornerRadius" Value="15" />
+                    </Style>
+                    <Style Selector="Button > StackPanel">
+                        <Setter Property="Orientation" Value="Horizontal" />
+                        <Setter Property="Spacing" Value="5" />
+                    </Style>
+                </Grid.Styles>
+                <Button Grid.Column="0"
+                        Foreground="White"
+                        Background="Firebrick"
+                        Classes="colored"
+                        IsCancel="True"
+                        Command="{Binding CloseCommand}"
+                        CommandParameter="{Binding $parent[Window]}">
+                    <StackPanel>
+                        <i:Icon Value="fa-right-from-bracket" />
+                        <TextBlock Text="Close" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="1"
+                        Foreground="White"
+                        Background="DodgerBlue"
+                        Classes="colored"
+                        Command="{Binding OpenAboutDialogCommand}"
+                        CommandParameter="{Binding $parent[Window]}">
+                    <StackPanel>
+                        <i:Icon Value="fa-circle-info" />
+                        <TextBlock Text="About" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="2"
+                        Classes="round"
+                        i:Attached.Icon="{Binding ThemeSwitchIcon}"
+                        ToolTip.Tip="Switch theme"
+                        Command="{Binding SwitchThemeCommand}" />
+                <Button Grid.Column="4"
+                        Command="{Binding NavigateToPreviousPageCommand}">
+                    <StackPanel>
+                        <i:Icon Value="fa-backward-step" />
+                        <TextBlock Text="Previous" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="5"
+                        IsDefault="True"
+                        Command="{Binding NavigateToNextPageCommand}">
+                    <StackPanel>
+                        <TextBlock Text="Next" />
+                        <i:Icon Value="fa-forward-step" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

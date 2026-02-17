@@ -11,84 +11,85 @@
              AttachedToVisualTree="OnAttachedToVisualTree"
              DetachedFromVisualTree="OnDetachedFromVisualTree">
 
-  <Design.DataContext>
-    <vm:WizardPage7ViewModel/>
-  </Design.DataContext>
-  
-  <Grid RowDefinitions="Auto, *">
-    <ContentControl Grid.Row="0"
-                    Content="{Binding Header}"/>
-    <ContentControl Grid.Row="1"
-                    Content="{Binding Progress}"
-                    IsVisible="{Binding IsBusy}"
-                    Classes="overlay"/>
-    <DockPanel Grid.Row="1">
-      <Border DockPanel.Dock="Top"
-              Background="#33777777"
-              Padding="5">
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Right"
-                    Spacing="5">
-          <Button i:Attached.Icon="fa-play"
-                  ToolTip.Tip="Execute the script"
-                  Foreground="LimeGreen"
-                  Classes="colored"
-                  Command="{Binding ExecuteScriptCommand}"/>
-          <Button i:Attached.Icon="fa-floppy-disk"
-                  ToolTip.Tip="Save the script to a file"
-                  Foreground="DodgerBlue"
-                  Classes="colored"
-                  Command="{Binding SaveScriptCommand}"
-                  CommandParameter="{Binding $parent[Window]}"/>
-          <Button i:Attached.Icon="fa-rotate"
-                  ToolTip.Tip="Reload the script"
-                  Command="{Binding ReloadScriptCommand}"
-                  Margin="5, 0, 0, 0"/>
-          <Button i:Attached.Icon="fa-magnifying-glass"
-                  ToolTip.Tip="Find/Replace"
-                  Command="{Binding FindReplaceCommand}"
-                  CommandParameter="{Binding #SqlEditor}"/>
-        </StackPanel>
-      </Border>
-      <ae:TextEditor Name="SqlEditor"
-                     ShowLineNumbers="True"
-                     FontFamily="{StaticResource RobotoMono}"
-                     FontSize="13"
-                     TextChanged="OnSqlEditorTextChanged">
-        <ae:TextEditor.ContextMenu>
-          <ContextMenu>
-            <MenuItem Header="Undo"
-                      i:MenuItem.Icon="fa-rotate-left"
-                      Command="{Binding UndoCommand}"
-                      CommandParameter="{Binding #SqlEditor}"/>
-            <MenuItem Header="Redo"
-                      i:MenuItem.Icon="fa-rotate-right"
-                      Command="{Binding RedoCommand}"
-                      CommandParameter="{Binding #SqlEditor}"/>
-            <Separator/>
-            <MenuItem Header="Cut"
-                      i:MenuItem.Icon="fa-scissors"
-                      Command="{Binding CutCommand}"
-                      CommandParameter="{Binding #SqlEditor}"/>
-            <MenuItem Header="Copy"
-                      i:MenuItem.Icon="fa-copy"
-                      Command="{Binding CopyCommand}"
-                      CommandParameter="{Binding #SqlEditor}"/>
-            <MenuItem Header="Paste"
-                      i:MenuItem.Icon="fa-paste"
-                      Command="{Binding PasteCommand}"
-                      CommandParameter="{Binding #SqlEditor}"/>
-            <MenuItem Header="Delete"
-                      i:MenuItem.Icon="fa-trash"
-                      Command="{Binding DeleteCommand}"
-                      CommandParameter="{Binding #SqlEditor}"/>
-            <Separator/>
-            <MenuItem Header="Select all"
-                      Command="{Binding SelectAllCommand}"
-                      CommandParameter="{Binding #SqlEditor}"/>
-          </ContextMenu>
-        </ae:TextEditor.ContextMenu>
-      </ae:TextEditor>
-    </DockPanel>
-  </Grid>
+    <Design.DataContext>
+        <vm:WizardPage7ViewModel
+            SqlScript="CREATE TABLE Test(id int NOT NULL, name varchar(50));" />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto, *">
+        <ContentControl Grid.Row="0"
+                        Content="{Binding Header}" />
+        <ContentControl Grid.Row="1"
+                        Content="{Binding Progress}"
+                        IsVisible="{Binding IsBusy}"
+                        Classes="overlay" />
+        <DockPanel Grid.Row="1">
+            <Border DockPanel.Dock="Top"
+                    Background="#33777777"
+                    Padding="5">
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Spacing="5">
+                    <Button i:Attached.Icon="fa-play"
+                            ToolTip.Tip="Execute the script"
+                            Foreground="LimeGreen"
+                            Classes="colored"
+                            Command="{Binding ExecuteScriptCommand}" />
+                    <Button i:Attached.Icon="fa-floppy-disk"
+                            ToolTip.Tip="Save the script to a file"
+                            Foreground="DodgerBlue"
+                            Classes="colored"
+                            Command="{Binding SaveScriptCommand}"
+                            CommandParameter="{Binding $parent[Window]}" />
+                    <Button i:Attached.Icon="fa-rotate"
+                            ToolTip.Tip="Reload the script"
+                            Command="{Binding ReloadScriptCommand}"
+                            Margin="5, 0, 0, 0" />
+                    <Button i:Attached.Icon="fa-magnifying-glass"
+                            ToolTip.Tip="Find/Replace"
+                            Command="{Binding FindReplaceCommand}"
+                            CommandParameter="{Binding #SqlEditor}" />
+                </StackPanel>
+            </Border>
+            <ae:TextEditor Name="SqlEditor"
+                           ShowLineNumbers="True"
+                           FontFamily="{StaticResource RobotoMono}"
+                           FontSize="13"
+                           TextChanged="OnSqlEditorTextChanged">
+                <ae:TextEditor.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Undo"
+                                  i:MenuItem.Icon="fa-rotate-left"
+                                  Command="{Binding UndoCommand}"
+                                  CommandParameter="{Binding #SqlEditor}" />
+                        <MenuItem Header="Redo"
+                                  i:MenuItem.Icon="fa-rotate-right"
+                                  Command="{Binding RedoCommand}"
+                                  CommandParameter="{Binding #SqlEditor}" />
+                        <Separator />
+                        <MenuItem Header="Cut"
+                                  i:MenuItem.Icon="fa-scissors"
+                                  Command="{Binding CutCommand}"
+                                  CommandParameter="{Binding #SqlEditor}" />
+                        <MenuItem Header="Copy"
+                                  i:MenuItem.Icon="fa-copy"
+                                  Command="{Binding CopyCommand}"
+                                  CommandParameter="{Binding #SqlEditor}" />
+                        <MenuItem Header="Paste"
+                                  i:MenuItem.Icon="fa-paste"
+                                  Command="{Binding PasteCommand}"
+                                  CommandParameter="{Binding #SqlEditor}" />
+                        <MenuItem Header="Delete"
+                                  i:MenuItem.Icon="fa-trash"
+                                  Command="{Binding DeleteCommand}"
+                                  CommandParameter="{Binding #SqlEditor}" />
+                        <Separator />
+                        <MenuItem Header="Select all"
+                                  Command="{Binding SelectAllCommand}"
+                                  CommandParameter="{Binding #SqlEditor}" />
+                    </ContextMenu>
+                </ae:TextEditor.ContextMenu>
+            </ae:TextEditor>
+        </DockPanel>
+    </Grid>
 </UserControl>

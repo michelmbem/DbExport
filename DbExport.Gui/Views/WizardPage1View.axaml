@@ -8,13 +8,13 @@
              x:Class="DbExport.Gui.Views.WizardPage1View"
              x:DataType="vm:WizardPage1ViewModel">
 
-  <Design.DataContext>
-    <vm:WizardPage1ViewModel/>
-  </Design.DataContext>
-  
-  <Border HorizontalAlignment="Center"
-          VerticalAlignment="Center">
-    <md:MarkdownScrollViewer Markdown="{Binding Header.Description}"
-                             Margin="30"/>
-  </Border>
+    <Design.DataContext>
+        <vm:WizardPage1ViewModel />
+    </Design.DataContext>
+
+    <Border HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+        <md:MarkdownScrollViewer Markdown="{Binding Header.Description}"
+                                 Margin="30" />
+    </Border>
 </UserControl>

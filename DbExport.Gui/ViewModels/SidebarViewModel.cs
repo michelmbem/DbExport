@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DbExport.Gui.Models;
 
@@ -10,17 +9,6 @@ public partial class SidebarViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(SelectedItem))]
     private int selectedIndex = -1;
-    
-    public SidebarViewModel()
-    {
-        if (!Design.IsDesignMode) return;
-        
-        Items.Add(new SidebarItem("Item #1"));
-        Items.Add(new SidebarItem("Item #2"));
-        Items.Add(new SidebarItem("Item #3"));
-
-        SelectedIndex = 1;
-    }
 
     public ObservableCollection<SidebarItem> Items { get; } = [];
     
@@ -31,5 +19,16 @@ public partial class SidebarViewModel : ViewModelBase
     {
         if (oldValue >= 0 && oldValue < Items.Count) Items[oldValue].IsSelected = false;
         if (newValue >= 0 && newValue < Items.Count) Items[newValue].IsSelected = true;
+    }
+}
+
+internal sealed class SidebarDesignViewModel : SidebarViewModel
+{
+    public SidebarDesignViewModel()
+    {
+        for (var i = 1; i <= 5; ++i)
+            Items.Add(new SidebarItem($"Step #{i}"));
+            
+        SelectedIndex = Items.Count / 2;
     }
 }

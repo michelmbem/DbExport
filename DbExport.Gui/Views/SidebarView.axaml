@@ -11,7 +11,7 @@
              Width="250">
 
   <Design.DataContext>
-    <vm:SidebarViewModel/>
+    <vm:SidebarDesignViewModel/>
   </Design.DataContext>
   
   <Border Padding="10">

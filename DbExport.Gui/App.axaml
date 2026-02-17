@@ -3,7 +3,7 @@
              x:Class="DbExport.Gui.App"
              xmlns:local="using:DbExport.Gui"
              RequestedThemeVariant="Default">
-            <!-- "Default" ThemeVariant follows the system theme variant. "Dark" or "Light" are other available options. -->
+    <!-- "Default" ThemeVariant follows the system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
         <local:ViewLocator />

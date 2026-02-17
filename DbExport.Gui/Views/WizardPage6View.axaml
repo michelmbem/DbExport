@@ -8,19 +8,19 @@
              x:Class="DbExport.Gui.Views.WizardPage6View"
              x:DataType="vm:WizardPage6ViewModel">
 
-  <Design.DataContext>
-    <vm:WizardPage6ViewModel/>
-  </Design.DataContext>
-  
-  <Grid RowDefinitions="Auto, *">
-    <ContentControl Grid.Row="0"
-                    Content="{Binding Header}"/>
-    <ContentControl Grid.Row="1"
-                    Content="{Binding Progress}"
-                    IsVisible="{Binding IsBusy}"
-                    Classes="overlay"/>
-    <md:MarkdownScrollViewer Grid.Row="1"
-                             Markdown="{Binding SummaryText}"
-                             Margin="15"/>
-  </Grid>
+    <Design.DataContext>
+        <vm:WizardPage6ViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto, *">
+        <ContentControl Grid.Row="0"
+                        Content="{Binding Header}" />
+        <ContentControl Grid.Row="1"
+                        Content="{Binding Progress}"
+                        IsVisible="{Binding IsBusy}"
+                        Classes="overlay" />
+        <md:MarkdownScrollViewer Grid.Row="1"
+                                 Markdown="{Binding SummaryText}"
+                                 Margin="15" />
+    </Grid>
 </UserControl>

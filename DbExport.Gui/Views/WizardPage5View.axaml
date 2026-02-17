@@ -9,37 +9,37 @@
              x:Class="DbExport.Gui.Views.WizardPage5View"
              x:DataType="vm:WizardPage5ViewModel">
 
-  <Design.DataContext>
-    <vm:WizardPage5ViewModel/>
-  </Design.DataContext>
-  
-  <Grid RowDefinitions="Auto, *">
-    <ContentControl Grid.Row="0"
-                    Content="{Binding Header}"/>
-    <ContentControl Grid.Row="1"
-                    Content="{Binding Progress}"
-                    IsVisible="{Binding IsBusy}"
-                    Classes="overlay"/>
-    <TreeView Grid.Row="1"
-              ItemsSource="{Binding Roots}"
-              SelectionMode="Toggle">
-      <TreeView.Styles>
-        <Style Selector="TreeViewItem" x:DataType="m:TreeNode">
-          <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
-        </Style>
-      </TreeView.Styles>
-      <TreeView.ItemTemplate>
-        <TreeDataTemplate ItemsSource="{Binding Children}">
-          <StackPanel Orientation="Horizontal">
-            <CheckBox IsChecked="{Binding IsChecked}"/>
-            <i:Icon Value="{Binding Icon}"
-                    Foreground="CadetBlue"/>
-            <TextBlock Text="{Binding Text}"
-                       VerticalAlignment="Center"
-                       Margin="5, 0, 0, 0"/>
-          </StackPanel>
-        </TreeDataTemplate>
-      </TreeView.ItemTemplate>
-    </TreeView>
-  </Grid>
+    <Design.DataContext>
+        <vm:WizardPage5ViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto, *">
+        <ContentControl Grid.Row="0"
+                        Content="{Binding Header}" />
+        <ContentControl Grid.Row="1"
+                        Content="{Binding Progress}"
+                        IsVisible="{Binding IsBusy}"
+                        Classes="overlay" />
+        <TreeView Grid.Row="1"
+                  ItemsSource="{Binding Roots}"
+                  SelectionMode="Toggle">
+            <TreeView.Styles>
+                <Style Selector="TreeViewItem" x:DataType="m:TreeNode">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                </Style>
+            </TreeView.Styles>
+            <TreeView.ItemTemplate>
+                <TreeDataTemplate ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding IsChecked}" />
+                        <i:Icon Value="{Binding Icon}"
+                                Foreground="CadetBlue" />
+                        <TextBlock Text="{Binding Text}"
+                                   VerticalAlignment="Center"
+                                   Margin="5, 0, 0, 0" />
+                    </StackPanel>
+                </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </Grid>
 </UserControl>

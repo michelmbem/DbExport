@@ -7,48 +7,48 @@
              x:Class="DbExport.Gui.Views.MySqlOptionsView"
              x:DataType="vm:MySqlOptionsViewModel">
 
-  <Design.DataContext>
-    <vm:MySqlOptionsViewModel/>
-  </Design.DataContext>
-  
-  <Grid RowDefinitions="Auto, Auto, Auto"
-        ColumnDefinitions="Auto, *"
-        RowSpacing="10"
-        ColumnSpacing="10">
-    <Grid.Styles>
-	    <Style Selector="Label">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-        <Style Selector="ComboBox">
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-        </Style>
-    </Grid.Styles>
-    <Label Grid.Row="0"
-           Grid.Column="0"
-           Content="Storage engine :"
-           Target="StorageEngineComboBox"/>
-    <ComboBox Name="StorageEngineComboBox"
-              Grid.Row="0"
-              Grid.Column="1"
-              ItemsSource="{Binding StorageEngines}"
-              SelectedItem="{Binding StorageEngine}"/>
-    <Label Grid.Row="1"
-           Grid.Column="0"
-           Content="Character set :"
-           Target="CharacterSetComboBox"/>
-    <ComboBox Name="CharacterSetComboBox"
-              Grid.Row="1"
-              Grid.Column="1"
-              ItemsSource="{Binding CharacterSets}"
-              SelectedItem="{Binding CharacterSet}"/>
-    <Label Grid.Row="2"
-           Grid.Column="0"
-           Content="Collation :"
-           Target="CollationComboBox"/>
-    <ComboBox Name="CollationComboBox"
-              Grid.Row="2"
-              Grid.Column="1"
-              ItemsSource="{Binding Collations}"
-              SelectedItem="{Binding Collation}"/>
-  </Grid>
+    <Design.DataContext>
+        <vm:MySqlOptionsViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto, Auto, Auto"
+          ColumnDefinitions="Auto, *"
+          RowSpacing="10"
+          ColumnSpacing="10">
+        <Grid.Styles>
+            <Style Selector="Label">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style Selector="ComboBox">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+            </Style>
+        </Grid.Styles>
+        <Label Grid.Row="0"
+               Grid.Column="0"
+               Content="Storage engine :"
+               Target="StorageEngineComboBox" />
+        <ComboBox Name="StorageEngineComboBox"
+                  Grid.Row="0"
+                  Grid.Column="1"
+                  ItemsSource="{Binding StorageEngines}"
+                  SelectedItem="{Binding StorageEngine}" />
+        <Label Grid.Row="1"
+               Grid.Column="0"
+               Content="Character set :"
+               Target="CharacterSetComboBox" />
+        <ComboBox Name="CharacterSetComboBox"
+                  Grid.Row="1"
+                  Grid.Column="1"
+                  ItemsSource="{Binding CharacterSets}"
+                  SelectedItem="{Binding CharacterSet}" />
+        <Label Grid.Row="2"
+               Grid.Column="0"
+               Content="Collation :"
+               Target="CollationComboBox" />
+        <ComboBox Name="CollationComboBox"
+                  Grid.Row="2"
+                  Grid.Column="1"
+                  ItemsSource="{Binding Collations}"
+                  SelectedItem="{Binding Collation}" />
+    </Grid>
 </UserControl>

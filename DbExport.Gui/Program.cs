@@ -40,6 +40,7 @@ internal static class Program
         Log.Logger = new LoggerConfiguration()
                      .Enrich.FromLogContext()
                      .WriteTo.Console()
+                     .WriteTo.Debug()
                      .WriteTo.File(logFilePath,
                                    LogEventLevel.Warning,
                                    rollingInterval : RollingInterval.Day,
