@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DbExport.Gui.Models;
-using DbExport.Providers;
 
 namespace DbExport.Gui.ViewModels;
 

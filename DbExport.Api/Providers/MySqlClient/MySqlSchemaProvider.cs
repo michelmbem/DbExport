@@ -324,13 +324,12 @@ public class MySqlSchemaProvider : ISchemaProvider
             "dec" or "decimal" or "numeric" => ColumnType.Decimal,
             "date" => ColumnType.Date,
             "time" => ColumnType.Time,
-            "datetime" => ColumnType.DateTime,
+            "datetime" or "timestamp" => ColumnType.DateTime,
             "char" => ColumnType.Char,
             "varchar" or "enum" or "set" => ColumnType.VarChar,
             "text" or "tinytext" or "mediumtext" or "longtext" => ColumnType.Text,
             "bit" => ColumnType.Bit,
             "blob" or "tinyblob" or "mediumblob" or "longblob" => ColumnType.Blob,
-            "timestamp" => ColumnType.RowVersion,
             _ => ColumnType.Unknown
         };
 

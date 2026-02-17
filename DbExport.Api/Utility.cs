@@ -43,7 +43,7 @@ public static class Utility
             var members = setting.Split('=', splitOptions);
             var (key, value) = (members[0], members.Length > 1 ? members[1] : string.Empty);
             if (string.IsNullOrWhiteSpace(key)) continue;
-            if (value.StartsWith('"')) value = value[1..^2].Replace("\"\"", "\"");
+            if (value.StartsWith('"')) value = value[1..^1].Replace("\"\"", "\"");
             properties[key.ToLower()] = value;
         }
 

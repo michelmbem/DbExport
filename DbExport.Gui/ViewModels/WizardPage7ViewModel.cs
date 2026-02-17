@@ -2,18 +2,25 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+
 using AvaloniaEdit;
 using AvaloniaEdit.Search;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+
 using DbExport.Gui.Models;
 using DbExport.Providers;
 using DbExport.Providers.Npgsql;
 using DbExport.Providers.SqlClient;
+using DbExport.Schema;
+
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+
 using Serilog;
 
 namespace DbExport.Gui.ViewModels;
@@ -177,6 +184,35 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
             Log.Error(e, "Failed to generate MS ACCESS database");
         }
     }
+
+    private static void GenerateSqlLocalDb(MigrationSummary? summary)
+    {
+        if (summary == null) return;
+
+        var settings = Utility.ParseConnectionString(summary.TargetConnectionString);
+        var tmpConStr = $"Server={settings["server"]};Integrated Security=true";
+
+        using (var helper1 = new SqlHelper(summary.TargetProvider.Name, tmpConStr))
+        {
+            try
+            {
+                helper1.Execute($"DROP Database {summary.Database.Name}");
+            }
+            catch
+            {
+                // Ignore
+            }
+
+            helper1.Execute($"""
+                    CREATE DATABASE {summary.Database.Name}
+                    ON (NAME= N'{summary.Database.Name}',
+                    FILENAME='{settings["attachdbfilename"]}')
+                    """);
+        }
+
+        using var helper2 = new SqlHelper(summary.TargetProvider.Name, summary.TargetConnectionString);
+        helper2.ExecuteScript(GenerateSqlScript(summary));
+    }
 #endif
 
     private static void ShowScriptExecutionMessage(bool hadError)
@@ -213,11 +249,15 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
        try
        {
 #if WINDOWS
-           if (ProviderNames.ACCESS == Summary?.TargetProvider.Name) 
+           switch (Summary?.TargetProvider.Name)
            {
-               GenerateAccessDb(Summary);
-               return;
-           }
+                case ProviderNames.ACCESS:
+                    GenerateAccessDb(Summary);
+                    return;
+                case ProviderNames.SQLSERVER when Summary.TargetProvider.HasFeature(ProviderFeatures.IsFileBased):
+                    GenerateSqlLocalDb(Summary);
+                    return;
+            }
 #endif
            using var helper = new SqlHelper(Summary?.TargetProvider.Name, Summary?.TargetConnectionString);
            helper.ExecuteScript(SqlScript);
