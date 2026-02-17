@@ -16,9 +16,17 @@ public class SqlCodeGenerator : CodeGenerator
 
     #endregion
 
+    #region New Properties
+
+    public bool IsLocalDb { get; set; }
+
+    #endregion
+
     #region Overriden Properties
 
     public override string ProviderName => ProviderNames.SQLSERVER;
+
+    protected override bool SupportsDbCreation => !IsLocalDb;
 
     protected override bool SupportsRowVersion => true;
 

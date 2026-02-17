@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.Input;
 using DbExport.Gui.Models;
 using DbExport.Providers;
 using DbExport.Providers.Npgsql;
+using DbExport.Providers.SqlClient;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Serilog;
@@ -129,11 +130,18 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         var codegen = CodeGenerator.Get(summary.TargetProvider.Name, sqlWriter);
         codegen.ExportOptions = summary.ExportOptions;
 
-        if (codegen is NpgsqlCodeGenerator npgsqlCodeGen)
+        switch (codegen)
         {
-            var settings = Utility.ParseConnectionString(summary.TargetConnectionString);
-            if (settings.TryGetValue("username", out var username))
-                npgsqlCodeGen.DbOwner = username;
+            case SqlCodeGenerator sqlCodeGen:
+                sqlCodeGen.IsLocalDb = summary.TargetProvider.HasFeature(ProviderFeatures.IsFileBased);
+                break;
+            case NpgsqlCodeGenerator npgsqlCodeGen:
+            {
+                var settings = Utility.ParseConnectionString(summary.TargetConnectionString);
+                if (settings.TryGetValue("username", out var username))
+                    npgsqlCodeGen.DbOwner = username;
+                break;
+            }
         }
         
         Utility.Encoding = Encoding.UTF8;
