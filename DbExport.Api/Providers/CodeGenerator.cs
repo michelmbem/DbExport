@@ -13,7 +13,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     private readonly bool closeOutput;
     private int indentation;
     private int textColumn;
-        
+
     #region Constructors
 
     protected CodeGenerator(TextWriter output)
