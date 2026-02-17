@@ -28,6 +28,18 @@ public class OleDbConnectionStringBuilder : IConnectionStringBuilder
         return sb.ToString();
     }
 }
+
+public class LocalDBConnectionStringBuilder : IConnectionStringBuilder
+{
+    public string Build(string dataSource, int? portNumber, string? database,
+        bool trustedConnection, string? username, string? password)
+    {
+        StringBuilder sb = new(@"Server=(LocalDB)\MSSQLLocalDB;Integrated Security=true");
+        sb.Append($";AttachDbFilename={dataSource}");
+        
+        return sb.ToString();
+    }
+}
 #endif
 
 public class SqlConnectionStringBuilder : IConnectionStringBuilder

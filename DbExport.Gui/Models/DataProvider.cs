@@ -16,6 +16,7 @@ public enum ProviderFeatures
     
     Access = IsFileBased | SupportsDatabaseCreation | SupportsScriptExecution,
     SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation | SupportsDDL| SupportsScriptExecution,
+    LocalDB = IsFileBased | SupportsDDL| SupportsScriptExecution,
     Oracle = SupportsTrustedConnection | SupportsDDL,
     MySql = SupportsDatabaseCreation | SupportsDDL| SupportsScriptExecution,
     PostgreSql = SupportsDDL | SupportsScriptExecution,
@@ -31,6 +32,7 @@ public sealed class DataProvider(
 {
 #if WINDOWS
     private const string ACCESS_DATABASE_FILE_PATTERN = "Microsoft Access Database (*.accdb;*.mdb)|*.accdb;*.mdb";
+    private const string SQLSERVER_DATABASE_FILE_PATTERN = "SQL Server Database (*.mdf)|*.mdf";
 #endif
     private const string SQLITE_DATABASE_FILE_PATTERN = "SQLite Database (*.db)|*.db";
     private const string SQLSERVER_DATABASE_LIST_QUERY = "EXEC sp_databases";
@@ -41,6 +43,7 @@ public sealed class DataProvider(
     [
 #if WINDOWS
         new(ProviderNames.ACCESS, "Microsoft Access", ProviderFeatures.Access, new OleDbConnectionStringBuilder(), ACCESS_DATABASE_FILE_PATTERN),
+        new(ProviderNames.SQLSERVER, "SQL Server LocalDB", ProviderFeatures.SqlServer, new LocalDBConnectionStringBuilder(), SQLSERVER_DATABASE_FILE_PATTERN),
 #endif
         new(ProviderNames.SQLSERVER, "Microsoft SQL Server", ProviderFeatures.SqlServer, new SqlConnectionStringBuilder(), SQLSERVER_DATABASE_LIST_QUERY),
         new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.Oracle, new OracleConnectionStringBuilder()),

@@ -25,11 +25,8 @@ public partial class WizardPage2ViewModel : WizardPageViewModel
 
     public ObservableCollection<DataProvider> AllProviders { get; }
 
-    public ConnectionViewModel Connection => SelectedProvider.Name switch
-    {
-        ProviderNames.ACCESS or ProviderNames.SQLITE => fileConnection,
-        _ => serverConnection
-    };
+    public ConnectionViewModel Connection =>
+        SelectedProvider.HasFeature(ProviderFeatures.IsFileBased) ? fileConnection : serverConnection;
     
     public string ConnectionString => Connection.ConnectionString;
 
