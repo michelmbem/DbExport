@@ -2,99 +2,99 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="https://github.com/projektanker/icons.avalonia">
 
-  <Design.PreviewWith>
-    <Border Width="600"
-            Height="400"
-            Padding="20">
-        <HeaderedContentControl Header="Sample Header">
-            <StackPanel Spacing="10">
-                <TextBlock Text="This is a sample content area."/>
-                <Label Content="This is another sample content area."/>
-                <Button>
-                    <StackPanel Orientation="Horizontal" Spacing="5">
-                        <i:Icon Value="fa-check"/>
-                        <TextBlock Text="Sample Button"/>
+    <Design.PreviewWith>
+        <Border Width="600"
+                Height="400"
+                Padding="20">
+            <HeaderedContentControl Header="Sample Header">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="This is a sample content area." />
+                    <Label Content="This is another sample content area." />
+                    <Button>
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <i:Icon Value="fa-check" />
+                            <TextBlock Text="Sample Button" />
+                        </StackPanel>
+                    </Button>
+                    <Button Content="Sample Colored Button"
+                            Classes="colored"
+                            Foreground="White"
+                            Background="DodgerBlue" />
+                    <ComboBox SelectedIndex="1">
+                        <ComboBoxItem Content="Option 1" />
+                        <ComboBoxItem Content="Option 2" />
+                        <ComboBoxItem Content="Option 3" />
+                    </ComboBox>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="50">
+                        <CheckBox Content="Option 1" />
+                        <CheckBox Content="Option 2" />
+                        <CheckBox Content="Option 3" />
                     </StackPanel>
-                </Button>
-                <Button Content="Sample Colored Button"
-                        Classes="colored"
-                        Foreground="White"
-                        Background="DodgerBlue"/>
-                <ComboBox SelectedIndex="1">
-                    <ComboBoxItem Content="Option 1"/>
-                    <ComboBoxItem Content="Option 2"/>
-                    <ComboBoxItem Content="Option 3"/>
-                </ComboBox>
-                <StackPanel Orientation="Horizontal"
-                            Spacing="50">
-					<CheckBox Content="Option 1"/>
-					<CheckBox Content="Option 2"/>
-					<CheckBox Content="Option 3"/>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="50">
+                        <RadioButton Content="Option 1" />
+                        <RadioButton Content="Option 2" />
+                        <RadioButton Content="Option 3" />
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal"
-                            Spacing="50">
-					<RadioButton Content="Option 1"/>
-					<RadioButton Content="Option 2"/>
-					<RadioButton Content="Option 3"/>
-                </StackPanel>
-             </StackPanel>
-        </HeaderedContentControl>
-    </Border>
-  </Design.PreviewWith>
+            </HeaderedContentControl>
+        </Border>
+    </Design.PreviewWith>
 
-  <!--  Add Styles Here  -->
+    <!--  Add Styles Here  -->
 
-  <Style Selector=":is(TopLevel)">
-    <Setter Property="FontFamily" Value="{DynamicResource Roboto}"/>
-  </Style>
-  
-  <Style Selector="Button.colored:pointerover /template/ ContentPresenter">
-    <Setter Property="Foreground"
-            Value="{Binding Foreground, RelativeSource={RelativeSource Self}}"/>
-    <Setter Property="Background"
-            Value="{Binding Background, RelativeSource={RelativeSource Self}}"/>
-    <Setter Property="OpacityMask" Value="#99FFFFFF"/>
-  </Style>
-  
-  <Style Selector="Button.colored:pressed /template/ ContentPresenter">
-    <Setter Property="Foreground"
-            Value="{Binding Foreground, RelativeSource={RelativeSource Self}}"/>
-    <Setter Property="Background"
-            Value="{Binding Background, RelativeSource={RelativeSource Self}}"/>
-    <Setter Property="OpacityMask" Value="#CCFFFFFF"/>
-  </Style>
+    <Style Selector=":is(TopLevel)">
+        <Setter Property="FontFamily" Value="{DynamicResource Roboto}" />
+    </Style>
 
-  <Style Selector="ContentControl.overlay">
-    <Setter Property="Background" Value="{DynamicResource OverlayBackground}"/>
-    <Setter Property="ZIndex" Value="100"/>
-  </Style>
-  
-  <Style Selector="HeaderedContentControl">
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Grid RowDefinitions="Auto, *"
-              ColumnDefinitions="Auto, *">
-          <!-- Header -->
-          <Border ZIndex="1"
-                  Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                  Padding="5, 0"
-                  Margin="10, 0, 0, 0">
-            <TextBlock Text="{TemplateBinding Header}" FontWeight="SemiBold"/>
-          </Border>
+    <Style Selector="Button.colored:pointerover /template/ ContentPresenter">
+        <Setter Property="Foreground"
+                Value="{Binding Foreground, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="Background"
+                Value="{Binding Background, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="OpacityMask" Value="#99FFFFFF" />
+    </Style>
 
-          <!-- Content Area -->
-          <Border Grid.RowSpan="2"
-                  Padding="15"
-                  Grid.ColumnSpan="2"
-                  CornerRadius="5"
-                  Margin="0, 7.5, 0, 0"
-                  BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                  BorderThickness="1">
-            <ContentPresenter Name="PART_ContentPresenter"
-                              Content="{TemplateBinding Content}"/>
-          </Border>
-        </Grid>
-      </ControlTemplate>
-    </Setter>
-  </Style>
+    <Style Selector="Button.colored:pressed /template/ ContentPresenter">
+        <Setter Property="Foreground"
+                Value="{Binding Foreground, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="Background"
+                Value="{Binding Background, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="OpacityMask" Value="#CCFFFFFF" />
+    </Style>
+
+    <Style Selector="ContentControl.overlay">
+        <Setter Property="Background" Value="{DynamicResource OverlayBackground}" />
+        <Setter Property="ZIndex" Value="100" />
+    </Style>
+
+    <Style Selector="HeaderedContentControl">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="Auto, *"
+                      ColumnDefinitions="Auto, *">
+                    <!-- Header -->
+                    <Border ZIndex="1"
+                            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                            Padding="5, 0"
+                            Margin="10, 0, 0, 0">
+                        <TextBlock Text="{TemplateBinding Header}" FontWeight="SemiBold" />
+                    </Border>
+
+                    <!-- Content Area -->
+                    <Border Grid.RowSpan="2"
+                            Padding="15"
+                            Grid.ColumnSpan="2"
+                            CornerRadius="5"
+                            Margin="0, 7.5, 0, 0"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                            BorderThickness="1">
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          Content="{TemplateBinding Content}" />
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
 </Styles>

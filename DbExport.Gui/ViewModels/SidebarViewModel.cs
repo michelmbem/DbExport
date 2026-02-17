@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DbExport.Gui.Models;
 
@@ -10,6 +11,17 @@ public partial class SidebarViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(SelectedItem))]
     private int selectedIndex = -1;
     
+    public SidebarViewModel()
+    {
+        if (!Design.IsDesignMode) return;
+        
+        Items.Add(new SidebarItem("Item #1"));
+        Items.Add(new SidebarItem("Item #2"));
+        Items.Add(new SidebarItem("Item #3"));
+
+        SelectedIndex = 1;
+    }
+
     public ObservableCollection<SidebarItem> Items { get; } = [];
     
     public SidebarItem? SelectedItem =>

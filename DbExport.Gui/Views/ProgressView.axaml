@@ -8,7 +8,8 @@
              x:DataType="vm:ProgressViewModel">
 
   <Design.DataContext>
-    <vm:ProgressViewModel/>
+    <vm:ProgressViewModel IsIndeterminate="True"
+                          Message="A task is in progress"/>
   </Design.DataContext>
   
   <StackPanel HorizontalAlignment="Center"
