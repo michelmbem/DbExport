@@ -36,6 +36,7 @@ public class MySqlSchemaProvider : ISchemaProvider
                            FROM
                                INFORMATION_SCHEMA.TABLES
                            WHERE
+                               TABLE_TYPE = 'BASE TABLE' AND
                                TABLE_SCHEMA = '{0}'
                            ORDER BY
                                TABLE_NAME

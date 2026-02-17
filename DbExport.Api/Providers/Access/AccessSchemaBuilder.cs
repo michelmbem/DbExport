@@ -53,7 +53,8 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         if (!visitSchema || !visitFKs) return;
 
         foreach (var fk in database.Tables.Where(t => t.IsChecked)
-            .SelectMany(t => t.ForeignKeys.Where(fk => fk.RelatedTable.IsChecked)))
+            .SelectMany(t => t.ForeignKeys.Where(fk => fk.IsChecked &&
+            fk.RelatedTable.IsChecked && fk.AllColumnsAreChecked)))
         {
             fk.AcceptVisitor(this);
         }
@@ -66,13 +67,16 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
         Write("CREATE TABLE {0} (", Escape(table.Name));
 
-        for (int i = 0; i < table.Columns.Count; ++i)
+        bool comma = false;
+
+        foreach (var column in table.Columns.Where(c => c.IsChecked))
         {
-            if (i > 0) Write(",");
-            table.Columns[i].AcceptVisitor(this);
+            if (comma) Write(",");
+            column.AcceptVisitor(this);
+            comma = true;
         }
 
-        if (visitPKs && table.HasPrimaryKey)
+        if (visitPKs && table.HasPrimaryKey && table.PrimaryKey.AllColumnsAreChecked)
         {
             Write(",");
             table.PrimaryKey.AcceptVisitor(this);
@@ -83,8 +87,11 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
         if (!visitIndexes) return;
 
-        foreach (Index index in table.Indexes.Where(i => !(i.MatchesKey || i.Columns.Count == 0)))
+        foreach (Index index in table.Indexes
+            .Where(i => i.IsChecked && !i.MatchesKey && i.Columns.Count > 0 && i.AllColumnsAreChecked))
+        {
             index.AcceptVisitor(this);
+        }
     }
 
     public void VisitColumn(Column column)

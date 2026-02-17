@@ -128,7 +128,8 @@ public abstract class CodeGenerator : IVisitor, IDisposable
             
             var fkExported = false;
 
-            foreach (var fk in table.ForeignKeys.Where(fk => fk.RelatedTable.IsChecked))
+            foreach (var fk in table.ForeignKeys
+                .Where(fk => fk.IsChecked && fk.RelatedTable.IsChecked && fk.AllColumnsAreChecked))
             {
                 fk.AcceptVisitor(this);
                 fkExported = true;
@@ -147,18 +148,24 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         WriteLine("CREATE TABLE {0} (", Escape(table.Name));
         Indent();
 
-        for (var i = 0; i < table.Columns.Count; ++i)
+        bool comma = false;
+
+        foreach (var column in table.Columns.Where(c => c.IsChecked))
         {
-            if (i > 0) WriteLine(",");
-            table.Columns[i].AcceptVisitor(this);
+            if (comma) WriteLine(",");
+            column.AcceptVisitor(this);
+            comma = true;
         }
 
-        if (visitPKs && table.HasPrimaryKey)
+        if (visitPKs && table.HasPrimaryKey && table.PrimaryKey.AllColumnsAreChecked)
             table.PrimaryKey.AcceptVisitor(this);
             
         if (visitFKs && RequireInlineConstraints)
-            foreach (var fk in table.ForeignKeys)
+            foreach (var fk in table.ForeignKeys
+                .Where(fk => fk.IsChecked && fk.RelatedTable.IsChecked && fk.AllColumnsAreChecked))
+            {
                 fk.AcceptVisitor(this);
+            }
 
         WriteLine();
         Unindent();
@@ -171,7 +178,8 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         
         var indexVisited = false;
 
-        foreach (var index in table.Indexes.Where(index => !index.MatchesKey && index.Columns.Count > 0))
+        foreach (var index in table.Indexes
+            .Where(i => i.IsChecked && !i.MatchesKey && i.Columns.Count > 0 && i.AllColumnsAreChecked))
         {
             index.AcceptVisitor(this);
             indexVisited = true;
