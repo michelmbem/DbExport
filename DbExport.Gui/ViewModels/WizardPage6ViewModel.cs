@@ -30,7 +30,7 @@ public partial class WizardPage6ViewModel : WizardPageViewModel
         if (value == null) return;
         
         IsBusy = true;
-        Task.Run(() => SummaryText = RazorTemplateLoader.LoadTemplate("summary.razor", value))
+        Task.Run(() => SummaryText = RazorTemplateLoader.LoadTemplate("summary", value))
             .GetAwaiter()
             .OnCompleted(() => IsBusy = false);
     }

@@ -8,14 +8,20 @@
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
-             
-    <Application.Resources>
-        <FontFamily x:Key="Bauhaus">avares://dbexport/Assets/Bauhaus.ttf#Bauhaus-Heavy-Bold</FontFamily>
-    </Application.Resources>
   
     <Application.Styles>
         <FluentTheme/>
         <StyleInclude Source="Styles.axaml"/>
         <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml"/>
     </Application.Styles>
+             
+    <Application.Resources>
+        <!-- Font families -->
+        <FontFamily x:Key="Bauhaus">avares://dbexport/Assets/Fonts/Bauhaus.ttf#Bauhaus</FontFamily>
+        <FontFamily x:Key="Roboto">avares://dbexport/Assets/Fonts/Roboto#Roboto</FontFamily>
+        <FontFamily x:Key="RobotoMono">avares://dbexport/Assets/Fonts/RobotoMono#Roboto Mono</FontFamily>
+        
+        <!-- Colors -->
+        <SolidColorBrush x:Key="OverlayBackground" Color="#CC777777"/>
+    </Application.Resources>
 </Application>

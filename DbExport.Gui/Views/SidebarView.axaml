@@ -16,7 +16,7 @@
   
   <Border Padding="10">
     <Border.Background>
-      <ImageBrush Source="/Assets/banner.jpg" Stretch="Fill"/>
+      <ImageBrush Source="/Assets/Images/banner.jpg" Stretch="Fill"/>
     </Border.Background>
     <Grid RowDefinitions="Auto, Auto, *, Auto, Auto">
       <TextBlock Grid.Row="0"
@@ -32,11 +32,11 @@
             <StackPanel Orientation="Horizontal">
               <svg:Svg Width="32"
                        Height="32"
-                       Path="/Assets/unselected-item.svg"
+                       Path="/Assets/Images/unselected-item.svg"
                        IsVisible="{Binding !IsSelected}"/>
               <svg:Svg Width="32"
                        Height="32"
-                       Path="/Assets/selected-item.svg"
+                       Path="/Assets/Images/selected-item.svg"
                        IsVisible="{Binding IsSelected}"/>
               <TextBlock Text="{Binding Title}"
                          Foreground="{Binding Foreground}"
@@ -47,7 +47,7 @@
         </ItemsControl.ItemTemplate>
       </ItemsControl>
       <Image Grid.Row="3"
-             Source="/Assets/connection.png"
+             Source="/Assets/Images/connection.png"
              Stretch="Uniform"/>
       <TextBlock Grid.Row="4"
                  Text="{x:Static util:AssemblyInfo.Copyright}"

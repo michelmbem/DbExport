@@ -175,7 +175,8 @@ public static class Utility
         return res;
     }
 
-    public static string QuotedStr(object value) => $"'{value!.ToString().Replace("'", "''")}'";
+    public static string QuotedStr(object value, char quote = '\'') =>
+        $"{quote}{value.ToString().Replace(quote.ToString(), new string(quote, 2))}{quote}";
 
     public static string BinToHex(byte[] bytes)
     {

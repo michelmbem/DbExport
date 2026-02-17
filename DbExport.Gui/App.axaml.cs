@@ -1,9 +1,9 @@
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
-using System.Linq;
 using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 using DbExport.Gui.ViewModels;
 using DbExport.Gui.Views;
 
@@ -14,6 +14,13 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+
+    public static bool IsDarkMode => Current!.ActualThemeVariant == ThemeVariant.Dark;
+
+    public static void ToggleDarkMode()
+    {
+        Current!.RequestedThemeVariant = IsDarkMode ? ThemeVariant.Light : ThemeVariant.Dark;
     }
 
     public override void OnFrameworkInitializationCompleted()

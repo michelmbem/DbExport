@@ -21,8 +21,7 @@
     <ContentControl Grid.Row="1"
                     Content="{Binding Progress}"
                     IsVisible="{Binding IsBusy}"
-                    Background="#CC777777"
-                    ZIndex="100"/>
+                    Classes="overlay"/>
     <DockPanel Grid.Row="1">
       <Border DockPanel.Dock="Top"
               Background="#33777777"
@@ -53,7 +52,7 @@
       </Border>
       <ae:TextEditor Name="SqlEditor"
                      ShowLineNumbers="True"
-                     FontFamily="Cascadia Code,Consolas,Menlo,Monospace"
+                     FontFamily="{StaticResource RobotoMono}"
                      FontSize="13"
                      TextChanged="OnSqlEditorTextChanged">
         <ae:TextEditor.ContextMenu>

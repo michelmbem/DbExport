@@ -30,9 +30,9 @@ public sealed class DataProvider(
     string? databaseListQuery = null)
 {
 #if WINDOWS
-    private const string ACCESS_DATABASE_FILE_PATTERN = "Microsoft Access Database File (*.accdb;*.mdb)|*.accdb;*.mdb|All Files (*.*)|*.*";
+    private const string ACCESS_DATABASE_FILE_PATTERN = "Microsoft Access Database (*.accdb;*.mdb)|*.accdb;*.mdb";
 #endif
-    private const string SQLITE_DATABASE_FILE_PATTERN = "SQLite Database (*.db)|*.db|All Files (*.*)|*.*";
+    private const string SQLITE_DATABASE_FILE_PATTERN = "SQLite Database (*.db)|*.db";
     private const string SQLSERVER_DATABASE_LIST_QUERY = "EXEC sp_databases";
     private const string MYSQL_DATABASE_LIST_QUERY = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA ORDER BY SCHEMA_NAME";
     private const string POSTGRESQL_DATABASE_LIST_QUERY = "SELECT datname FROM pg_catalog.pg_database ORDER BY datname";

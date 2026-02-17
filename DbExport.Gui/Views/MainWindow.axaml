@@ -4,7 +4,7 @@
         xmlns:vm="using:DbExport.Gui.ViewModels"
         x:Class="DbExport.Gui.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/DbExport.ico"
+        Icon="/Assets/Images/DbExport.ico"
         Title="Database Migration Wizard"
         Width="900"
         Height="600"
@@ -78,7 +78,7 @@
                       CommandParameter="{Binding $parent[Window]}">
                   <StackPanel>
                       <i:Icon Value="fa-circle-info"/>
-                      <TextBlock Text="About..."/>
+                      <TextBlock Text="About"/>
                   </StackPanel>
               </Button>
               <Button Grid.Column="2"

@@ -50,10 +50,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private static void SwitchTheme()
     {
-        var app = Application.Current!;
-        app.RequestedThemeVariant = app.ActualThemeVariant == ThemeVariant.Dark
-            ? ThemeVariant.Light
-            : ThemeVariant.Dark;
+        App.ToggleDarkMode();
     }
 
     [RelayCommand]

@@ -19,8 +19,7 @@
     <ContentControl Grid.Row="1"
                     Content="{Binding Progress}"
                     IsVisible="{Binding IsBusy}"
-                    Background="#CC777777"
-                    ZIndex="100"/>
+                    Classes="overlay"/>
     <TreeView Grid.Row="1"
               ItemsSource="{Binding Roots}"
               SelectionMode="Toggle">

@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Styling;
 using AvaloniaEdit.TextMate;
 using DbExport.Gui.ViewModels;
 using TextMateSharp.Grammars;
@@ -19,7 +18,7 @@ public partial class WizardPage7View : UserControl
     }
     
     private static ThemeName EditorThemeName =>
-        Application.Current?.ActualThemeVariant == ThemeVariant.Dark ? ThemeName.DarkPlus: ThemeName.LightPlus;
+        App.IsDarkMode ? ThemeName.DarkPlus: ThemeName.LightPlus;
 
     private WizardPage7ViewModel? ViewModel => (WizardPage7ViewModel?)DataContext;
 
@@ -52,12 +51,12 @@ public partial class WizardPage7View : UserControl
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         InitializeSqlEditor();
-        ViewModel?.PropertyChanged += OnViewModelPropertyChanged;
+        ViewModel!.PropertyChanged += OnViewModelPropertyChanged;
     }
 
     private void OnDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
-        ViewModel?.PropertyChanged -= OnViewModelPropertyChanged;
+        ViewModel!.PropertyChanged -= OnViewModelPropertyChanged;
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -70,6 +69,6 @@ public partial class WizardPage7View : UserControl
 
     private void OnSqlEditorTextChanged(object? sender, EventArgs e)
     {
-        ViewModel?.SqlScript = SqlEditor.Text;
+        ViewModel!.SqlScript = SqlEditor.Text;
     }
 }
