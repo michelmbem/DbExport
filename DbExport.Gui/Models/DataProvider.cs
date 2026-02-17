@@ -43,7 +43,7 @@ public sealed class DataProvider(
     [
 #if WINDOWS
         new(ProviderNames.ACCESS, "Microsoft Access", ProviderFeatures.Access, new OleDbConnectionStringBuilder(), ACCESS_DATABASE_FILE_PATTERN),
-        new(ProviderNames.SQLSERVER, "SQL Server LocalDB", ProviderFeatures.SqlServer, new LocalDBConnectionStringBuilder(), SQLSERVER_DATABASE_FILE_PATTERN),
+        new(ProviderNames.SQLSERVER, "SQL Server Express LocalDB", ProviderFeatures.SqlServer, new LocalDBConnectionStringBuilder(), SQLSERVER_DATABASE_FILE_PATTERN),
 #endif
         new(ProviderNames.SQLSERVER, "Microsoft SQL Server", ProviderFeatures.SqlServer, new SqlConnectionStringBuilder(), SQLSERVER_DATABASE_LIST_QUERY),
         new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.Oracle, new OracleConnectionStringBuilder()),
