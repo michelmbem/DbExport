@@ -27,13 +27,5 @@ public abstract class SchemaItem : IVisitorAcceptor
 
     #endregion
 
-    public override bool Equals(object obj)
-    {
-        if (obj is not SchemaItem other) return false;
-        return GetType() == other.GetType() && Name == other.Name;
-    }
-
-    public override int GetHashCode() => HashCode.Combine(GetType(), Name);
-
-    public override string ToString() => $"{GetType().Name} : {Name}";
+    public override string ToString() => $"{GetType().Name}[{FullName}]";
 }

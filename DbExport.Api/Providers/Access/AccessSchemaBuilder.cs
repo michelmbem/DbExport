@@ -20,8 +20,8 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
     {
         var visitSchema = ExportOptions == null || ExportOptions.ExportSchema;
         var visitData = ExportOptions == null || ExportOptions.ExportData;
-        var visitFKs = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportForeignKeys);
-        var visitIdent = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportIdentities);
+        var visitFKs = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportForeignKeys);
+        var visitIdent = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
 
         var catalog = new ADOX.Catalog();
 
@@ -62,8 +62,8 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     public void VisitTable(Table table)
     {
-        var visitPKs = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportPrimaryKeys);
-        var visitIndexes = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportIndexes);
+        var visitPKs = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportPrimaryKeys);
+        var visitIndexes = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIndexes);
 
         Write("CREATE TABLE {0} (", Escape(table.Name));
 
@@ -96,7 +96,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     public void VisitColumn(Column column)
     {
-        var visitDefaults = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportDefaults);
+        var visitDefaults = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportDefaults);
 
         Write("{0} {1}", Escape(column.Name), GetTypeName(column, ExportOptions));
         
@@ -277,7 +277,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     private void ImportRecord(Table table, DbDataReader dr)
     {
-        var skipIdentity = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportIdentities);
+        var skipIdentity = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
         var comma = false;
 
         Write("INSERT INTO {0} (", Escape(table.Name));

@@ -34,12 +34,15 @@ public static class SchemaProvider
         }
     }
 
-    public static Database GetDatabase(ISchemaProvider provider)
+    public static Database GetDatabase(ISchemaProvider provider, string schema)
     {
         var database = new Database(provider.DatabaseName, provider.ProviderName, provider.ConnectionString);
         var tablePairs = provider.GetTableNames();
+        var filteredTablePairs = string.IsNullOrWhiteSpace(schema)
+            ? tablePairs
+            : Array.FindAll(tablePairs, pair => pair.Item2 == schema);
 
-        foreach (var (tableName, tableOwner) in tablePairs)
+        foreach (var (tableName, tableOwner) in filteredTablePairs)
         {
             var table = GetTable(provider, database, tableName, tableOwner);
             database.Tables.Add(table);
@@ -48,8 +51,8 @@ public static class SchemaProvider
         return database;
     }
 
-    public static Database GetDatabase(string providerName, string connectionString) =>
-        GetDatabase(GetProvider(providerName, connectionString));
+    public static Database GetDatabase(string providerName, string connectionString, string schema) =>
+        GetDatabase(GetProvider(providerName, connectionString), schema);
 
     private static Table GetTable(ISchemaProvider provider, Database database, string tableName, string tableOwner)
     {

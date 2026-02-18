@@ -79,8 +79,8 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     {
         var visitSchema = ExportOptions == null || ExportOptions.ExportSchema;
         var visitData = ExportOptions == null || ExportOptions.ExportData;
-        var visitFKs = ExportOptions == null || (ExportOptions.Flags & ExportFlags.ExportForeignKeys) != ExportFlags.ExportNothing;
-        var visitIdent = ExportOptions == null || (ExportOptions.Flags & ExportFlags.ExportIdentities) != ExportFlags.ExportNothing;
+        var visitFKs = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportForeignKeys);
+        var visitIdent = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
 
         WriteComment("Database: {0}", database.Name);
         WriteComment("Generated on: {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -129,8 +129,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
             
             var fkExported = false;
 
-            foreach (var fk in table.ForeignKeys
-                .Where(fk => fk.IsChecked && fk.RelatedTable.IsChecked && fk.AllColumnsAreChecked))
+            foreach (var fk in table.ForeignKeys.Where(IsSelected))
             {
                 fk.AcceptVisitor(this);
                 fkExported = true;
@@ -142,9 +141,9 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     public virtual void VisitTable(Table table)
     {
-        var visitPKs = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportPrimaryKeys);
-        var visitIndexes = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportIndexes);
-        var visitFKs = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportForeignKeys);
+        var visitPKs = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportPrimaryKeys);
+        var visitIndexes = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIndexes);
+        var visitFKs = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportForeignKeys);
 
         WriteLine("CREATE TABLE {0} (", Escape(table.Name));
         Indent();
@@ -162,8 +161,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
             table.PrimaryKey.AcceptVisitor(this);
             
         if (visitFKs && RequireInlineConstraints)
-            foreach (var fk in table.ForeignKeys
-                .Where(fk => fk.IsChecked && fk.RelatedTable.IsChecked && fk.AllColumnsAreChecked))
+            foreach (var fk in table.ForeignKeys.Where(IsSelected))
             {
                 fk.AcceptVisitor(this);
             }
@@ -179,8 +177,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         
         var indexVisited = false;
 
-        foreach (var index in table.Indexes
-            .Where(i => i.IsChecked && !i.MatchesKey && i.Columns.Count > 0 && i.AllColumnsAreChecked))
+        foreach (var index in table.Indexes.Where(IsSelected))
         {
             index.AcceptVisitor(this);
             indexVisited = true;
@@ -191,7 +188,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     public virtual void VisitColumn(Column column)
     {
-        var visitDefaults = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportDefaults);
+        var visitDefaults = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportDefaults);
 
         Write("{0} {1}", Escape(column.Name), GetTypeName(column));
             
@@ -368,7 +365,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     protected virtual void WriteInsertDirective(Table table, DbDataReader dr)
     {
-        var skipIdentity = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportIdentities);
+        var skipIdentity = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
         var insertableColumns = table.Columns.Where(
             column => (!skipIdentity || !column.IsIdentity) &&
                       (!SupportsRowVersion || column.ColumnType != ColumnType.RowVersion)
@@ -450,6 +447,12 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     {
         Write(format + Environment.NewLine, values);
     }
+
+    private static bool IsSelected(Index index) =>
+        index.IsChecked && !index.MatchesKey && index.Columns.Count > 0 && index.AllColumnsAreChecked;
+
+    private static bool IsSelected(ForeignKey fk) =>
+        fk.IsChecked && fk.AllColumnsAreChecked && fk.RelatedTable is { IsChecked: true };
 
     #endregion
 }

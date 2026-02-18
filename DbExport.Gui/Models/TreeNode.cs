@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DbExport.Schema;
@@ -34,7 +33,7 @@ public partial class TreeNode : ObservableObject
         Type = type;
     }
 
-    public TreeNode(TreeNode? parent, Table table) : this(parent, table.FullName, TreeNodeType.Table)
+    public TreeNode(TreeNode? parent, Table table) : this(parent, table.Name, TreeNodeType.Table)
     {
         checkable = table;
         
@@ -88,13 +87,18 @@ public partial class TreeNode : ObservableObject
     
     public List<TreeNode> Children { get; } = [];
     
-    public static ObservableCollection<TreeNode> FromDatabase(Database database)
+    public static IEnumerable<TreeNode> FromDatabase(Database database)
     {
-        var tablesNode = new TreeNode(null, "Tables", TreeNodeType.Group);
-        tablesNode.Children.AddRange(database.Tables.Select(t => new TreeNode(tablesNode, t)));
-        tablesNode.IsChecked = tablesNode.IsExpanded = true;
-        
-        return new ObservableCollection<TreeNode>([tablesNode]);
+        var schemas = database.Tables.GroupBy(t => string.IsNullOrEmpty(t.Owner) ? "Tables" : t.Owner);
+
+        foreach (var schema in schemas)
+        {
+            var schemaNode = new TreeNode(null, schema.Key, TreeNodeType.Group);
+            schemaNode.Children.AddRange(schema.Select(t => new TreeNode(schemaNode, t)));
+            schemaNode.IsChecked = schemaNode.IsExpanded = true;
+
+            yield return schemaNode;
+        }
     }
 
     partial void OnIsCheckedChanged(bool? value)

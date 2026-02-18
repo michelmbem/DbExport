@@ -29,6 +29,6 @@ public partial class WizardPage5ViewModel : WizardPageViewModel
 
     partial void OnDatabaseChanged(Database? value)
     {
-        Roots = value is null ? [] : TreeNode.FromDatabase(value);
+        Roots = value is null ? [] : [..TreeNode.FromDatabase(value)];
     }
 }

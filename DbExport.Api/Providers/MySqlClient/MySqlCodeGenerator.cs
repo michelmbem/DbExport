@@ -35,7 +35,7 @@ public class MySqlCodeGenerator : CodeGenerator
     {
         base.VisitColumn(column);
 
-        var visitIdentities = ExportOptions == null || ExportOptions.Flags.HasFlag(ExportFlags.ExportIdentities);
+        var visitIdentities = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
         
         if (visitIdentities && column.IsIdentity) Write(" AUTO_INCREMENT");
     }

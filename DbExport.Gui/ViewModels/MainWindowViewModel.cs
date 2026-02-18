@@ -96,7 +96,8 @@ public partial class MainWindowViewModel : ViewModelBase
                                                             wizardPage2.ConnectionString);
 
             wizardPage5.IsBusy = true;
-            wizardPage5.Database = SchemaProvider.GetDatabase(schemaProvider);
+            wizardPage5.Database = SchemaProvider.GetDatabase(schemaProvider,
+                                                              wizardPage2.Connection.SelectedSchema);
         }
         catch (Exception e)
         {

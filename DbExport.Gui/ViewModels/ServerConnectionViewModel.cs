@@ -3,6 +3,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
+
+using DbExport.Providers;
+
 using Serilog;
 
 namespace DbExport.Gui.ViewModels;
@@ -26,15 +29,24 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
     
     [ObservableProperty]
     private string? catalog;
-    
+
+    [ObservableProperty]
+    private string? schema;
+
     public ObservableCollection<string> AllCatalogs { get; } = [];
+
+    public ObservableCollection<string> AvailableSchemas { get; } = [];
 
     public override string ConnectionString =>
         DataProvider?.ConnectionStringBuilder.Build(Host, Port, Catalog, TrustedConnection, Username, Password) ?? string.Empty;
 
+    public override string SelectedSchema => Schema ?? string.Empty;
+
     public void ReloadCatalogs()
     {
         AllCatalogs.Clear();
+
+        if (string.IsNullOrWhiteSpace(DataProvider?.DatabaseListQuery)) return;
         
         try
         {
@@ -45,6 +57,28 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
         catch(Exception e)
         {
             Log.Warning(e, "Failed to reload catalogs");
+        }
+    }
+
+    public void ReloadSchemas()
+    {
+        AvailableSchemas.Clear();
+
+        if (string.IsNullOrWhiteSpace(Catalog)) return;
+
+        try
+        {
+            var schemaProvider = SchemaProvider.GetProvider(DataProvider?.Name, ConnectionString);
+            var schemas = schemaProvider.GetTableNames()
+                                        .Select(t => t.Item2)
+                                        .Where(s => !string.IsNullOrEmpty(s))
+                                        .Distinct();
+
+            AvailableSchemas.AddRange(schemas);
+        }
+        catch (Exception e)
+        {
+            Log.Warning(e, "Failed to reload schemas");
         }
     }
 

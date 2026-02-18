@@ -19,7 +19,9 @@ public partial class ConnectionViewModel : ViewModelBase
     private bool isDestination;
 
     public virtual string ConnectionString => string.Empty;
-    
+
+    public virtual string SelectedSchema => string.Empty;
+
     public bool SupportsTrustedConnection =>
         DataProvider?.HasFeature(ProviderFeatures.SupportsTrustedConnection) ?? false;
 

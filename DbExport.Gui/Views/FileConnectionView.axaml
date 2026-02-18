@@ -12,18 +12,13 @@
         <vm:FileConnectionViewModel />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto, Auto, Auto,Auto, Auto"
-          ColumnDefinitions="Auto, *"
+    <Grid RowDefinitions="Auto, Auto, Auto"
+          ColumnDefinitions="Auto, *, Auto, *"
           RowSpacing="10"
           ColumnSpacing="10">
         <Grid.Styles>
             <Style Selector="Label">
                 <Setter Property="VerticalAlignment" Value="Center" />
-            </Style>
-            <Style Selector="Button">
-                <Setter Property="HorizontalContentAlignment" Value="Center" />
-                <Setter Property="VerticalContentAlignment" Value="Center" />
-                <Setter Property="Padding" Value="10, 5" />
             </Style>
             <Style Selector="Button > StackPanel">
                 <Setter Property="Orientation" Value="Horizontal" />
@@ -37,50 +32,51 @@
         <TextBox Name="FilePathTextBox"
                  Grid.Row="0"
                  Grid.Column="1"
+                 Grid.ColumnSpan="3"
                  Text="{Binding FilePath}"
                  Height="80"
-                 TextWrapping="Wrap" />
-        <Button Grid.Row="1"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                HorizontalAlignment="Right"
-                Command="{Binding ChooseFileCommand}"
-                CommandParameter="{Binding $parent[Window]}">
-            <StackPanel>
-                <i:Icon Value="fa-folder-open"></i:Icon>
-                <TextBlock Text="Choose a database file" />
-            </StackPanel>
-        </Button>
-        <Label Grid.Row="2"
+                 TextWrapping="Wrap">
+            <TextBox.InnerRightContent>
+                <Button HorizontalAlignment="Right"
+                        i:Attached.Icon="fa-folder-open"
+                        ToolTip.Tip="Choose a database file"
+                        Command="{Binding ChooseFileCommand}"
+                        CommandParameter="{Binding $parent[Window]}" />
+            </TextBox.InnerRightContent>
+        </TextBox>
+        <Label Grid.Row="1"
                Grid.Column="0"
                Content="Username :"
                Target="UsernameTextBox" />
         <TextBox Name="UsernameTextBox"
-                 Grid.Row="2"
+                 Grid.Row="1"
                  Grid.Column="1"
                  Text="{Binding Username}">
             <TextBox.InnerRightContent>
                 <i:Icon Value="fa-user"/>
             </TextBox.InnerRightContent>
         </TextBox>
-        <Label Grid.Row="3"
-               Grid.Column="0"
+        <Label Grid.Row="1"
+               Grid.Column="2"
                Content="Password :"
                Target="PasswordTextBox" />
         <TextBox Name="PasswordTextBox"
-                 Grid.Row="3"
-                 Grid.Column="1"
+                 Grid.Row="1"
+                 Grid.Column="3"
                  PasswordChar="*"
                  Text="{Binding Password}">
             <TextBox.InnerRightContent>
                 <i:Icon Value="fa-lock"/>
             </TextBox.InnerRightContent>
         </TextBox>
-        <Button Grid.Row="4"
+        <Button Grid.Row="2"
                 Grid.Column="0"
-                Grid.ColumnSpan="2"
+                Grid.ColumnSpan="4"
                 Content="Test connection"
                 HorizontalAlignment="Center"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Padding="15, 5"
                 Command="{Binding TestConnectionCommand}" />
     </Grid>
 </UserControl>

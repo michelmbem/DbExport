@@ -37,11 +37,19 @@
                         <RadioButton Content="Option 2" />
                         <RadioButton Content="Option 3" />
                     </StackPanel>
-                    <TextBox>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="10">
+                    <TextBox Width="150">
                         <TextBox.InnerRightContent>
                             <i:Icon Value="fa-trash"/>
                         </TextBox.InnerRightContent>
                     </TextBox>
+                    <TextBox Width="150">
+                        <TextBox.InnerRightContent>
+                            <Button i:Attached.Icon="fa-eye"/>
+                        </TextBox.InnerRightContent>
+                    </TextBox>
+                    </StackPanel>
                 </StackPanel>
             </HeaderedContentControl>
         </Border>
@@ -72,6 +80,12 @@
     <Style Selector="TextBox i|Icon">
         <Setter Property="Margin" Value="5, 0"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    
+    <Style Selector="TextBox Button">
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="CornerRadius" Value="0, 4, 4, 0"/>
     </Style>
 
     <Style Selector="ContentControl.overlay">
