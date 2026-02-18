@@ -118,7 +118,10 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
             sb.Append(Utility.Escape(column.Name, table.Database.ProviderName)).Append(", ");
 
         sb.Length -= 2;
-        sb.Append(" FROM ").Append(Utility.Escape(table.Name, table.Database.ProviderName));
+        sb.Append(" FROM ");
+        if (!string.IsNullOrEmpty(table.Owner))
+            sb.Append(Utility.Escape(table.Owner, table.Database.ProviderName)).Append('.');
+        sb.Append(Utility.Escape(table.Name, table.Database.ProviderName));
 
         var connection = Utility.GetConnection(table.Database);
         connection.Open();

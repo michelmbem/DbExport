@@ -69,7 +69,7 @@
 
 @foreach (var table in Model.Database.Tables.Where(t => t.IsChecked))
 {
-    @("### " + table.Name + Environment.NewLine + Environment.NewLine)
+    @("### " + table.FullName + Environment.NewLine + Environment.NewLine)
 
     @("| Column | Type | Nullable | Default |" + Environment.NewLine)
     @("|--------|------|----------|---------|" + Environment.NewLine)
