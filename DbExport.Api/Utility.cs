@@ -10,11 +10,9 @@ using DbExport.Schema;
 
 namespace DbExport;
 
-public static class Utility
+public static partial class Utility
 {
-    public const int DEFAULT_CODE_PAGE = 65001; // UTF-8
-
-    public static Encoding Encoding { get; set; }
+    public static Encoding Encoding { get; set; } = Encoding.UTF8;
     
     public static void RegisterDbProviderFactories()
     {
@@ -36,13 +34,13 @@ public static class Utility
     {
         const StringSplitOptions splitOptions = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
         
-        var properties = new Dictionary<string, string>();
+        Dictionary<string, string> properties = [];
 
         foreach (var setting in connectionString.Split(';', splitOptions))
         {
             var members = setting.Split('=', splitOptions);
             var (key, value) = (members[0], members.Length > 1 ? members[1] : string.Empty);
-            if (string.IsNullOrWhiteSpace(key)) continue;
+            if (key.Length == 0) continue;
             if (value.StartsWith('"')) value = value[1..^1].Replace("\"\"", "\"");
             properties[key.ToLower()] = value;
         }
@@ -54,13 +52,13 @@ public static class Utility
     {
         const StringSplitOptions splitOptions = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
         
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
 
         foreach (var setting in connectionString.Split(';', splitOptions))
         {
             var members = setting.Split('=', splitOptions);
             var (key, value) = (members[0], members.Length > 1 ? members[1] : string.Empty);
-            if (string.IsNullOrWhiteSpace(key)) continue;
+            if (key.Length == 0) continue;
             if (key.Equals("password", StringComparison.OrdinalIgnoreCase) ||
                 key.Equals("pwd", StringComparison.OrdinalIgnoreCase))
                 sb.Append($"{key}={new string('*', value.Length)};");
@@ -95,92 +93,32 @@ public static class Utility
     public static bool IsEmpty(object value) =>
         value switch
         {
-            null => true,
+            null or DBNull => true,
             string s => string.IsNullOrWhiteSpace(s),
-            Array array => array.Length == 0,
-            _ => value == DBNull.Value || value.Equals(0)
+            Array a => a.Length == 0,
+            _ => value.Equals(0)
         };
 
     public static bool IsBoolean(object value) => Convert.ToString(value)?.ToLower() is "false" or "true";
 
-    public static bool IsNumeric(object value)
-    {
-        var numeric = true;
+    public static bool IsNumeric(object value) =>
+        decimal.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out _);
 
-        try
-        {
-            _ = Convert.ToDecimal(value);
-        }
-        catch
-        {
-            numeric = false;
-        }
+    public static bool IsDate(object value) =>
+        DateTime.TryParse(value?.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
 
-        return numeric;
-    }
+    public static byte ToByte(object value) =>
+        byte.TryParse(value?.ToString(), out var res) ? res : (byte)0;
 
-    public static bool IsDate(object value)
-    {
-        var date = true;
-
-        try
-        {
-            _ = Convert.ToDateTime(value);
-        }
-        catch
-        {
-            date = false;
-        }
-
-        return date;
-    }
-
-    public static byte ToByte(object value)
-    {
-        byte res = 0;
-
-        try
-        {
-            res = Convert.ToByte(value);
-        }
-        catch (InvalidCastException)
-        {
-            // ignore
-        }
-        catch (OverflowException)
-        {
-            // ignore
-        }
-
-        return res;
-    }
-
-    public static short ToInt16(object value)
-    {
-        short res = 0;
-
-        try
-        {
-            res = Convert.ToInt16(value);
-        }
-        catch (InvalidCastException)
-        {
-            // ignore
-        }
-        catch (OverflowException)
-        {
-            // ignore
-        }
-
-        return res;
-    }
+    public static short ToInt16(object value) =>
+        short.TryParse(value?.ToString(), out var res) ? res : (short)0;
 
     public static string QuotedStr(object value, char quote = '\'') =>
-        $"{quote}{value.ToString().Replace(quote.ToString(), new string(quote, 2))}{quote}";
+        $"{quote}{value.ToString()?.Replace(quote.ToString(), new string(quote, 2))}{quote}";
 
     public static string BinToHex(byte[] bytes)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
 
         foreach (var b in bytes)
             sb.Append(b.ToString("x2"));
@@ -200,7 +138,7 @@ public static class Utility
 
     public static string GetString(byte[] bytes)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
 
         foreach (var b in bytes)
         {
@@ -212,11 +150,11 @@ public static class Utility
                 case 92: // backslash
                     sb.Append(@"\\\\");
                     break;
+                case >= 32 and < 127:
+                    sb.Append((char)b);
+                    break;
                 default:
-                    if (b is >= 32 and < 127)
-                        sb.Append((char)b);
-                    else
-                        sb.Append(@"\\").Append(ToBaseN(b, 8).PadLeft(3, '0'));
+                    sb.Append(@"\\").Append(ToBaseN(b, 8).PadLeft(3, '0'));
                     break;
             }
         }
@@ -226,7 +164,7 @@ public static class Utility
 
     public static byte[] GetBytes(string value)
     {
-        var bytes = new List<byte>();
+        List<byte> bytes = [];
         var counter = 0;
 
         try
@@ -234,7 +172,6 @@ public static class Utility
             while (counter < value.Length)
             {
                 var c = value[counter];
-
                 switch (c)
                 {
                     case '\'':
@@ -293,7 +230,7 @@ public static class Utility
                                     bytes.Add(92);
                                     counter += 4;
                                 }
-                                else if (Regex.IsMatch(value.Substring(counter + 2, 3), @"\d{3}"))
+                                else if (ThreeDigitsRegex().IsMatch(value.AsSpan(counter + 2, 3)))
                                 {
                                     bytes.Add(FromBaseN(value.Substring(counter + 2, 3), 8));
                                     counter += 5;
@@ -317,12 +254,12 @@ public static class Utility
             throw new FormatException("The string terminates incorrectly");
         }
 
-        return bytes.ToArray();
+        return [..bytes];
     }
 
     public static string ToBitString(byte[] bytes)
     {
-        var sb = new StringBuilder();
+        StringBuilder sb = new();
 
         foreach (var b in bytes)
             sb.Append(ToBaseN(b, 2));
@@ -345,8 +282,8 @@ public static class Utility
     {
         if (b == 0) return "0";
 
-        var sb = new StringBuilder();
-            
+        StringBuilder sb = new();
+    
         while (b > 0)
         {
             sb.Insert(0, Digit2Char(b % n));
@@ -370,4 +307,7 @@ public static class Utility
         >= '0' and <= '9' => c - '0',
         _ => c - 'A' + 10
     };
+    
+    [GeneratedRegex(@"\d{3}", RegexOptions.Compiled)]
+    private static partial Regex ThreeDigitsRegex();
 }

@@ -30,102 +30,114 @@ public class OracleSchemaProvider : ISchemaProvider
 
     public string DatabaseName => databaseName;
 
-    public string[] GetTableNames()
+    public (string, string)[] GetTableNames()
     {
         const string sql = """
                            SELECT
-                           	    TABLE_NAME
+                               OWNER,
+                               TABLE_NAME
                            FROM
-                           	    USER_TABLES
+                               ALL_TABLES
                            WHERE
                                TEMPORARY = 'N'
+                               AND SECONDARY = 'N'
+                               AND OWNER NOT IN (
+                                    'SYS', 'SYSTEM', 'XDB', 'CTXSYS', 'MDSYS', 'ORDSYS', 'OLAPSYS',
+                                    'WMSYS', 'LBACSYS', 'OUTLN', 'DBSNMP', 'APPQOSSYS', 'AUDSYS',
+                                    'DBSFWUSER'
+                               )
                            ORDER BY
-                           	    TABLE_NAME
+                               OWNER,
+                               TABLE_NAME
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToList);
-        return [..list.Select(item => item.ToString())];
+        var list = helper.Query(sql, SqlHelper.ToArrayList);
+        return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
     }
 
-    public string[] GetColumnNames(string tableName)
+    public string[] GetColumnNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
                            	    COLUMN_NAME
                            FROM
-                           	    USER_TAB_COLUMNS
+                           	    ALL_TAB_COLUMNS
                            WHERE
                            	    TABLE_NAME = '{0}'
+                           	    AND OWNER = '{1}'
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetIndexNames(string tableName)
+    public string[] GetIndexNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
                                INDEX_NAME
                            FROM
-                               USER_INDEXES
+                               ALL_INDEXES
                            WHERE
                                TABLE_NAME = '{0}'
+                               AND OWNER = '{1}'
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetFKNames(string tableName)
+    public string[] GetFKNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
                            	    CONSTRAINT_NAME
                            FROM
-                           	    USER_CONSTRAINTS
+                           	    ALL_CONSTRAINTS
                            WHERE
                            	    TABLE_NAME = '{0}'
+                                AND OWNER = '{1}'
                            	    AND CONSTRAINT_TYPE = 'R'
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName)
+    public Dictionary<string, object> GetTableMeta(string tableName, string owner)
     {
         const string sql = """
                            SELECT
                                C.CONSTRAINT_NAME,
                                K.COLUMN_NAME
                            FROM
-                               USER_CONSTRAINTS C,
-                               USER_CONS_COLUMNS K
+                               ALL_CONSTRAINTS C,
+                               ALL_CONS_COLUMNS K
                            WHERE
                                C.TABLE_NAME = K.TABLE_NAME
                                AND C.CONSTRAINT_NAME = K.CONSTRAINT_NAME
                                AND C.TABLE_NAME = '{0}'
+                               AND C.OWNER = '{1}'
                                AND C.CONSTRAINT_TYPE = 'P'
                            ORDER BY
                                K.POSITION
                            """;
 
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = tableName,
-            ["owner"] = string.Empty
+            ["owner"] = owner
         };
 
         List<string> pkColumns = [];
         var pkName = string.Empty;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToArrayList);
         
         foreach (var values in list)
         {
@@ -142,7 +154,7 @@ public class OracleSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string columnName)
+    public Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName)
     {
         const string sql = """
                            SELECT
@@ -153,20 +165,21 @@ public class OracleSchemaProvider : ISchemaProvider
                            	    DATA_DEFAULT,
                            	    NULLABLE
                            FROM
-                           	    USER_TAB_COLUMNS
+                           	    ALL_TAB_COLUMNS
                            WHERE
                            	    TABLE_NAME =  '{0}'
-                           	    AND COLUMN_NAME = '{1}'
+                                AND OWNER = '{1}'
+                           	    AND COLUMN_NAME = '{2}'
                            """;
 
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = columnName,
             ["description"] = string.Empty
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var values = helper.Query(string.Format(sql, tableName, columnName), SqlHelper.ToArray);
+        var values = helper.Query(string.Format(sql, tableName, owner, columnName), SqlHelper.ToArray);
         var attributes = ColumnAttribute.None;
         ColumnType columnType;
 
@@ -184,37 +197,40 @@ public class OracleSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string indexName)
+    public Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName)
     {
         const string sql1 = """
                             SELECT
                             	COLUMN_NAME,
                                 DESCEND
                             FROM
-                            	USER_IND_COLUMNS
+                            	ALL_IND_COLUMNS
                             WHERE
                             	TABLE_NAME =  '{0}'
-                            	AND INDEX_NAME = '{1}'
+                                AND TABLE_OWNER = '{1}'
+                            	AND INDEX_NAME = '{2}'
                             """;
 
         const string sql2 = """
                             SELECT
                                 UNIQUENESS
                             FROM
-                                USER_INDEXES
+                                ALL_INDEXES
                             WHERE
                                 TABLE_NAME = '{0}'
-                                AND INDEX_NAME = '{1}'
+                                AND OWNER = '{1}'
+                                AND INDEX_NAME = '{2}'
                             """;
 
         const string sql3 = """
                             SELECT
                                 COUNT(*)
                             FROM
-                                USER_CONSTRAINTS
+                                ALL_CONSTRAINTS
                             WHERE
                                 TABLE_NAME = '{0}'
-                                AND CONSTRAINT_NAME = '{1}'
+                                AND OWNER = '{1}'
+                                AND CONSTRAINT_NAME = '{2}'
                                 AND CONSTRAINT_TYPE = 'P'
                             """;
 
@@ -224,17 +240,17 @@ public class OracleSchemaProvider : ISchemaProvider
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql1, tableName, indexName), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql1, tableName, owner, indexName), SqlHelper.ToArrayList);
         List<string> indexColumns = [..list.Select(values => values[0].ToString())];
 
         metadata["columns"] = indexColumns.ToArray();
-        metadata["unique"] = helper.QueryScalar(string.Format(sql2, tableName, indexName)).Equals("UNIQUE");
-        metadata["primaryKey"] = helper.QueryScalar(string.Format(sql3, tableName, indexName)).Equals(1);
+        metadata["unique"] = helper.QueryScalar(string.Format(sql2, tableName, owner, indexName)).Equals("UNIQUE");
+        metadata["primaryKey"] = helper.QueryScalar(string.Format(sql3, tableName, owner, indexName)).Equals(1);
 
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string fkName)
+    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName)
     {
         const string sql = """
                            SELECT
@@ -243,10 +259,10 @@ public class OracleSchemaProvider : ISchemaProvider
                                 PT.TABLE_NAME PK_Table,
                                 C.DELETE_RULE
                            FROM
-                                USER_CONSTRAINTS C,
-                                USER_CONS_COLUMNS FK,
-                                USER_CONSTRAINTS PT,
-                                USER_CONS_COLUMNS PK
+                                ALL_CONSTRAINTS C,
+                                ALL_CONS_COLUMNS FK,
+                                ALL_CONSTRAINTS PT,
+                                ALL_CONS_COLUMNS PK
                            WHERE
                                 C.TABLE_NAME = FK.TABLE_NAME
                                 AND C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
@@ -256,7 +272,8 @@ public class OracleSchemaProvider : ISchemaProvider
                                 AND PT.CONSTRAINT_NAME = PK.CONSTRAINT_NAME
                                 AND FK.POSITION = PK.POSITION
                                 AND C.TABLE_NAME = '{0}'
-                           	    AND C.CONSTRAINT_NAME = '{1}'
+                                AND C.OWNER = '{1}'
+                           	    AND C.CONSTRAINT_NAME = '{2}'
                            ORDER BY
                                FK.POSITION
                            """;
@@ -268,7 +285,7 @@ public class OracleSchemaProvider : ISchemaProvider
         var deleteRule = ForeignKeyRule.None;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, fkName), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql, tableName, owner, fkName), SqlHelper.ToArrayList);
         
         foreach (object[] values in list)
         {
@@ -294,49 +311,31 @@ public class OracleSchemaProvider : ISchemaProvider
 
     private static ColumnType GetColumnType(string oracleType, byte precision, byte scale)
     {
-        switch (oracleType)
+        return oracleType switch
         {
-            case "SIMPLE_INTEGER":
-                return ColumnType.Integer;
-            case "BINARY_FLOAT":
-                return ColumnType.SinglePrecision;
-            case "BINARY_DOUBLE":
-                return ColumnType.DoublePrecision;
-            case "NUMBER":
-                if (scale == 0)
-                {
-                    if (precision < 3) return ColumnType.TinyInt;
-                    if (precision < 5) return ColumnType.SmallInt;
-                    if (precision < 10) return ColumnType.Integer;
-                    if (precision < 19) return ColumnType.BigInt;
-                }
-                return ColumnType.Decimal;
-            case "DATE":
-                return ColumnType.DateTime;
-            case "CHAR":
-                return ColumnType.Char;
-            case "NCHAR":
-                return ColumnType.NChar;
-            case "VARCHAR2":
-                return ColumnType.VarChar;
-            case "NVARCHAR2":
-                return ColumnType.NVarChar;
-            case "CLOB":
-            case "LONG":
-                return ColumnType.Text;
-            case "NCLOB":
-                return ColumnType.NText;
-            case "BLOB":
-            case "RAW":
-            case "LONG RAW":
-                return ColumnType.Blob;
-            case "BFILE":
-                return ColumnType.File;
-            case "XMLType":
-                return ColumnType.Xml;
-            default:
-                return oracleType.StartsWith("TIMESTAMP") ? ColumnType.DateTime : ColumnType.Unknown;
-        }
+            "SIMPLE_INTEGER" => ColumnType.Integer,
+            "BINARY_FLOAT" => ColumnType.SinglePrecision,
+            "BINARY_DOUBLE" => ColumnType.DoublePrecision,
+            "NUMBER" => scale switch
+            {
+                0 when precision < 3 => ColumnType.TinyInt,
+                0 when precision < 5 => ColumnType.SmallInt,
+                0 when precision < 10 => ColumnType.Integer,
+                0 when precision < 19 => ColumnType.BigInt,
+                _ => ColumnType.Decimal
+            },
+            "DATE" => ColumnType.DateTime,
+            "CHAR" => ColumnType.Char,
+            "NCHAR" => ColumnType.NChar,
+            "VARCHAR2" => ColumnType.VarChar,
+            "NVARCHAR2" => ColumnType.NVarChar,
+            "CLOB" or "LONG" => ColumnType.Text,
+            "NCLOB" => ColumnType.NText,
+            "BLOB" or "RAW" or "LONG RAW" => ColumnType.Blob,
+            "BFILE" => ColumnType.File,
+            "XMLType" => ColumnType.Xml,
+            _ => oracleType.StartsWith("TIMESTAMP") ? ColumnType.DateTime : ColumnType.Unknown
+        };
     }
 
     private static object Parse(string value, ColumnType columnType)
@@ -344,34 +343,20 @@ public class OracleSchemaProvider : ISchemaProvider
         if (Utility.IsEmpty(value) || value.ToUpper() == "NULL")
             return DBNull.Value;
 
-        switch (columnType)
+        return columnType switch
         {
-            case ColumnType.TinyInt:
-                return Utility.IsNumeric(value) ? (object) Convert.ToSByte(value) : DBNull.Value;
-            case ColumnType.SmallInt:
-                return Utility.IsNumeric(value) ? (object) Convert.ToInt16(value) : DBNull.Value;
-            case ColumnType.Integer:
-                return Utility.IsNumeric(value) ? (object) Convert.ToInt32(value) : DBNull.Value;
-            case ColumnType.BigInt:
-                return Utility.IsNumeric(value) ? (object) Convert.ToInt64(value) : DBNull.Value;
-            case ColumnType.SinglePrecision:
-                return Utility.IsNumeric(value) ? (object) Convert.ToSingle(value) : DBNull.Value;
-            case ColumnType.DoublePrecision:
-                return Utility.IsNumeric(value) ? (object) Convert.ToDouble(value) : DBNull.Value;
-            case ColumnType.Decimal:
-                return Utility.IsNumeric(value) ? (object) Convert.ToDecimal(value) : DBNull.Value;
-            case ColumnType.DateTime:
-                return Utility.IsDate(value) ? (object) Convert.ToDateTime(value) : DBNull.Value;
-            case ColumnType.Char:
-            case ColumnType.NChar:
-            case ColumnType.VarChar:
-            case ColumnType.NVarChar:
-            case ColumnType.Text:
-            case ColumnType.NText:
-                return value;
-            default:
-                return DBNull.Value;
-        }
+            ColumnType.TinyInt => Utility.IsNumeric(value) ? Convert.ToSByte(value) : DBNull.Value,
+            ColumnType.SmallInt => Utility.IsNumeric(value) ? Convert.ToInt16(value) : DBNull.Value,
+            ColumnType.Integer => Utility.IsNumeric(value) ? Convert.ToInt32(value) : DBNull.Value,
+            ColumnType.BigInt => Utility.IsNumeric(value) ? Convert.ToInt64(value) : DBNull.Value,
+            ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value) : DBNull.Value,
+            ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value) : DBNull.Value,
+            ColumnType.Decimal => Utility.IsNumeric(value) ? Convert.ToDecimal(value) : DBNull.Value,
+            ColumnType.DateTime => Utility.IsDate(value) ? Convert.ToDateTime(value) : DBNull.Value,
+            ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or ColumnType.Text
+                or ColumnType.NText => value,
+            _ => DBNull.Value
+        };
     }
 
     #endregion

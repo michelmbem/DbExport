@@ -34,26 +34,29 @@ public class SqlSchemaProvider : ISchemaProvider
 
     public string DatabaseName => databaseName;
 
-    public string[] GetTableNames()
+    public (string, string)[] GetTableNames()
     {
         const string sql = """
                            SELECT
-                           	    TABLE_NAME
-                           FROM
-                           	    INFORMATION_SCHEMA.TABLES
-                           WHERE
-                           	    TABLE_TYPE = 'BASE TABLE'
-                           	    AND OBJECTPROPERTY(OBJECT_ID(TABLE_NAME), 'IsMsShipped') = 0
-                           ORDER BY
-                           	    TABLE_NAME
+                               TABLE_SCHEMA,
+                               TABLE_NAME
+                           FROM INFORMATION_SCHEMA.TABLES
+                           WHERE TABLE_TYPE = 'BASE TABLE'
+                             AND TABLE_SCHEMA NOT IN ('sys', 'INFORMATION_SCHEMA')
+                             AND HAS_PERMS_BY_NAME(
+                                   QUOTENAME(TABLE_SCHEMA) + '.' + QUOTENAME(TABLE_NAME),
+                                   'OBJECT',
+                                   'SELECT'
+                                 ) = 1
+                           ORDER BY TABLE_SCHEMA, TABLE_NAME;
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToList);
-        return [..list.Select(item => item.ToString())];
+        var list = helper.Query(sql, SqlHelper.ToArrayList);
+        return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
     }
 
-    public string[] GetColumnNames(string tableName)
+    public string[] GetColumnNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
@@ -62,21 +65,22 @@ public class SqlSchemaProvider : ISchemaProvider
                            	    INFORMATION_SCHEMA.COLUMNS
                            WHERE
                            	    TABLE_NAME = '{0}'
+                           	    AND TABLE_SCHEMA = '{1}'
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetIndexNames(string tableName)
+    public string[] GetIndexNames(string tableName, string owner)
     {
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query("EXEC sp_helpindex '" + tableName + "'", SqlHelper.ToArrayList);
+        var list = helper.Query($"EXEC sp_helpindex '{owner}.{tableName}'", SqlHelper.ToArrayList);
         return [..list.Select(values => values[0].ToString())];
     }
 
-    public string[] GetFKNames(string tableName)
+    public string[] GetFKNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
@@ -85,38 +89,31 @@ public class SqlSchemaProvider : ISchemaProvider
                            	    INFORMATION_SCHEMA.TABLE_CONSTRAINTS
                            WHERE
                            	    TABLE_NAME = '{0}'
+                                AND TABLE_SCHEMA = '{1}'
                            	    AND CONSTRAINT_TYPE = 'FOREIGN KEY'
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName)
+    public Dictionary<string, object> GetTableMeta(string tableName, string owner)
     {
-        const string sql1 = """
+        const string sql = """
                             SELECT
-                            	TABLE_SCHEMA
+                                T.CONSTRAINT_NAME,
+                                K.COLUMN_NAME
                             FROM
-                            	INFORMATION_SCHEMA.TABLES
+                                INFORMATION_SCHEMA.TABLE_CONSTRAINTS T
+                                INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE K
+                                ON T.CONSTRAINT_NAME = K.CONSTRAINT_NAME
                             WHERE
-                            	TABLE_NAME =  '{0}'
-                            """;
-
-        const string sql2 = """
-                            SELECT
-                            	T.CONSTRAINT_NAME,
-                            	K.COLUMN_NAME
-                            FROM
-                            	INFORMATION_SCHEMA.TABLE_CONSTRAINTS T
-                            	INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE K
-                            	ON T.CONSTRAINT_NAME = K.CONSTRAINT_NAME
-                            WHERE
-                            	T.CONSTRAINT_TYPE = 'PRIMARY KEY'
-                            	AND T.TABLE_NAME = '{0}'
+                                T.CONSTRAINT_TYPE = 'PRIMARY KEY'
+                                AND T.TABLE_NAME = '{0}'
+                                AND T.TABLE_SCHEMA = '{1}'
                             ORDER BY
-                            	K.ORDINAL_POSITION
+                                K.ORDINAL_POSITION
                             """;
 
         var metadata = new Dictionary<string, object>();
@@ -125,9 +122,9 @@ public class SqlSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         metadata["name"] = tableName;
-        metadata["owner"] = helper.QueryScalar(string.Format(sql1, tableName));
+        metadata["owner"] = owner;
 
-        var list = helper.Query(string.Format(sql2, tableName), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToArrayList);
         
         foreach (var values in list)
         {
@@ -144,7 +141,7 @@ public class SqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string columnName)
+    public Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName)
     {
         const string sql1 = """
                             SELECT
@@ -160,7 +157,8 @@ public class SqlSchemaProvider : ISchemaProvider
                             	INFORMATION_SCHEMA.COLUMNS
                             WHERE
                             	TABLE_NAME =  '{0}'
-                            	AND COLUMN_NAME = '{1}'
+                                AND TABLE_SCHEMA = '{1}'
+                            	AND COLUMN_NAME = '{2}'
                             """;
 
         const string sql2 = """
@@ -175,16 +173,16 @@ public class SqlSchemaProvider : ISchemaProvider
                             WHERE
                                 OBJECT_NAME(c.object_id) = '{0}'
                                 AND c.name = '{1}'
-                            """;
+                            """; // TODO: Check this!
 
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = columnName,
             ["defaultValue"] = string.Empty
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var values = helper.Query(string.Format(sql1, tableName, columnName), SqlHelper.ToArray);
+        var values = helper.Query(string.Format(sql1, tableName, owner, columnName), SqlHelper.ToArray);
         var attributes = ColumnAttribute.None;
         ColumnType columnType;
                 
@@ -196,8 +194,8 @@ public class SqlSchemaProvider : ISchemaProvider
 
         if (values[4] != DBNull.Value)
         {
-            var defaultValue = values[5].ToString();
-            metadata["defaultValue"] = Parse(defaultValue.Substring(2, defaultValue.Length - 2), columnType);
+            var defaultValue = values[5].ToString()!;
+            metadata["defaultValue"] = Parse(defaultValue[2..], columnType);
         }
 
         if (values[5].Equals("NO"))
@@ -214,21 +212,21 @@ public class SqlSchemaProvider : ISchemaProvider
 
         if (attributes.HasFlag(ColumnAttribute.Identity))
         {
-            metadata["ident_seed"] = Convert.ToInt64(helper.QueryScalar("SELECT IDENT_SEED('" + tableName + "')"));
-            metadata["ident_incr"] = Convert.ToInt64(helper.QueryScalar("SELECT IDENT_INCR('" + tableName + "')"));
+            metadata["ident_seed"] = Convert.ToInt64(helper.QueryScalar($"SELECT IDENT_SEED('{owner}.{tableName}')"));
+            metadata["ident_incr"] = Convert.ToInt64(helper.QueryScalar($"SELECT IDENT_INCR('{owner}.{tableName}')"));
         }
 
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string indexName)
+    public Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName)
     {
         var metadata = new Dictionary<string, object>();
         var indexDescription = string.Empty;
         var indexKeys = string.Empty;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query("EXEC sp_helpindex '" + tableName + "'", SqlHelper.ToArrayList);
+        var list = helper.Query($"EXEC sp_helpindex '{owner}.{tableName}'", SqlHelper.ToArrayList);
         
         foreach (object[] values in list)
         {
@@ -246,7 +244,7 @@ public class SqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string fkName)
+    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName)
     {
         const string sql = """
                            SELECT
@@ -268,7 +266,8 @@ public class SqlSchemaProvider : ISchemaProvider
                            		    AND KCU1.ORDINAL_POSITION = KCU2.ORDINAL_POSITION
                            WHERE
                            	    TC1.TABLE_NAME = '{0}'
-                           	    AND TC1.CONSTRAINT_NAME = '{1}'
+                                AND TC1.TABLE_SCHEMA = '{1}'
+                           	    AND TC1.CONSTRAINT_NAME = '{2}'
                            ORDER BY
                            	    KCU1.ORDINAL_POSITION
                            """;
@@ -281,7 +280,7 @@ public class SqlSchemaProvider : ISchemaProvider
         var deleteRule = ForeignKeyRule.None;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, fkName), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql, tableName, owner, fkName), SqlHelper.ToArrayList);
         
         foreach (object[] values in list)
         {

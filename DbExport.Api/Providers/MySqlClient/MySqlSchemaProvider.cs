@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DbExport.Schema;
@@ -28,7 +29,7 @@ public class MySqlSchemaProvider : ISchemaProvider
 
     public string DatabaseName { get; }
 
-    public string[] GetTableNames()
+    public (string, string)[] GetTableNames()
     {
         const string sql = """
                            SELECT
@@ -44,10 +45,10 @@ public class MySqlSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, DatabaseName), SqlHelper.ToList);
-        return [..list.Select(item => item.ToString())];
+        return [..list.Select(item => (item.ToString(), string.Empty))];
     }
 
-    public string[] GetColumnNames(string tableName)
+    public string[] GetColumnNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
@@ -64,7 +65,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetIndexNames(string tableName)
+    public string[] GetIndexNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
@@ -83,7 +84,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetFKNames(string tableName)
+    public string[] GetFKNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
@@ -102,7 +103,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName)
+    public Dictionary<string, object> GetTableMeta(string tableName, string owner)
     {
         const string sql = """
                            SELECT
@@ -123,12 +124,12 @@ public class MySqlSchemaProvider : ISchemaProvider
                                C.ORDINAL_POSITION
                            """;
 
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = tableName,
-            ["owner"] = string.Empty
+            ["owner"] = owner
         };
-
+        
         List<string> pkColumns = [];
         var pkName = string.Empty;
 
@@ -150,7 +151,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string columnName)
+    public Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName)
     {
         const string sql = """
                            SELECT
@@ -171,7 +172,7 @@ public class MySqlSchemaProvider : ISchemaProvider
                                COLUMN_NAME = '{2}'
                            """;
 
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = columnName
         };
@@ -205,7 +206,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string indexName)
+    public Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName)
     {
         const string sql = """
                            SELECT
@@ -251,7 +252,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string fkName)
+    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName)
     {
         const string sql = """
                            SELECT
@@ -358,10 +359,10 @@ public class MySqlSchemaProvider : ISchemaProvider
             ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value) : DBNull.Value,
             ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value) : DBNull.Value,
             ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value)
-                ? Convert.ToDecimal(value)
+                ? Convert.ToDecimal(value, CultureInfo.InvariantCulture)
                 : DBNull.Value,
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => Utility.IsDate(value)
-                ? Convert.ToDateTime(value)
+                ? Convert.ToDateTime(value, CultureInfo.InvariantCulture)
                 : DBNull.Value,
             ColumnType.Char or ColumnType.VarChar or ColumnType.Text => value,
             ColumnType.Bit => Utility.FromBitString(value),

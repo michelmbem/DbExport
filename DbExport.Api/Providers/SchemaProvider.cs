@@ -37,11 +37,11 @@ public static class SchemaProvider
     public static Database GetDatabase(ISchemaProvider provider)
     {
         var database = new Database(provider.DatabaseName, provider.ProviderName, provider.ConnectionString);
-        var tableNames = provider.GetTableNames();
+        var tablePairs = provider.GetTableNames();
 
-        foreach (var tableName in tableNames)
+        foreach (var (tableName, owner) in tablePairs)
         {
-            var table = GetTable(provider, database, tableName);
+            var table = GetTable(provider, database, tableName, owner);
             database.Tables.Add(table);
         }
 
@@ -51,41 +51,41 @@ public static class SchemaProvider
     public static Database GetDatabase(string providerName, string connectionString) =>
         GetDatabase(GetProvider(providerName, connectionString));
 
-    private static Table GetTable(ISchemaProvider provider, Database database, string tableName)
+    private static Table GetTable(ISchemaProvider provider, Database database, string tableName, string owner)
     {
-        var metadata = provider.GetTableMeta(tableName);
-        var table = new Table(database, tableName, (string) metadata["owner"]);
+        var metadata = provider.GetTableMeta(tableName, owner);
+        var table = new Table(database, tableName, owner);
 
-        var columnNames = provider.GetColumnNames(tableName);
+        var columnNames = provider.GetColumnNames(tableName, owner);
         foreach (var columnName in columnNames)
         {
             var column = GetColumn(provider, table, columnName);
             table.Columns.Add(column);
         }
 
-        var indexNames = provider.GetIndexNames(tableName);
+        var indexNames = provider.GetIndexNames(tableName, owner);
         foreach (var indexName in indexNames)
         {
             var index = GetIndex(provider, table, indexName);
             table.Indexes.Add(index);
         }
 
-        var fkNames = provider.GetFKNames(tableName);
+        var fkNames = provider.GetFKNames(tableName, owner);
         foreach (var fkName in fkNames)
         {
             var fk = GetForeignKey(provider, table, fkName);
             table.ForeignKeys.Add(fk);
         }
 
-        if (metadata.TryGetValue("pk_name", out var value))
-            table.GeneratePrimaryKey((string)value, (IEnumerable<string>) metadata["pk_columns"]);
+        if (metadata.TryGetValue("pk_name", out var pkName))
+            table.GeneratePrimaryKey((string)pkName, (IEnumerable<string>) metadata["pk_columns"]);
 
         return table;
     }
 
     private static Column GetColumn(ISchemaProvider provider, Table table, string columnName)
     {
-        var metadata = provider.GetColumnMeta(table.Name, columnName);
+        var metadata = provider.GetColumnMeta(table.Name, table.Owner, columnName);
         var column = new Column(table, columnName, (ColumnType)metadata["type"], (string)metadata["nativeType"],
                                 (short)metadata["size"], (byte)metadata["precision"], (byte)metadata["scale"],
                                 (ColumnAttribute)metadata["attributes"], metadata["defaultValue"],
@@ -99,7 +99,7 @@ public static class SchemaProvider
 
     private static Index GetIndex(ISchemaProvider provider, Table table, string indexName)
     {
-        var metadata = provider.GetIndexMeta(table.Name, indexName);
+        var metadata = provider.GetIndexMeta(table.Name, table.Owner, indexName);
         var index = new Index(table, indexName, (IEnumerable<string>)metadata["columns"],
                               (bool)metadata["unique"], (bool)metadata["primaryKey"]);
 
@@ -108,7 +108,7 @@ public static class SchemaProvider
 
     private static ForeignKey GetForeignKey(ISchemaProvider provider, Table table, string fkName)
     {
-        var metadata = provider.GetForeignKeyMeta(table.Name, fkName);
+        var metadata = provider.GetForeignKeyMeta(table.Name, table.Owner, fkName);
         var fk = new ForeignKey(table, fkName, (IEnumerable<string>)metadata["columns"],
                                 (string)metadata["relatedTable"], (string[])metadata["relatedColumns"],
                                 (ForeignKeyRule)metadata["updateRule"], (ForeignKeyRule)metadata["deleteRule"]);

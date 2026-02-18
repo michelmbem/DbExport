@@ -33,15 +33,10 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     public string DatabaseName => databaseName;
 
-    public string[] GetTableNames()
-    {
-        var tableNames = new string[tableDefinitions.Count];
-        tableDefinitions.Keys.CopyTo(tableNames, 0);
+    public (string, string)[] GetTableNames() =>
+        tableDefinitions.Keys.Select(name => (name, string.Empty)).ToArray();
 
-        return tableNames;
-    }
-
-    public string[] GetColumnNames(string tableName)
+    public string[] GetColumnNames(string tableName, string owner)
     {
         var tableDef = tableDefinitions[tableName];
         var colSpecList = tableDef.Children[0];
@@ -56,9 +51,9 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return colNames;
     }
 
-    public string[] GetIndexNames(string tableName) => []; // Note: Not relevant for now!
+    public string[] GetIndexNames(string tableName, string owner) => []; // Note: Not relevant for now!
 
-    public string[] GetFKNames(string tableName)
+    public string[] GetFKNames(string tableName, string owner)
     {
         var tableDef = tableDefinitions[tableName];
 
@@ -69,7 +64,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
             .ToArray();
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName)
+    public Dictionary<string, object> GetTableMeta(string tableName, string owner)
     {
         Dictionary<string, object> metadata = new ()
         {
@@ -99,7 +94,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string columnName)
+    public Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName)
     {
         var metadata = new Dictionary<string, object>
         {
@@ -138,10 +133,10 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string indexName)
+    public Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName)
         => null; // Note: Ignored for the moment!
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string fkName)
+    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName)
     {
         var metadata = new Dictionary<string, object>();
         var tableDef = tableDefinitions[tableName];
@@ -215,7 +210,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         {
             var parser = new Parser(new Scanner(values[1].ToString()));
             var tabelDef = parser.CreateTable();
-            tableDefinitions.Add(values[0].ToString(), tabelDef);
+            tableDefinitions.Add(values[0].ToString()!, tabelDef);
         }
     }
 

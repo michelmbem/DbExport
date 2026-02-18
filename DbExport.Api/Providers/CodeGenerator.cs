@@ -104,7 +104,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
             
             foreach (var table in database.Tables.Where(table => table.IsChecked))
             {
-                using var dr = SqlHelper.OpenTable(table, visitIdent, SupportsRowVersion);
+                var (dr, con) = SqlHelper.OpenTable(table, visitIdent, SupportsRowVersion);
                 var rowsInserted = false;
                 
                 while (dr.Read())
@@ -113,7 +113,9 @@ public abstract class CodeGenerator : IVisitor, IDisposable
                     rowsInserted = true;
                 }
 
-                dr.Close();
+                dr.Dispose();
+                con.Dispose();
+                
                 if (rowsInserted) WriteLine();
             }
             

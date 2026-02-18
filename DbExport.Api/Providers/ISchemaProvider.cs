@@ -10,19 +10,19 @@ public interface ISchemaProvider
 
     string DatabaseName { get; }
 
-    string[] GetTableNames();
+    (string, string)[] GetTableNames();
 
-    string[] GetColumnNames(string tableName);
+    string[] GetColumnNames(string tableName, string owner);
 
-    string[] GetIndexNames(string tableName);
+    string[] GetIndexNames(string tableName, string owner);
 
-    string[] GetFKNames(string tableName);
+    string[] GetFKNames(string tableName, string owner);
 
-    Dictionary<string, object> GetTableMeta(string tableName);
+    Dictionary<string, object> GetTableMeta(string tableName, string owner);
 
-    Dictionary<string, object> GetColumnMeta(string tableName, string columnName);
+    Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName);
 
-    Dictionary<string, object> GetIndexMeta(string tableName, string indexName);
+    Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName);
 
-    Dictionary<string, object> GetForeignKeyMeta(string tableName, string fkName);
+    Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName);
 }

@@ -1,26 +1,18 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
-
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-
 using AvaloniaEdit;
 using AvaloniaEdit.Search;
-
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
 using DbExport.Gui.Models;
 using DbExport.Providers;
 using DbExport.Providers.Npgsql;
 using DbExport.Providers.SqlClient;
-using DbExport.Schema;
-
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
-
 using Serilog;
 
 namespace DbExport.Gui.ViewModels;
@@ -150,8 +142,6 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
                 break;
             }
         }
-        
-        Utility.Encoding = Encoding.UTF8;
 
         try
         {

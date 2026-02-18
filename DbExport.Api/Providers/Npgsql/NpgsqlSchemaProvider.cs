@@ -6,7 +6,7 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.Npgsql;
 
-public class NpgsqlSchemaProvider : ISchemaProvider
+public partial class NpgsqlSchemaProvider : ISchemaProvider
 {
     private readonly string connectionString;
     private readonly string databaseName;
@@ -27,25 +27,26 @@ public class NpgsqlSchemaProvider : ISchemaProvider
 
     public string DatabaseName => databaseName;
 
-    public string[] GetTableNames()
+    public (string, string)[] GetTableNames()
     {
         const string sql = """
-                           SELECT
-                                TABLE_NAME
-                           FROM
-                                INFORMATION_SCHEMA.TABLES
-                           WHERE
-                                TABLE_SCHEMA = 'public'
-                           ORDER BY
-                                TABLE_NAME
+                           SELECT TABLE_SCHEMA, TABLE_NAME
+                           FROM INFORMATION_SCHEMA.TABLES
+                           WHERE TABLE_TYPE = 'BASE TABLE'
+                             AND TABLE_SCHEMA NOT IN ('pg_catalog', 'information_schema')
+                             AND HAS_TABLE_PRIVILEGE(
+                                   FORMAT('%I.%I', TABLE_SCHEMA, TABLE_NAME),
+                                   'SELECT'
+                                 )
+                           ORDER BY TABLE_SCHEMA, TABLE_NAME
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToList);
-        return [..list.Select(item => item.ToString())];
+        var list = helper.Query(sql, SqlHelper.ToArrayList);
+        return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
     }
 
-    public string[] GetColumnNames(string tableName)
+    public string[] GetColumnNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
@@ -53,18 +54,18 @@ public class NpgsqlSchemaProvider : ISchemaProvider
                            FROM
                            	    INFORMATION_SCHEMA.COLUMNS
                            WHERE
-                           	    TABLE_SCHEMA = 'public'
+                           	    TABLE_SCHEMA = '{1}'
                            	    AND TABLE_NAME = '{0}'
                            ORDER BY
                            	    ORDINAL_POSITION
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetIndexNames(string tableName)
+    public string[] GetIndexNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
@@ -72,16 +73,16 @@ public class NpgsqlSchemaProvider : ISchemaProvider
                            FROM
                            	    PG_CATALOG.PG_INDEXES
                            WHERE
-                           	    SCHEMANAME = 'public'
+                           	    SCHEMANAME = '{1}'
                            	    AND TABLENAME = '{0}'
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetFKNames(string tableName)
+    public string[] GetFKNames(string tableName, string owner)
     {
         const string sql = """
                            SELECT
@@ -90,18 +91,18 @@ public class NpgsqlSchemaProvider : ISchemaProvider
                            	    INFORMATION_SCHEMA.TABLE_CONSTRAINTS
                            WHERE
                            	    CONSTRAINT_TYPE = 'FOREIGN KEY'
-                           	    AND TABLE_SCHEMA = 'public'
+                           	    AND TABLE_SCHEMA = '{1}'
                            	    AND TABLE_NAME = '{0}'
                            ORDER BY
                            	    CONSTRAINT_NAME
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName)
+    public Dictionary<string, object> GetTableMeta(string tableName, string owner)
     {
         const string sql = """
                            SELECT
@@ -115,25 +116,25 @@ public class NpgsqlSchemaProvider : ISchemaProvider
                            	    AND PK.CONSTRAINT_NAME = C.CONSTRAINT_NAME
                            WHERE
                            	    PK.CONSTRAINT_TYPE = 'PRIMARY KEY'
-                           	    AND PK.TABLE_SCHEMA = 'public'
+                           	    AND PK.TABLE_SCHEMA = '{1}'
                            	    AND PK.TABLE_NAME = '{0}'
                            ORDER BY
                            	    C.ORDINAL_POSITION
                            """;
 
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = tableName,
-            ["owner"] = "public"
+            ["owner"] = owner
         };
-
+        
         List<string> pkColumns = [];
         var pkName = string.Empty;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToArrayList);
         
-        foreach (object[] values in list)
+        foreach (var values in list)
         {
             pkName = values[0].ToString();
             pkColumns.Add(values[1].ToString());
@@ -148,7 +149,7 @@ public class NpgsqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string columnName)
+    public Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName)
     {
         const string sql = """
                            SELECT
@@ -167,12 +168,12 @@ public class NpgsqlSchemaProvider : ISchemaProvider
                            FROM
                            	    INFORMATION_SCHEMA.COLUMNS
                            WHERE
-                           	    TABLE_SCHEMA = 'public'
+                           	    TABLE_SCHEMA = '{1}'
                            	    AND TABLE_NAME = '{0}'
-                           	    AND COLUMN_NAME = '{1}'
+                           	    AND COLUMN_NAME = '{2}'
                            """;
 
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = columnName,
             ["description"] = string.Empty
@@ -181,7 +182,7 @@ public class NpgsqlSchemaProvider : ISchemaProvider
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         ColumnType columnType;
         var attributes = ColumnAttribute.None;
-        var values = helper.Query(string.Format(sql, tableName, columnName), SqlHelper.ToArray);
+        var values = helper.Query(string.Format(sql, tableName, owner, columnName), SqlHelper.ToArray);
                 
         metadata["type"] = columnType = GetColumnType(values[0].ToString());
         metadata["nativeType"] = values[0].ToString();
@@ -190,7 +191,7 @@ public class NpgsqlSchemaProvider : ISchemaProvider
         metadata["scale"] = Utility.ToByte(values[3]);
         metadata["defaultValue"] = Parse(Convert.ToString(values[4]), columnType);
 
-        if (Regex.IsMatch(Convert.ToString(values[5]), "utf8", RegexOptions.IgnoreCase))
+        if (Utf8Regex().IsMatch(Convert.ToString(values[5])!))
             attributes |= ColumnAttribute.Unicode;
 
         if (values[6].Equals("NO"))
@@ -219,7 +220,7 @@ public class NpgsqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string indexName)
+    public Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName)
     {
         const string sql1 = """
                             SELECT
@@ -227,9 +228,9 @@ public class NpgsqlSchemaProvider : ISchemaProvider
                             FROM
                             	PG_CATALOG.PG_INDEXES
                             WHERE
-                            	SCHEMANAME = 'public'
+                            	SCHEMANAME = '{1}'
                             	AND TABLENAME = '{0}'
-                            	AND INDEXNAME = '{1}'
+                            	AND INDEXNAME = '{2}'
                             """;
 
         const string sql2 = """
@@ -238,31 +239,31 @@ public class NpgsqlSchemaProvider : ISchemaProvider
                             FROM
                                 INFORMATION_SCHEMA.TABLE_CONSTRAINTS
                             WHERE
-                                TABLE_SCHEMA = 'public'
+                                TABLE_SCHEMA = '{1}'
                                 AND TABLE_NAME = '{0}'
-                                AND CONSTRAINT_NAME = '{1}'
+                                AND CONSTRAINT_NAME = '{2}'
                                 AND CONSTRAINT_TYPE = 'PRIMARY KEY'
                             """;
 
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = indexName
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var def = helper.QueryScalar(string.Format(sql1, tableName, indexName)).ToString();
-        var lparen = def.IndexOf('(');
-        var rparent = def.LastIndexOf(')');
-        var columnNames = def.Substring(lparen + 1, rparent - lparen - 1);
+        var def = helper.QueryScalar(string.Format(sql1, tableName, owner, indexName)).ToString();
+        var lparen = def!.IndexOf('(');
+        var rparen = def.LastIndexOf(')');
+        var columnNames = def.Substring(lparen + 1, rparen - lparen - 1);
 
         metadata["unique"] = def.StartsWith("CREATE UNIQUE INDEX");
-        metadata["columns"] = Regex.Split(columnNames, @"\s*\,\s*");
-        metadata["primaryKey"] = helper.QueryScalar(string.Format(sql2, tableName, indexName)).Equals(1);
+        metadata["columns"] = CommaRegex().Split(columnNames);
+        metadata["primaryKey"] = helper.QueryScalar(string.Format(sql2, tableName, owner, indexName)).Equals(1);
 
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string fkName)
+    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName)
     {
         const string sql = """
                            SELECT
@@ -287,9 +288,9 @@ public class NpgsqlSchemaProvider : ISchemaProvider
                                    AND TC2.CONSTRAINT_NAME = KCU2.CONSTRAINT_NAME
                                    AND KCU1.ORDINAL_POSITION = KCU2.ORDINAL_POSITION
                            WHERE
-                               TC1.TABLE_SCHEMA = 'public'
+                               TC1.TABLE_SCHEMA = '{1}'
                                AND TC1.TABLE_NAME = '{0}'
-                               AND TC1.CONSTRAINT_NAME = '{1}'
+                               AND TC1.CONSTRAINT_NAME = '{2}'
                            ORDER BY
                                KCU1.ORDINAL_POSITION
                            """;
@@ -302,7 +303,7 @@ public class NpgsqlSchemaProvider : ISchemaProvider
         var deleteRule = ForeignKeyRule.None;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, fkName), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql, tableName, owner, fkName), SqlHelper.ToArrayList);
         
         foreach (object[] values in list)
         {
@@ -391,6 +392,12 @@ public class NpgsqlSchemaProvider : ISchemaProvider
             "SET NULL" => ForeignKeyRule.SetNull,
             _ => ForeignKeyRule.None
         };
+    
+    [GeneratedRegex(@"\s*\,\s*", RegexOptions.Compiled)]
+    private static partial Regex CommaRegex();
+    
+    [GeneratedRegex("utf8", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+    private static partial Regex Utf8Regex();
 
     #endregion
 }

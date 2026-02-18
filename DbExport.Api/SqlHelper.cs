@@ -10,7 +10,7 @@ using DbExport.Schema;
 
 namespace DbExport;
 
-public sealed class SqlHelper(DbConnection connection) : IDisposable
+public sealed partial class SqlHelper(DbConnection connection) : IDisposable
 {
     private readonly bool disposeConnection;
 
@@ -38,7 +38,6 @@ public sealed class SqlHelper(DbConnection connection) : IDisposable
     public void Dispose()
     {
         Dispose(true);
-        GC.SuppressFinalize(this);
     }
 
     public TResult Query<TResult>(string sql, Func<DbDataReader, TResult> extractor)
@@ -111,60 +110,51 @@ public sealed class SqlHelper(DbConnection connection) : IDisposable
             Execute(script);
     }
 
-    public static DbDataReader OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
+    public static (DbDataReader, DbConnection) OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
     {
-        var sb = new StringBuilder("SELECT ");
+        StringBuilder sb = new("SELECT ");
 
-        foreach (var column in table.Columns.Where(c => !((skipIdentity && c.IsIdentity) ||
-                                                          (skipRowVersion && c.ColumnType == ColumnType.RowVersion))))
-        {
-            sb.Append(Utility.Escape(column.Name, table.Database.ProviderName))
-              .Append(", ");
-        }
+        foreach (var column in table.Columns.Where(ShouldNotSkip))
+            sb.Append(Utility.Escape(column.Name, table.Database.ProviderName)).Append(", ");
 
         sb.Length -= 2;
-        sb.Append(" FROM ")
-          .Append(Utility.Escape(table.Name, table.Database.ProviderName));
+        sb.Append(" FROM ").Append(Utility.Escape(table.Name, table.Database.ProviderName));
 
         var connection = Utility.GetConnection(table.Database);
         connection.Open();
 
-        var command = connection.CreateCommand();
+        using var command = connection.CreateCommand();
         command.CommandText = sb.ToString();
-
-        return command.ExecuteReader(CommandBehavior.CloseConnection);
+        
+        var dataReader = command.ExecuteReader(CommandBehavior.CloseConnection);
+        return (dataReader, connection);
+        
+        bool ShouldNotSkip(Column c) => !(skipIdentity && c.IsIdentity ||
+                                          skipRowVersion && c.ColumnType == ColumnType.RowVersion);
     }
 
     public static object[] ToArray(DbDataReader dataReader)
     {
-        object[] result = null;
-
-        if (dataReader.Read())
-        {
-            result = new object[dataReader.FieldCount];
-            dataReader.GetValues(result);
-        }
-
+        if (!dataReader.Read()) return null;
+        
+        var result = new object[dataReader.FieldCount];
+        dataReader.GetValues(result);
         return result;
     }
 
     public static Dictionary<string, object> ToDictionary(DbDataReader dataReader)
     {
-        Dictionary<string, object> result = null;
-
-        if (dataReader.Read())
-        {
-            result = new Dictionary<string, object>();
-            for (int i = 0; i < dataReader.FieldCount; ++i)
-                result[dataReader.GetName(i)] = dataReader.GetValue(i);
-        }
-
+        if (!dataReader.Read()) return null;
+        
+        Dictionary<string, object> result = [];
+        for (var i = 0; i < dataReader.FieldCount; ++i)
+            result[dataReader.GetName(i)] = dataReader.GetValue(i);
         return result;
     }
 
     public static List<object[]> ToArrayList(DbDataReader dataReader)
     {
-        var result = new List<object[]>();
+        List<object[]> result = [];
 
         while (dataReader.Read())
         {
@@ -178,12 +168,12 @@ public sealed class SqlHelper(DbConnection connection) : IDisposable
 
     public static List<Dictionary<string, object>> ToDictionaryList(DbDataReader dataReader)
     {
-        var result = new List<Dictionary<string, object>>();
+        List<Dictionary<string, object>> result = [];
 
         while (dataReader.Read())
         {
-            var values = new Dictionary<string, object>();
-            for (int i = 0; i < dataReader.FieldCount; ++i)
+            Dictionary<string, object> values = [];
+            for (var i = 0; i < dataReader.FieldCount; ++i)
                 values[dataReader.GetName(i)] = dataReader.GetValue(i);
             result.Add(values);
         }
@@ -193,7 +183,7 @@ public sealed class SqlHelper(DbConnection connection) : IDisposable
 
     public static List<object> ToList(DbDataReader dataReader)
     {
-        var result = new List<object>();
+        List<object> result = [];
 
         while (dataReader.Read())
             result.Add(dataReader.GetValue(0));
@@ -209,16 +199,22 @@ public sealed class SqlHelper(DbConnection connection) : IDisposable
 
     private void ExecuteSqlScript(string script)
     {
-        var match = Regex.Match(script, @"CREATE DATABASE (.+)\s+GO", RegexOptions.IgnoreCase);
-
+        var match = SqlCreateDbRegex().Match(script);
+        
         if (match.Success)
         {
-            var sqlCreateDb = match.Value[..(match.Length - 2)].TrimEnd();
+            var sqlCreateDb = match.Value[..^2].TrimEnd();
             Execute(sqlCreateDb);
             script = script[(match.Index + match.Length)..];
         }
 
-        script = Regex.Replace(script, @"[\r\n]GO[\r\n]", ";\n", RegexOptions.IgnoreCase);
+        script = SqlDelimiterRegex().Replace(script, ";\n");
         Execute(script);
     }
+
+    [GeneratedRegex(@"CREATE DATABASE (.+)\s+GO", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    private static partial Regex SqlCreateDbRegex();
+    
+    [GeneratedRegex(@"[\r\n]GO[\r\n]", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    private static partial Regex SqlDelimiterRegex();
 }
