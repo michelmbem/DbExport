@@ -17,29 +17,26 @@ public class UtilityTest
     }
 
 
-    [Fact]
-    public void FromBaseNTest()
+    [Theory]
+    [InlineData("11000000", 2, 192)]
+    [InlineData("FE", 16, 254)]
+    [InlineData("143", 8, 99)]
+    public void FromBaseNTest(string value, byte n, int expected)
     {
-        // Arrange
-        var value = "1010";
-        byte n = 2;
-        byte expected = 10;
-
         // Act
         var actual = Utility.FromBaseN(value, n);
 
+        // Assert
         Assert.Equal(expected, actual);
     }
 
 
-    [Fact]
-    public void ToBaseNTest()
+    [Theory]
+    [InlineData(192, 2, "11000000")]
+    [InlineData(254, 16, "FE")]
+    [InlineData(99, 8, "143")]
+    public void ToBaseNTest(byte b, byte n, string expected)
     {
-        // Arrange
-        byte b = 192;
-        byte n = 2;
-        var expected = "11000000";
-
         // Act
         var actual = Utility.ToBaseN(b, n);
 
@@ -53,7 +50,7 @@ public class UtilityTest
     {
         // Arrange
         var value = "11111001011";
-        byte[] expected = {7, 203};
+        byte[] expected = [7, 203];
 
         // Act
         var actual = Utility.FromBitString(value);

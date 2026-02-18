@@ -62,7 +62,7 @@ public class Token
         Data = data;
     }
 
-    public TokenId Id { get; private set; }
+    public TokenId Id { get; }
     
-    public object Data { get; private set; }
+    public object Data { get; }
 }

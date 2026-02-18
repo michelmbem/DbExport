@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="https://github.com/projektanker/icons.avalonia"
              xmlns:vm="using:DbExport.Gui.ViewModels"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -64,7 +65,11 @@
                  Grid.Row="2"
                  Grid.Column="1"
                  Text="{Binding Username}"
-                 IsEnabled="{Binding !TrustedConnection}" />
+                 IsEnabled="{Binding !TrustedConnection}">
+            <TextBox.InnerRightContent>
+                <i:Icon Value="fa-user"/>
+            </TextBox.InnerRightContent>
+        </TextBox>
         <Label Grid.Row="3"
                Grid.Column="0"
                Content="Password :"
@@ -74,7 +79,11 @@
                  Grid.Column="1"
                  PasswordChar="*"
                  Text="{Binding Password}"
-                 IsEnabled="{Binding !TrustedConnection}" />
+                 IsEnabled="{Binding !TrustedConnection}">
+            <TextBox.InnerRightContent>
+                <i:Icon Value="fa-lock"/>
+            </TextBox.InnerRightContent>
+        </TextBox>
         <Label Grid.Row="4"
                Grid.Column="0"
                Content="Database :"

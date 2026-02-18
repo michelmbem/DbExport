@@ -44,12 +44,12 @@ public class SQLiteSchemaProvider : ISchemaProvider
     public string[] GetColumnNames(string tableName)
     {
         var tableDef = tableDefinitions[tableName];
-        var colSpecList = tableDef.ChildNodes[0];
-        var colNames = new string[colSpecList.ChildNodes.Count];
+        var colSpecList = tableDef.Children[0];
+        var colNames = new string[colSpecList.Children.Count];
 
         for (var i = 0; i < colNames.Length; ++i)
         {
-            var colAttribs = colSpecList.ChildNodes[i].Data as Dictionary<string, object>;
+            var colAttribs = colSpecList.Children[i].Data as Dictionary<string, object>;
             colNames[i] = colAttribs["COLUMN_NAME"].ToString();
         }
 
@@ -62,7 +62,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
     {
         var tableDef = tableDefinitions[tableName];
 
-        return (from node in tableDef.ChildNodes
+        return (from node in tableDef.Children
                 where node.Kind == AstNodeKind.FKSPEC
                 select (Dictionary<string, object>)node.Data into fkAttribs
                 select fkAttribs["CONSTRAINT_NAME"].ToString())
@@ -78,11 +78,11 @@ public class SQLiteSchemaProvider : ISchemaProvider
         };
 
         var tableDef = tableDefinitions[tableName];
-        var pkNode = tableDef.ChildNodes.FirstOrDefault(node => node.Kind == AstNodeKind.PKSPEC);
+        var pkNode = tableDef.Children.FirstOrDefault(node => node.Kind == AstNodeKind.PKSPEC);
 
         if (pkNode == null)
         {
-            var colAttribs = tableDef.ChildNodes[0].ChildNodes
+            var colAttribs = tableDef.Children[0].Children
                                      .Select(colSpec => (Dictionary<string, object>)colSpec.Data)
                                      .FirstOrDefault(colAttribs => Convert.ToBoolean(colAttribs["PRIMARY_KEY"]));
             if (colAttribs == null) return metadata;
@@ -107,7 +107,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         };
 
         var tableDef = tableDefinitions[tableName];
-        var colAttribs = tableDef.ChildNodes[0].ChildNodes
+        var colAttribs = tableDef.Children[0].Children
                                  .Select(colSpec => (Dictionary<string, object>)colSpec.Data)
                                  .FirstOrDefault(colAttribs => colAttribs["COLUMN_NAME"].Equals(columnName));
         if (colAttribs == null) return metadata;
@@ -146,7 +146,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         var metadata = new Dictionary<string, object>();
         var tableDef = tableDefinitions[tableName];
 
-        foreach (var fkSpec in tableDef.ChildNodes)
+        foreach (var fkSpec in tableDef.Children)
         {
             if (fkSpec.Kind != AstNodeKind.FKSPEC) continue;
 
@@ -171,11 +171,11 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     private static string[] ExtractColumnNames(AstNode node, int index)
     {
-        var columnList = node.ChildNodes[index];
-        var columnNames = new string[columnList.ChildNodes.Count];
+        var columnList = node.Children[index];
+        var columnNames = new string[columnList.Children.Count];
             
         for (var i = 0; i < columnNames.Length; ++i)
-            columnNames[i] = columnList.ChildNodes[i].Data.ToString();
+            columnNames[i] = columnList.Children[i].Data.ToString();
 
         return columnNames;
     }

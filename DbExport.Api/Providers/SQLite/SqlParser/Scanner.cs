@@ -3,16 +3,9 @@ using System.Text;
 
 namespace DbExport.Providers.SQLite.SqlParser;
 
-public class Scanner
+public class Scanner(string input)
 {
-    private string input;
     private int offset;
-
-    public Scanner(string input)
-    {
-        this.input = input;
-        offset = 0;
-    }
 
     public Token NextToken()
     {

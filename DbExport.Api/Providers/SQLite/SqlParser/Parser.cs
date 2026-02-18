@@ -6,7 +6,7 @@ namespace DbExport.Providers.SQLite.SqlParser;
 
 public class Parser
 {
-    private Scanner scanner;
+    private readonly Scanner scanner;
     private Token token;
 
     public Parser(Scanner scanner)
@@ -23,22 +23,22 @@ public class Parser
         Match(TokenId.LPAREN);
         var colSpecList = ColumnSpecList();
 
-        var childNodes = new List<AstNode> { colSpecList };
-        AstNode childNode;
+        List<AstNode> children = [colSpecList];
         var loop = true;
 
         while (loop)
         {
+            AstNode child;
             switch (token.Id)
             {
                 case TokenId.KW_PRIMARY:
-                    childNode = PrimaryKeySpec();
-                    childNodes.Add(childNode);
+                    child = PrimaryKeySpec();
+                    children.Add(child);
                     if (token.Id == TokenId.COMMA) Skip();
                     break;
                 case TokenId.KW_CONSTRAINT:
-                    childNode = ConstraintSpec();
-                    childNodes.Add(childNode);
+                    child = ConstraintSpec();
+                    children.Add(child);
                     if (token.Id == TokenId.COMMA) Skip();
                     break;
                 default:
@@ -49,21 +49,18 @@ public class Parser
 
         Match(TokenId.RPAREN);
 
-        return new AstNode(AstNodeKind.CREATE_TBL, tableName, childNodes.ToArray());
+        return new AstNode(AstNodeKind.CREATE_TBL, tableName, [..children]);
     }
 
     private AstNode ColumnSpecList()
     {
-        var colSpecs = new List<AstNode>();
+        List<AstNode> colSpecs = [];
         var colSpec = ColumnSpec();
 
         while (colSpec != null)
         {
             colSpecs.Add(colSpec);
-            if (TryMatch(TokenId.COMMA, out _))
-                colSpec = ColumnSpec();
-            else
-                colSpec = null;
+            colSpec = TryMatch(TokenId.COMMA, out _) ? ColumnSpec() : null;
         }
 
         return new AstNode(AstNodeKind.COLSPECLIST, null, colSpecs.ToArray());
@@ -71,13 +68,11 @@ public class Parser
 
     private AstNode ColumnSpec()
     {
-        Token tok;
-        if (!TryMatch(TokenId.IDENT, out tok)) return null;
+        if (!TryMatch(TokenId.IDENT, out var tok)) return null;
 
         var colName = tok.Data.ToString();
         var typeName = string.Empty;
-        var prec = 0;
-        var scale = 0;
+        var (prec, scale) = (0, 0);
 
         if (TryMatch(TokenId.TYPE, out tok))
         {
@@ -136,16 +131,18 @@ public class Parser
             }
         }
 
-        var attributes = new Dictionary<string, object>();
-        attributes["COLUMN_NAME"] = colName;
-        attributes["TYPE_NAME"] = typeName;
-        attributes["PRECISION"] = prec;
-        attributes["SCALE"] = scale;
-        attributes["ALLOW_DBNULL"] = allowDbNull;
-        attributes["UNIQUE"] = unique;
-        attributes["PRIMARY_KEY"] = pk;
-        attributes["AUTO_INCREMENT"] = autoinc;
-        attributes["DEFAULT_VALUE"] = defaultValue;
+        Dictionary<string, object> attributes = new()
+        {
+            ["COLUMN_NAME"] = colName,
+            ["TYPE_NAME"] = typeName,
+            ["PRECISION"] = prec,
+            ["SCALE"] = scale,
+            ["ALLOW_DBNULL"] = allowDbNull,
+            ["UNIQUE"] = unique,
+            ["PRIMARY_KEY"] = pk,
+            ["AUTO_INCREMENT"] = autoinc,
+            ["DEFAULT_VALUE"] = defaultValue
+        };
 
         return new AstNode(AstNodeKind.COLSPEC, attributes);
 
@@ -167,17 +164,13 @@ public class Parser
         Match(TokenId.KW_CONSTRAINT);
         var constraintName = Match(TokenId.IDENT).Data.ToString();
 
-        switch (token.Id)
+        return token.Id switch
         {
-            case TokenId.KW_UNIQUE:
-                return UniqueKeySpec(constraintName);
-            case TokenId.KW_FOREIGN:
-                return ForeignKeySpec(constraintName);
-            case TokenId.KW_CHECK:
-                return CheckSpec(constraintName);
-            default:
-                throw new FormatException("Invalid constraint specification " + token.Id);
-        }
+            TokenId.KW_UNIQUE => UniqueKeySpec(constraintName),
+            TokenId.KW_FOREIGN => ForeignKeySpec(constraintName),
+            TokenId.KW_CHECK => CheckSpec(constraintName),
+            _ => throw new FormatException("Invalid constraint specification " + token.Id)
+        };
     }
 
     private AstNode UniqueKeySpec(string ukName)
@@ -221,11 +214,13 @@ public class Parser
             }
         }
 
-        var attributes = new Dictionary<string, object>();
-        attributes["CONSTRAINT_NAME"] = fkName;
-        attributes["TARGET_TABLE_NAME"] = targetTableName;
-        attributes["UPDATE_RULE"] = updateRule;
-        attributes["DELETE_RULE"] = deleteRule;
+        Dictionary<string, object> attributes = new()
+        {
+            ["CONSTRAINT_NAME"] = fkName,
+            ["TARGET_TABLE_NAME"] = targetTableName,
+            ["UPDATE_RULE"] = updateRule,
+            ["DELETE_RULE"] = deleteRule
+        };
 
         return new AstNode(AstNodeKind.FKSPEC, attributes, fkColNames, pkColNames);
     }

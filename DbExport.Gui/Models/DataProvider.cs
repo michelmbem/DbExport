@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using DbExport.Providers;
 
 namespace DbExport.Gui.Models;
@@ -15,6 +14,7 @@ public enum ProviderFeatures
     SupportsScriptExecution = 16,
     
     Access = IsFileBased | SupportsScriptExecution,
+    LocalDB = Access | SupportsTrustedConnection ,
     SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation | SupportsDDL| SupportsScriptExecution,
     Oracle = SupportsTrustedConnection | SupportsDDL,
     MySql = SupportsDatabaseCreation | SupportsDDL| SupportsScriptExecution,
@@ -42,7 +42,7 @@ public sealed class DataProvider(
     [
 #if WINDOWS
         new(ProviderNames.ACCESS, "Microsoft Access", ProviderFeatures.Access, new OleDbConnectionStringBuilder(), ACCESS_DATABASE_FILE_PATTERN),
-        new(ProviderNames.SQLSERVER, "Microsoft SQL Server LocalDB", ProviderFeatures.Access, new LocalDBConnectionStringBuilder(), LOCALDB_DATABASE_FILE_PATTERN),
+        new(ProviderNames.SQLSERVER, "Microsoft SQL Server LocalDB", ProviderFeatures.LocalDB, new LocalDBConnectionStringBuilder(), LOCALDB_DATABASE_FILE_PATTERN),
 #endif
         new(ProviderNames.SQLSERVER, "Microsoft SQL Server", ProviderFeatures.SqlServer, new SqlConnectionStringBuilder(), SQLSERVER_DATABASE_LIST_QUERY),
         new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.Oracle, new OracleConnectionStringBuilder()),
@@ -60,8 +60,6 @@ public sealed class DataProvider(
     public IConnectionStringBuilder ConnectionStringBuilder { get; } = connectionStringBuilder;
     
     public string? DatabaseListQuery { get; } = databaseListQuery;
-
-    public static DataProvider? Get(string name) => All.FirstOrDefault(provider => provider.Name == name);
     
     public bool HasFeature(ProviderFeatures feature) => Features.HasFlag(feature);
 }

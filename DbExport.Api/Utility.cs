@@ -349,7 +349,7 @@ public static class Utility
             
         while (b > 0)
         {
-            sb.Insert(0, b % n);
+            sb.Insert(0, Digit2Char(b % n));
             b /= n;
         }
 
@@ -357,5 +357,17 @@ public static class Utility
     }
 
     public static byte FromBaseN(string value, byte n) =>
-        value.Aggregate<char, byte>(0, (current, next) => (byte)(n * current + next - '0'));
+        value.Aggregate<char, byte>(0, (current, next) => (byte)(n * current + Char2Digit(next)));
+
+    private static char Digit2Char(int i) => i switch
+    {
+        >= 0 and <= 9 => (char)('0' + i),
+        _ => (char)('A' + i - 10)
+    };
+
+    private static int Char2Digit(char c) => c switch
+    {
+        >= '0' and <= '9' => c - '0',
+        _ => c - 'A' + 10
+    };
 }

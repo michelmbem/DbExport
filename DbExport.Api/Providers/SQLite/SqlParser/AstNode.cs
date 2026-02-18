@@ -55,26 +55,26 @@ public class AstNode
     public AstNode(AstNodeKind kind)
     {
         Kind = kind;
-        ChildNodes = [];
+        Children = [];
     }
 
     public AstNode(AstNodeKind kind, object data)
     {
         Kind = kind;
         Data = data;
-        ChildNodes = [];
+        Children = [];
     }
 
-    public AstNode(AstNodeKind kind, object data, params AstNode[] childNodes)
+    public AstNode(AstNodeKind kind, object data, params AstNode[] children)
     {
         Kind = kind;
         Data = data;
-        ChildNodes = new List<AstNode>(childNodes);
+        Children = [..children];
     }
 
-    public AstNodeKind Kind { get; private set; }
+    public AstNodeKind Kind { get; }
     
-    public object Data { get; private set; }
+    public object Data { get; }
     
-    public List<AstNode> ChildNodes { get; private set; }
+    public List<AstNode> Children { get; }
 }

@@ -1,4 +1,5 @@
 ﻿using DbExport.Providers.SQLite.SqlParser;
+using DbExport.Schema;
 
 namespace DbExport.Tests;
 
@@ -9,21 +10,14 @@ public class ParserTest
     {
         // Arrange
         var input = """
-            CREATE TABLE [app_traitement_marche] (
-            	[id_traitement] integer NOT NULL UNIQUE,
-            	[code_exercice] char(2) NOT NULL,
-            	[num_session] tinyint NOT NULL,
-            	[code_admin_benef] char(10) NOT NULL,
-            	[num_marche] smallint NOT NULL,
-            	[code_type_traitement] tinyint NOT NULL,
-            	[date_traitement] datetime NOT NULL,
-            	[previsionnel] tinyint NOT NULL DEFAULT 0,
-            	PRIMARY KEY ([id_traitement]),
-            	CONSTRAINT [UK_app_traitement_marche] UNIQUE ([code_exercice], [num_session], [code_admin_benef], [num_marche], [code_type_traitement]),
-            	CONSTRAINT [CK_previsionnel_bit] CHECK (previsionnel = 0 OR previsionnel = 1),
-            	CONSTRAINT [FK_app_traitement_marche_app_marche] FOREIGN KEY ([code_exercice], [code_admin_benef], [num_marche]) REFERENCES [app_marche] ([code_exercice], [code_admin_benef], [num_marche]) ON UPDATE CASCADE ON DELETE CASCADE,
-            	CONSTRAINT [FK_app_traitement_marche_app_session] FOREIGN KEY ([code_exercice], [num_session]) REFERENCES [app_session] ([code_exercice], [num_session]) ON UPDATE CASCADE ON DELETE CASCADE,
-            	CONSTRAINT [FK_app_traitement_marche_app_type_traitement] FOREIGN KEY ([code_exercice], [code_type_traitement]) REFERENCES [app_type_traitement] ([code_exercice], [code_type_traitement]) ON UPDATE CASCADE ON DELETE CASCADE
+            CREATE TABLE city (
+            	ID integer NOT NULL UNIQUE,
+            	Name char(35) NOT NULL DEFAULT '',
+            	CountryCode char(3) NOT NULL DEFAULT '',
+            	District char(20) NOT NULL DEFAULT '',
+            	Population integer NOT NULL,
+            	PRIMARY KEY (ID),
+            	CONSTRAINT city_country_fk FOREIGN KEY (CountryCode) REFERENCES country (Code)
             )
             """;
 
@@ -33,7 +27,96 @@ public class ParserTest
 
         // Assert
         Assert.Equal(AstNodeKind.CREATE_TBL, node.Kind);
-        Assert.Equal(7, node.ChildNodes.Count);
-        Assert.Equal("app_traitement_marche", node.Data);
+        Assert.Equal(3, node.Children.Count);
+        Assert.Equal("city", node.Data);
+        
+        var colSpecList = node.Children[0];
+        Assert.Equal(AstNodeKind.COLSPECLIST, colSpecList.Kind);
+        Assert.Equal(5, colSpecList.Children.Count);
+        
+        var colSpec = colSpecList.Children[0];
+        Assert.Equal(AstNodeKind.COLSPEC, colSpec.Kind);
+        
+        var colAttribs = Assert.IsType<Dictionary<string, object>>(colSpec.Data);
+        Assert.Equal("ID", colAttribs["COLUMN_NAME"]);
+        Assert.Equal("integer", colAttribs["TYPE_NAME"]);
+        Assert.Equal(false, colAttribs["ALLOW_DBNULL"]);
+        Assert.Equal(true, colAttribs["UNIQUE"]);
+        
+        colSpec = colSpecList.Children[1];
+        Assert.Equal(AstNodeKind.COLSPEC, colSpec.Kind);
+        
+        colAttribs = Assert.IsType<Dictionary<string, object>>(colSpec.Data);
+        Assert.Equal("Name", colAttribs["COLUMN_NAME"]);
+        Assert.Equal("char", colAttribs["TYPE_NAME"]);
+        Assert.Equal(35, colAttribs["PRECISION"]);
+        Assert.Equal(false, colAttribs["ALLOW_DBNULL"]);
+        Assert.Equal("", colAttribs["DEFAULT_VALUE"]);
+        
+        colSpec = colSpecList.Children[2];
+        Assert.Equal(AstNodeKind.COLSPEC, colSpec.Kind);
+        
+        colAttribs = Assert.IsType<Dictionary<string, object>>(colSpec.Data);
+        Assert.Equal("CountryCode", colAttribs["COLUMN_NAME"]);
+        Assert.Equal("char", colAttribs["TYPE_NAME"]);
+        Assert.Equal(3, colAttribs["PRECISION"]);
+        Assert.Equal(false, colAttribs["ALLOW_DBNULL"]);
+        Assert.Equal("", colAttribs["DEFAULT_VALUE"]);
+        
+        colSpec = colSpecList.Children[3];
+        Assert.Equal(AstNodeKind.COLSPEC, colSpec.Kind);
+        
+        colAttribs = Assert.IsType<Dictionary<string, object>>(colSpec.Data);
+        Assert.Equal("District", colAttribs["COLUMN_NAME"]);
+        Assert.Equal("char", colAttribs["TYPE_NAME"]);
+        Assert.Equal(20, colAttribs["PRECISION"]);
+        Assert.Equal(false, colAttribs["ALLOW_DBNULL"]);
+        Assert.Equal("", colAttribs["DEFAULT_VALUE"]);
+        
+        colSpec = colSpecList.Children[4];
+        Assert.Equal(AstNodeKind.COLSPEC, colSpec.Kind);
+        
+        colAttribs = Assert.IsType<Dictionary<string, object>>(colSpec.Data);
+        Assert.Equal("Population", colAttribs["COLUMN_NAME"]);
+        Assert.Equal("integer", colAttribs["TYPE_NAME"]);
+        Assert.Equal(false, colAttribs["ALLOW_DBNULL"]);
+        
+        var pkSpec = node.Children[1];
+        Assert.Equal(AstNodeKind.PKSPEC, pkSpec.Kind);
+        Assert.Null(pkSpec.Data);
+        
+        var pkColumns = Assert.Single(pkSpec.Children);
+        Assert.Equal(AstNodeKind.COLREFLIST, pkColumns.Kind);
+        
+        var pkColumn = Assert.Single(pkColumns.Children);
+        Assert.Equal(AstNodeKind.COLREF, pkColumn.Kind);
+        Assert.Equal("ID", pkColumn.Data);
+        Assert.Empty(pkColumn.Children);
+        
+        var fkSpec = node.Children[2];
+        Assert.Equal(AstNodeKind.FKSPEC, fkSpec.Kind);
+        
+        var fkAttribs = Assert.IsType<Dictionary<string, object>>(fkSpec.Data);
+        Assert.Equal("city_country_fk", fkAttribs["CONSTRAINT_NAME"]);
+        Assert.Equal("country", fkAttribs["TARGET_TABLE_NAME"]);
+        Assert.Equal(ForeignKeyRule.None, fkAttribs["UPDATE_RULE"]);
+        Assert.Equal(ForeignKeyRule.None, fkAttribs["DELETE_RULE"]);
+        Assert.Equal(2, fkSpec.Children.Count);
+        
+        var fkColumns = fkSpec.Children[0];
+        Assert.Equal(AstNodeKind.COLREFLIST, fkColumns.Kind);
+        
+        var fkColumn = Assert.Single(fkColumns.Children);
+        Assert.Equal(AstNodeKind.COLREF, fkColumn.Kind);
+        Assert.Equal("CountryCode", fkColumn.Data);
+        Assert.Empty(fkColumn.Children);
+        
+        pkColumns = fkSpec.Children[1];
+        Assert.Equal(AstNodeKind.COLREFLIST, pkColumns.Kind);
+        
+        pkColumn = Assert.Single(pkColumns.Children);
+        Assert.Equal(AstNodeKind.COLREF, pkColumn.Kind);
+        Assert.Equal("Code", pkColumn.Data);
+        Assert.Empty(pkColumn.Children);
     }
 }
