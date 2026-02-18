@@ -48,7 +48,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => (item.ToString(), string.Empty))];
     }
 
-    public string[] GetColumnNames(string tableName, string owner)
+    public string[] GetColumnNames(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
@@ -65,7 +65,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetIndexNames(string tableName, string owner)
+    public string[] GetIndexNames(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
@@ -84,7 +84,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetFKNames(string tableName, string owner)
+    public string[] GetFKNames(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
@@ -103,7 +103,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName, string owner)
+    public Dictionary<string, object> GetTableMeta(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
@@ -127,7 +127,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         Dictionary<string, object> metadata = new()
         {
             ["name"] = tableName,
-            ["owner"] = owner
+            ["owner"] = tableOwner
         };
         
         List<string> pkColumns = [];
@@ -151,7 +151,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName)
+    public Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         const string sql = """
                            SELECT
@@ -206,7 +206,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName)
+    public Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         const string sql = """
                            SELECT
@@ -227,7 +227,7 @@ public class MySqlSchemaProvider : ISchemaProvider
                                A.SEQ_IN_INDEX
                            """;
 
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = indexName
         };
@@ -252,7 +252,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName)
+    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         const string sql = """
                            SELECT

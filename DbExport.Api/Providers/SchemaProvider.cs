@@ -39,9 +39,9 @@ public static class SchemaProvider
         var database = new Database(provider.DatabaseName, provider.ProviderName, provider.ConnectionString);
         var tablePairs = provider.GetTableNames();
 
-        foreach (var (tableName, owner) in tablePairs)
+        foreach (var (tableName, tableOwner) in tablePairs)
         {
-            var table = GetTable(provider, database, tableName, owner);
+            var table = GetTable(provider, database, tableName, tableOwner);
             database.Tables.Add(table);
         }
 
@@ -51,26 +51,26 @@ public static class SchemaProvider
     public static Database GetDatabase(string providerName, string connectionString) =>
         GetDatabase(GetProvider(providerName, connectionString));
 
-    private static Table GetTable(ISchemaProvider provider, Database database, string tableName, string owner)
+    private static Table GetTable(ISchemaProvider provider, Database database, string tableName, string tableOwner)
     {
-        var metadata = provider.GetTableMeta(tableName, owner);
-        var table = new Table(database, tableName, owner);
+        var metadata = provider.GetTableMeta(tableName, tableOwner);
+        var table = new Table(database, tableName, tableOwner);
 
-        var columnNames = provider.GetColumnNames(tableName, owner);
+        var columnNames = provider.GetColumnNames(tableName, tableOwner);
         foreach (var columnName in columnNames)
         {
             var column = GetColumn(provider, table, columnName);
             table.Columns.Add(column);
         }
 
-        var indexNames = provider.GetIndexNames(tableName, owner);
+        var indexNames = provider.GetIndexNames(tableName, tableOwner);
         foreach (var indexName in indexNames)
         {
             var index = GetIndex(provider, table, indexName);
             table.Indexes.Add(index);
         }
 
-        var fkNames = provider.GetFKNames(tableName, owner);
+        var fkNames = provider.GetFKNames(tableName, tableOwner);
         foreach (var fkName in fkNames)
         {
             var fk = GetForeignKey(provider, table, fkName);
@@ -78,7 +78,7 @@ public static class SchemaProvider
         }
 
         if (metadata.TryGetValue("pk_name", out var pkName))
-            table.GeneratePrimaryKey((string)pkName, (IEnumerable<string>) metadata["pk_columns"]);
+            table.GeneratePrimaryKey((string)pkName, (IEnumerable<string>)metadata["pk_columns"]);
 
         return table;
     }

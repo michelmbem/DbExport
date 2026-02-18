@@ -17,6 +17,8 @@ public abstract class SchemaItem : IVisitorAcceptor
 
     public string Name { get; }
 
+    public virtual string FullName => Name;
+
     #region Implementation of IVisitorAcceptor
 
     public virtual void AcceptVisitor(IVisitor visitor)

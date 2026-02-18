@@ -42,7 +42,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return [..tablePairs];
     }
 
-    public string[] GetColumnNames(string tableName, string owner)
+    public string[] GetColumnNames(string tableName, string tableOwner)
     {
         List<string> columnNames = [];
         var table = catalog.Tables[tableName];
@@ -53,7 +53,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return [..columnNames];
     }
 
-    public string[] GetIndexNames(string tableName, string owner)
+    public string[] GetIndexNames(string tableName, string tableOwner)
     {
         List<string> indexNames = [];
         var table = catalog.Tables[tableName];
@@ -64,7 +64,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return [..indexNames];
     }
 
-    public string[] GetFKNames(string tableName, string owner)
+    public string[] GetFKNames(string tableName, string tableOwner)
     {
         List<string> fkNames = [];
         var table = catalog.Tables[tableName];
@@ -78,7 +78,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return [..fkNames];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName, string owner)
+    public Dictionary<string, object> GetTableMeta(string tableName, string tableOwner)
     {
         Dictionary<string, object> metadata = [];
         var table = catalog.Tables[tableName];
@@ -102,7 +102,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName)
+    public Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         Dictionary<string, object> metadata = [];
         var table = catalog.Tables[tableName];
@@ -144,7 +144,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName)
+    public Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         var metadata = new Dictionary<string, object>();
         var table = catalog.Tables[tableName];
@@ -162,7 +162,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName)
+    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         var metadata = new Dictionary<string, object>();
         var table = catalog.Tables[tableName];

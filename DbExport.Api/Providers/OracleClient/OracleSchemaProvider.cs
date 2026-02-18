@@ -7,28 +7,26 @@ namespace DbExport.Providers.OracleClient;
 
 public class OracleSchemaProvider : ISchemaProvider
 {
-    private readonly string connectionString;
-    private readonly string databaseName;
 
     public OracleSchemaProvider(string connectionString)
     {
-        this.connectionString = connectionString;
+        ConnectionString = connectionString;
             
         var properties = Utility.ParseConnectionString(connectionString);
         
         if (properties.TryGetValue("user id", out var userId))
-            databaseName = userId;
+            DatabaseName = userId;
         else if (properties.TryGetValue("uid", out var uid))
-            databaseName = uid;
+            DatabaseName = uid;
     }
 
     #region ISchemaProvider Members
 
     public string ProviderName => ProviderNames.ORACLE;
 
-    public string ConnectionString => connectionString;
+    public string ConnectionString { get; }
 
-    public string DatabaseName => databaseName;
+    public string DatabaseName { get; }
 
     public (string, string)[] GetTableNames()
     {
@@ -56,7 +54,7 @@ public class OracleSchemaProvider : ISchemaProvider
         return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
     }
 
-    public string[] GetColumnNames(string tableName, string owner)
+    public string[] GetColumnNames(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
@@ -69,11 +67,11 @@ public class OracleSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetIndexNames(string tableName, string owner)
+    public string[] GetIndexNames(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
@@ -86,11 +84,11 @@ public class OracleSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetFKNames(string tableName, string owner)
+    public string[] GetFKNames(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
@@ -104,25 +102,26 @@ public class OracleSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName, string owner)
+    public Dictionary<string, object> GetTableMeta(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
                                C.CONSTRAINT_NAME,
                                K.COLUMN_NAME
                            FROM
-                               ALL_CONSTRAINTS C,
-                               ALL_CONS_COLUMNS K
+                               ALL_CONSTRAINTS C
+                               JOIN ALL_CONS_COLUMNS K
+                                    ON C.OWNER = K.OWNER
+                                        AND C.TABLE_NAME = K.TABLE_NAME
+                                        AND C.CONSTRAINT_NAME = K.CONSTRAINT_NAME
                            WHERE
-                               C.TABLE_NAME = K.TABLE_NAME
-                               AND C.CONSTRAINT_NAME = K.CONSTRAINT_NAME
-                               AND C.TABLE_NAME = '{0}'
-                               AND C.OWNER = '{1}'
-                               AND C.CONSTRAINT_TYPE = 'P'
+                               C.TABLE_NAME = '{0}'
+                                   AND C.OWNER = '{1}'
+                                   AND C.CONSTRAINT_TYPE = 'P'
                            ORDER BY
                                K.POSITION
                            """;
@@ -130,14 +129,14 @@ public class OracleSchemaProvider : ISchemaProvider
         Dictionary<string, object> metadata = new()
         {
             ["name"] = tableName,
-            ["owner"] = owner
+            ["owner"] = tableOwner
         };
 
         List<string> pkColumns = [];
         var pkName = string.Empty;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner), SqlHelper.ToArrayList);
         
         foreach (var values in list)
         {
@@ -154,7 +153,7 @@ public class OracleSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName)
+    public Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         const string sql = """
                            SELECT
@@ -179,7 +178,7 @@ public class OracleSchemaProvider : ISchemaProvider
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var values = helper.Query(string.Format(sql, tableName, owner, columnName), SqlHelper.ToArray);
+        var values = helper.Query(string.Format(sql, tableName, tableOwner, columnName), SqlHelper.ToArray);
         var attributes = ColumnAttribute.None;
         ColumnType columnType;
 
@@ -197,18 +196,21 @@ public class OracleSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName)
+    public Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         const string sql1 = """
                             SELECT
-                            	COLUMN_NAME,
+                                COLUMN_NAME,
                                 DESCEND
                             FROM
-                            	ALL_IND_COLUMNS
+                                ALL_IND_COLUMNS
                             WHERE
-                            	TABLE_NAME =  '{0}'
-                                AND TABLE_OWNER = '{1}'
-                            	AND INDEX_NAME = '{2}'
+                                TABLE_NAME = '{0}'
+                                    AND TABLE_OWNER = '{1}'
+                                    AND INDEX_NAME = '{2}'
+                                    AND COLUMN_NAME NOT LIKE 'SYS_NC%'
+                            ORDER BY
+                                COLUMN_POSITION
                             """;
 
         const string sql2 = """
@@ -218,8 +220,8 @@ public class OracleSchemaProvider : ISchemaProvider
                                 ALL_INDEXES
                             WHERE
                                 TABLE_NAME = '{0}'
-                                AND OWNER = '{1}'
-                                AND INDEX_NAME = '{2}'
+                                    AND TABLE_OWNER = '{1}'
+                                    AND INDEX_NAME = '{2}'
                             """;
 
         const string sql3 = """
@@ -234,46 +236,49 @@ public class OracleSchemaProvider : ISchemaProvider
                                 AND CONSTRAINT_TYPE = 'P'
                             """;
 
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = indexName
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql1, tableName, owner, indexName), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql1, tableName, tableOwner, indexName), SqlHelper.ToArrayList);
         List<string> indexColumns = [..list.Select(values => values[0].ToString())];
 
         metadata["columns"] = indexColumns.ToArray();
-        metadata["unique"] = helper.QueryScalar(string.Format(sql2, tableName, owner, indexName)).Equals("UNIQUE");
-        metadata["primaryKey"] = helper.QueryScalar(string.Format(sql3, tableName, owner, indexName)).Equals(1);
+        metadata["unique"] = helper.QueryScalar(string.Format(sql2, tableName, tableOwner, indexName)).Equals("UNIQUE");
+        metadata["primaryKey"] = helper.QueryScalar(string.Format(sql3, tableName, tableOwner, indexName)).Equals(1);
 
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName)
+    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         const string sql = """
                            SELECT
-                                FK.COLUMN_NAME FK_Column,
-                                PK.COLUMN_NAME PK_Column,
-                                PT.TABLE_NAME PK_Table,
-                                C.DELETE_RULE
+                               FK.COLUMN_NAME AS FK_Column,
+                               PK.COLUMN_NAME AS PK_Column,
+                               PT.TABLE_NAME  AS PK_Table,
+                               C.DELETE_RULE
                            FROM
-                                ALL_CONSTRAINTS C,
-                                ALL_CONS_COLUMNS FK,
-                                ALL_CONSTRAINTS PT,
-                                ALL_CONS_COLUMNS PK
+                               ALL_CONSTRAINTS C
+                                   JOIN ALL_CONS_COLUMNS FK
+                                        ON C.OWNER = FK.OWNER
+                                            AND C.TABLE_NAME = FK.TABLE_NAME
+                                            AND C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
+                                   JOIN ALL_CONSTRAINTS PT
+                                        ON C.R_OWNER = PT.OWNER
+                                            AND C.R_CONSTRAINT_NAME = PT.CONSTRAINT_NAME
+                                            AND PT.CONSTRAINT_TYPE = 'P'
+                                   JOIN ALL_CONS_COLUMNS PK
+                                        ON PT.OWNER = PK.OWNER
+                                            AND PT.TABLE_NAME = PK.TABLE_NAME
+                                            AND PT.CONSTRAINT_NAME = PK.CONSTRAINT_NAME
+                                            AND FK.POSITION = PK.POSITION
                            WHERE
-                                C.TABLE_NAME = FK.TABLE_NAME
-                                AND C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
-                                AND C.R_CONSTRAINT_NAME = PT.CONSTRAINT_NAME
-                                AND PT.CONSTRAINT_TYPE = 'P'
-                                AND PT.TABLE_NAME = PK.TABLE_NAME
-                                AND PT.CONSTRAINT_NAME = PK.CONSTRAINT_NAME
-                                AND FK.POSITION = PK.POSITION
-                                AND C.TABLE_NAME = '{0}'
-                                AND C.OWNER = '{1}'
-                           	    AND C.CONSTRAINT_NAME = '{2}'
+                               C.TABLE_NAME = '{0}'
+                                   AND C.OWNER = '{1}'
+                                   AND C.CONSTRAINT_NAME = '{2}'
                            ORDER BY
                                FK.POSITION
                            """;
@@ -285,7 +290,7 @@ public class OracleSchemaProvider : ISchemaProvider
         var deleteRule = ForeignKeyRule.None;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, owner, fkName), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner, fkName), SqlHelper.ToArrayList);
         
         foreach (object[] values in list)
         {

@@ -106,15 +106,14 @@ public abstract class CodeGenerator : IVisitor, IDisposable
             {
                 var (dr, con) = SqlHelper.OpenTable(table, visitIdent, SupportsRowVersion);
                 var rowsInserted = false;
-                
-                while (dr.Read())
-                {
-                    WriteInsertDirective(table, dr);
-                    rowsInserted = true;
-                }
 
-                dr.Dispose();
-                con.Dispose();
+                using (con)
+                using (dr)
+                    while (dr.Read())
+                    {
+                        WriteInsertDirective(table, dr);
+                        rowsInserted = true;
+                    }
                 
                 if (rowsInserted) WriteLine();
             }

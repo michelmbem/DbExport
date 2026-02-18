@@ -9,19 +9,17 @@ namespace DbExport.Providers.SQLite;
 
 public class SQLiteSchemaProvider : ISchemaProvider
 {
-    private readonly string connectionString;
-    private readonly string databaseName;
     private readonly Dictionary<string, AstNode> tableDefinitions;
 
     public SQLiteSchemaProvider(string connectionString)
     {
-        this.connectionString = connectionString;
+        ConnectionString = connectionString;
             
         var properties = Utility.ParseConnectionString(connectionString);
         var dbFilename = properties["data source"];
-        databaseName = Path.GetFileNameWithoutExtension(dbFilename);
+        DatabaseName = Path.GetFileNameWithoutExtension(dbFilename);
 
-        tableDefinitions = new Dictionary<string, AstNode>();
+        tableDefinitions = [];
         LoadTableDefinitions();
     }
 
@@ -29,14 +27,14 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     public string ProviderName => ProviderNames.SQLITE;
 
-    public string ConnectionString => connectionString;
+    public string ConnectionString { get; }
 
-    public string DatabaseName => databaseName;
+    public string DatabaseName { get; }
 
     public (string, string)[] GetTableNames() =>
         tableDefinitions.Keys.Select(name => (name, string.Empty)).ToArray();
 
-    public string[] GetColumnNames(string tableName, string owner)
+    public string[] GetColumnNames(string tableName, string tableOwner)
     {
         var tableDef = tableDefinitions[tableName];
         var colSpecList = tableDef.Children[0];
@@ -51,22 +49,21 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return colNames;
     }
 
-    public string[] GetIndexNames(string tableName, string owner) => []; // Note: Not relevant for now!
+    public string[] GetIndexNames(string tableName, string tableOwner) => []; // Note: Not relevant for now!
 
-    public string[] GetFKNames(string tableName, string owner)
+    public string[] GetFKNames(string tableName, string tableOwner)
     {
         var tableDef = tableDefinitions[tableName];
 
-        return (from node in tableDef.Children
+        return [..(from node in tableDef.Children
                 where node.Kind == AstNodeKind.FKSPEC
                 select (Dictionary<string, object>)node.Data into fkAttribs
-                select fkAttribs["CONSTRAINT_NAME"].ToString())
-            .ToArray();
+                select fkAttribs["CONSTRAINT_NAME"].ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName, string owner)
+    public Dictionary<string, object> GetTableMeta(string tableName, string tableOwner)
     {
-        Dictionary<string, object> metadata = new ()
+        Dictionary<string, object> metadata = new()
         {
             ["name"] = tableName,
             ["owner"] = string.Empty
@@ -94,7 +91,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName)
+    public Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         var metadata = new Dictionary<string, object>
         {
@@ -133,10 +130,10 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName)
+    public Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName)
         => null; // Note: Ignored for the moment!
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName)
+    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         var metadata = new Dictionary<string, object>();
         var tableDef = tableDefinitions[tableName];

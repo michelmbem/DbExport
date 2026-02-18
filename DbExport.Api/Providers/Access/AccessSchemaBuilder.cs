@@ -42,12 +42,12 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         if (visitData)
             foreach (Table table in database.Tables.Where(t => t.IsChecked))
             {
-                using DbDataReader dr = SqlHelper.OpenTable(table, visitIdent, false);
+                var (dr, con) = SqlHelper.OpenTable(table, visitIdent, false);
 
-                while (dr.Read())
-                    ImportRecord(table, dr);
-
-                dr.Close();
+                using (con)
+                using (dr)
+                    while (dr.Read())
+                        ImportRecord(table, dr);
             }
 
         if (!visitSchema || !visitFKs) return;

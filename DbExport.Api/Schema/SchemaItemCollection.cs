@@ -24,11 +24,11 @@ public abstract class SchemaItemCollection<TItem> : List<TItem> where TItem : Sc
     {
         ArgumentNullException.ThrowIfNull(item);
 
-        if (dictionary.ContainsKey(item.Name))
-            throw new ArgumentException($"Item '{item.Name}' is already contained in the collection");
+        if (dictionary.ContainsKey(item.FullName))
+            throw new ArgumentException($"Item '{item.FullName}' is already contained in the collection");
             
         base.Add(item);
-        dictionary.Add(item.Name, item);
+        dictionary.Add(item.FullName, item);
     }
     
     public new void AddRange(IEnumerable<TItem> items)
@@ -41,7 +41,7 @@ public abstract class SchemaItemCollection<TItem> : List<TItem> where TItem : Sc
 
     public int IndexOf(string name) => IndexOf(dictionary[name]);
 
-    public new bool Remove(TItem item) => base.Remove(item) && dictionary.Remove(item.Name);
+    public new bool Remove(TItem item) => base.Remove(item) && dictionary.Remove(item.FullName);
 
     public bool Remove(string name) => Remove(dictionary[name]);
     

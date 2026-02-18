@@ -7,32 +7,30 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.SqlClient;
 
-public class SqlSchemaProvider : ISchemaProvider
+public partial class SqlSchemaProvider : ISchemaProvider
 {
-    private readonly string connectionString;
-    private readonly string databaseName;
     
     public SqlSchemaProvider(string connectionString)
     {
-        this.connectionString = connectionString;
+        ConnectionString = connectionString;
             
         var properties = Utility.ParseConnectionString(connectionString);
         
         if (properties.TryGetValue("initial catalog", out var catalog))
-            databaseName = catalog;
+            DatabaseName = catalog;
         else if (properties.TryGetValue("database", out var database))
-            databaseName = database;
+            DatabaseName = database;
         else if (properties.TryGetValue("attachdbfilename", out var filename))
-            databaseName = Path.GetFileNameWithoutExtension(filename);
+            DatabaseName = Path.GetFileNameWithoutExtension(filename);
     }
 
     #region ISchemaProvider Members
 
     public string ProviderName => ProviderNames.SQLSERVER;
 
-    public string ConnectionString => connectionString;
+    public string ConnectionString { get; }
 
-    public string DatabaseName => databaseName;
+    public string DatabaseName { get; }
 
     public (string, string)[] GetTableNames()
     {
@@ -56,7 +54,7 @@ public class SqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
     }
 
-    public string[] GetColumnNames(string tableName, string owner)
+    public string[] GetColumnNames(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
@@ -69,18 +67,18 @@ public class SqlSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetIndexNames(string tableName, string owner)
+    public string[] GetIndexNames(string tableName, string tableOwner)
     {
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query($"EXEC sp_helpindex '{owner}.{tableName}'", SqlHelper.ToArrayList);
+        var list = helper.Query($"EXEC sp_helpindex '{tableOwner}.{tableName}'", SqlHelper.ToArrayList);
         return [..list.Select(values => values[0].ToString())];
     }
 
-    public string[] GetFKNames(string tableName, string owner)
+    public string[] GetFKNames(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
@@ -94,11 +92,11 @@ public class SqlSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToList);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner), SqlHelper.ToList);
         return [..list.Select(item => item.ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName, string owner)
+    public Dictionary<string, object> GetTableMeta(string tableName, string tableOwner)
     {
         const string sql = """
                             SELECT
@@ -122,9 +120,9 @@ public class SqlSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         metadata["name"] = tableName;
-        metadata["owner"] = owner;
+        metadata["owner"] = tableOwner;
 
-        var list = helper.Query(string.Format(sql, tableName, owner), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner), SqlHelper.ToArrayList);
         
         foreach (var values in list)
         {
@@ -141,7 +139,7 @@ public class SqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName)
+    public Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         const string sql1 = """
                             SELECT
@@ -182,7 +180,7 @@ public class SqlSchemaProvider : ISchemaProvider
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var values = helper.Query(string.Format(sql1, tableName, owner, columnName), SqlHelper.ToArray);
+        var values = helper.Query(string.Format(sql1, tableName, tableOwner, columnName), SqlHelper.ToArray);
         var attributes = ColumnAttribute.None;
         ColumnType columnType;
                 
@@ -212,21 +210,21 @@ public class SqlSchemaProvider : ISchemaProvider
 
         if (attributes.HasFlag(ColumnAttribute.Identity))
         {
-            metadata["ident_seed"] = Convert.ToInt64(helper.QueryScalar($"SELECT IDENT_SEED('{owner}.{tableName}')"));
-            metadata["ident_incr"] = Convert.ToInt64(helper.QueryScalar($"SELECT IDENT_INCR('{owner}.{tableName}')"));
+            metadata["ident_seed"] = Convert.ToInt64(helper.QueryScalar($"SELECT IDENT_SEED('{tableOwner}.{tableName}')"));
+            metadata["ident_incr"] = Convert.ToInt64(helper.QueryScalar($"SELECT IDENT_INCR('{tableOwner}.{tableName}')"));
         }
 
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName)
+    public Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         var metadata = new Dictionary<string, object>();
         var indexDescription = string.Empty;
         var indexKeys = string.Empty;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query($"EXEC sp_helpindex '{owner}.{tableName}'", SqlHelper.ToArrayList);
+        var list = helper.Query($"EXEC sp_helpindex '{tableOwner}.{tableName}'", SqlHelper.ToArrayList);
         
         foreach (object[] values in list)
         {
@@ -237,14 +235,14 @@ public class SqlSchemaProvider : ISchemaProvider
         }
 
         metadata["name"] = indexName;
-        metadata["unique"] = Regex.IsMatch(indexDescription, @"\bunique\b");
-        metadata["primaryKey"] = Regex.IsMatch(indexDescription, @"\bprimary key\b");
-        metadata["columns"] = Regex.Split(indexKeys, @"\s*\,\s*");
+        metadata["unique"] = UniqueRegex().IsMatch(indexDescription);
+        metadata["primaryKey"] = PrimaryKeyRegex().IsMatch(indexDescription);
+        metadata["columns"] = CommaRegex().Split(indexKeys);
 
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName)
+    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         const string sql = """
                            SELECT
@@ -280,7 +278,7 @@ public class SqlSchemaProvider : ISchemaProvider
         var deleteRule = ForeignKeyRule.None;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, owner, fkName), SqlHelper.ToArrayList);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner, fkName), SqlHelper.ToArrayList);
         
         foreach (object[] values in list)
         {
@@ -333,7 +331,7 @@ public class SqlSchemaProvider : ISchemaProvider
 
     private static object Parse(string value, ColumnType columnType)
     {
-        if (Utility.IsEmpty(value) || value.ToUpper() == "NULL")
+        if (Utility.IsEmpty(value) || value.Equals("NULL", StringComparison.OrdinalIgnoreCase))
             return DBNull.Value;
 
         return columnType switch
@@ -366,6 +364,15 @@ public class SqlSchemaProvider : ISchemaProvider
             "CASCADE" => ForeignKeyRule.Cascade,
             _ => ForeignKeyRule.None
         };
+
+    [GeneratedRegex(@"\bunique\b", RegexOptions.Compiled)]
+    private static partial Regex UniqueRegex();
+
+    [GeneratedRegex(@"\bprimary key\b", RegexOptions.Compiled)]
+    private static partial Regex PrimaryKeyRegex();
+
+    [GeneratedRegex(@"\s*\,\s*", RegexOptions.Compiled)]
+    private static partial Regex CommaRegex();
 
     #endregion
 }

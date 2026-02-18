@@ -12,17 +12,17 @@ public interface ISchemaProvider
 
     (string, string)[] GetTableNames();
 
-    string[] GetColumnNames(string tableName, string owner);
+    string[] GetColumnNames(string tableName, string tableOwner);
 
-    string[] GetIndexNames(string tableName, string owner);
+    string[] GetIndexNames(string tableName, string tableOwner);
 
-    string[] GetFKNames(string tableName, string owner);
+    string[] GetFKNames(string tableName, string tableOwner);
 
-    Dictionary<string, object> GetTableMeta(string tableName, string owner);
+    Dictionary<string, object> GetTableMeta(string tableName, string tableOwner);
 
-    Dictionary<string, object> GetColumnMeta(string tableName, string owner, string columnName);
+    Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName);
 
-    Dictionary<string, object> GetIndexMeta(string tableName, string owner, string indexName);
+    Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName);
 
-    Dictionary<string, object> GetForeignKeyMeta(string tableName, string owner, string fkName);
+    Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName);
 }

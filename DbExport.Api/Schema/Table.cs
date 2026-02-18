@@ -13,9 +13,9 @@ public class Table(Database db, string name, string owner) : ColumnSet(db, name)
 
     public ForeignKeyCollection ForeignKeys { get; } = [];
 
-    public Database Database => (Database) Parent;
+    public Database Database => (Database)Parent;
 
-    public bool HasPrimaryKey => PrimaryKey != null && PrimaryKey.Columns.Count > 0;
+    public bool HasPrimaryKey => PrimaryKey?.Columns.Count > 0;
 
     public bool HasIndex => Indexes.Any(index => index.Columns.Count > 0);
 
@@ -32,7 +32,7 @@ public class Table(Database db, string name, string owner) : ColumnSet(db, name)
     public TableCollection ReferencingTables =>
         [..Database.Tables.Where(table => table.GetReferencingKey(this) != null)];
 
-    public string FullName => string.IsNullOrEmpty(Owner) ? Name : $"{Owner}.{Name}";
+    public override string FullName => string.IsNullOrEmpty(Owner) ? Name : $"{Owner}.{Name}";
 
     public void GeneratePrimaryKey(string name, IEnumerable<string> columnNames)
     {

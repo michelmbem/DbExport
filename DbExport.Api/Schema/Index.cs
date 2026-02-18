@@ -15,9 +15,9 @@ public class Index : Key
             column.SetAttribute(ColumnAttribute.IXColumn);
     }
 
-    public bool IsUnique { get; private set; }
+    public bool IsUnique { get; }
 
-    public bool IsPrimaryKey { get; private set; }
+    public bool IsPrimaryKey { get; }
 
     public bool MatchesPrimaryKey => Table.HasPrimaryKey && MatchesSignature(Table.PrimaryKey);
 
