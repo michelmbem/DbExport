@@ -34,7 +34,7 @@ public partial class TreeNode : ObservableObject
         Type = type;
     }
 
-    public TreeNode(TreeNode? parent, Table table) : this(parent, table.Name, TreeNodeType.Table)
+    public TreeNode(TreeNode? parent, Table table) : this(parent, table.FullName, TreeNodeType.Table)
     {
         checkable = table;
         
