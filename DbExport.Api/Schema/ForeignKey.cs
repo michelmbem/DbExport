@@ -5,12 +5,13 @@ namespace DbExport.Schema;
 public class ForeignKey : Key
 {
     public ForeignKey(Table table, string name, IEnumerable<string> columnNames,
-                      string relatedTableName, string[] relatedColumnNames,
+                      string relatedName, string relatedOwner, string[] relatedColumns,
                       ForeignKeyRule updateRule, ForeignKeyRule deleteRule) :
         base(table, name, columnNames)
     {
-        RelatedTableName = relatedTableName;
-        RelatedColumnNames = relatedColumnNames;
+        RelatedTableName = relatedName;
+        RelatedTableOwner = relatedOwner;
+        RelatedColumnNames = relatedColumns;
         UpdateRule = updateRule;
         DeleteRule = deleteRule;
 
@@ -20,6 +21,12 @@ public class ForeignKey : Key
 
     public string RelatedTableName { get; }
 
+    public string RelatedTableOwner { get; }
+
+    public string RelatedTableFullName => string.IsNullOrEmpty(RelatedTableOwner)
+        ? RelatedTableName
+        : $"{RelatedTableOwner}.{RelatedTableName}";
+
     public string[] RelatedColumnNames { get; }
 
     public ForeignKeyRule UpdateRule { get; }
@@ -27,7 +34,7 @@ public class ForeignKey : Key
     public ForeignKeyRule DeleteRule { get; }
 
     public Table RelatedTable =>
-        Table.Database.Tables.TryGetValue(RelatedTableName, out var related) ? related : null;
+        Table.Database.Tables.TryGetValue(RelatedTableFullName, out var related) ? related : null;
 
     public Column GetRelatedColumn(int i) => RelatedTable?.Columns[RelatedColumnNames[i]];
 

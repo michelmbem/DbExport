@@ -63,7 +63,7 @@ public partial class TreeNode : ObservableObject
     }
 
     public TreeNode(TreeNode? parent, ForeignKey fk) :
-        this(parent, $"{fk.Name} \u2192 {fk.RelatedTableName}", TreeNodeType.ForeignKey)
+        this(parent, $"{fk.Name} \u2192 {fk.RelatedTableFullName}", TreeNodeType.ForeignKey)
     {
         checkable = fk;
     }
@@ -89,11 +89,12 @@ public partial class TreeNode : ObservableObject
     
     public static IEnumerable<TreeNode> FromDatabase(Database database)
     {
-        var schemas = database.Tables.GroupBy(t => string.IsNullOrEmpty(t.Owner) ? "Tables" : t.Owner);
+        var schemas = database.Tables.GroupBy(t => t.Owner);
 
         foreach (var schema in schemas)
         {
-            var schemaNode = new TreeNode(null, schema.Key, TreeNodeType.Group);
+            var schemaName = string.IsNullOrEmpty(schema.Key) ? "Tables" : schema.Key;
+            var schemaNode = new TreeNode(null, schemaName, TreeNodeType.Group);
             schemaNode.Children.AddRange(schema.Select(t => new TreeNode(schemaNode, t)));
             schemaNode.IsChecked = schemaNode.IsExpanded = true;
 

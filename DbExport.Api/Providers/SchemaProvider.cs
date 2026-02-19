@@ -113,8 +113,9 @@ public static class SchemaProvider
     {
         var metadata = provider.GetForeignKeyMeta(table.Name, table.Owner, fkName);
         var fk = new ForeignKey(table, fkName, (IEnumerable<string>)metadata["columns"],
-                                (string)metadata["relatedTable"], (string[])metadata["relatedColumns"],
-                                (ForeignKeyRule)metadata["updateRule"], (ForeignKeyRule)metadata["deleteRule"]);
+                                (string)metadata["relatedName"], (string)metadata["relatedOwner"],
+                                (string[])metadata["relatedColumns"], (ForeignKeyRule)metadata["updateRule"],
+                                (ForeignKeyRule)metadata["deleteRule"]);
 
         return fk;
     }

@@ -258,7 +258,8 @@ public class OracleSchemaProvider : ISchemaProvider
                            SELECT
                                FK.COLUMN_NAME AS FK_Column,
                                PK.COLUMN_NAME AS PK_Column,
-                               PT.TABLE_NAME  AS PK_Table,
+                               PT.TABLE_NAME AS PK_Table,
+                               PT.OWNER AS PK_Owner,
                                C.DELETE_RULE
                            FROM
                                ALL_CONSTRAINTS C
@@ -287,6 +288,7 @@ public class OracleSchemaProvider : ISchemaProvider
         List<string> fkColumns = [];
         List<string> relatedColumns = [];
         var relatedTable = string.Empty;
+        var relatedOwner = string.Empty;
         var deleteRule = ForeignKeyRule.None;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
@@ -297,12 +299,14 @@ public class OracleSchemaProvider : ISchemaProvider
             fkColumns.Add(values[0].ToString());
             relatedColumns.Add(values[1].ToString());
             relatedTable = values[2].ToString();
-            deleteRule = values[3].Equals("NO ACTION") ? ForeignKeyRule.None : ForeignKeyRule.Cascade;
+            relatedOwner = values[3].ToString();
+            deleteRule = values[4].Equals("NO ACTION")? ForeignKeyRule.None : ForeignKeyRule.Cascade;
         }
 
         metadata["name"] = fkName;
         metadata["columns"] = fkColumns.ToArray();
-        metadata["relatedTable"] = relatedTable;
+        metadata["relatedName"] = relatedTable;
+        metadata["relatedOwner"] = relatedOwner;
         metadata["relatedColumns"] = relatedColumns.ToArray();
         metadata["updateRule"] = ForeignKeyRule.None;
         metadata["deleteRule"] = deleteRule;

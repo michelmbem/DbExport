@@ -297,7 +297,8 @@ public class MySqlSchemaProvider : ISchemaProvider
 
         metadata["name"] = fkName;
         metadata["columns"] = fkColumns.ToArray();
-        metadata["relatedTable"] = relatedTable;
+        metadata["relatedName"] = relatedTable;
+        metadata["relatedOwner"] = string.Empty;
         metadata["relatedColumns"] = relatedColumns.ToArray();
         metadata["updateRule"] = updateRule;
         metadata["deleteRule"] = deleteRule;

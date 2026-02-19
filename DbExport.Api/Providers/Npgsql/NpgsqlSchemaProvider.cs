@@ -266,6 +266,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                                KCU1.COLUMN_NAME FK_COLUMN_NAME,
                                KCU2.COLUMN_NAME PK_COLUMN_NAME,
                                TC2.TABLE_NAME PK_TABLE_NAME,
+                               TC2.TABLE_SCHEMA PK_TABLE_OWNER,
                                RC.UPDATE_RULE,
                                RC.DELETE_RULE
                            FROM
@@ -295,6 +296,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         List<string> fkColumns = [];
         List<string> relatedColumns = [];
         var relatedTable = string.Empty;
+        var relatedOwner = string.Empty;
         var updateRule = ForeignKeyRule.None;
         var deleteRule = ForeignKeyRule.None;
 
@@ -306,13 +308,15 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
             fkColumns.Add(values[0].ToString());
             relatedColumns.Add(values[1].ToString());
             relatedTable = values[2].ToString();
-            updateRule = GetFKRule(values[3].ToString());
-            deleteRule = GetFKRule(values[4].ToString());
+            relatedOwner = values[3].ToString();
+            updateRule = GetFKRule(values[4].ToString());
+            deleteRule = GetFKRule(values[5].ToString());
         }
 
         metadata["name"] = fkName;
         metadata["columns"] = fkColumns.ToArray();
-        metadata["relatedTable"] = relatedTable;
+        metadata["relatedName"] = relatedTable;
+        metadata["relatedOwner"] = relatedOwner;
         metadata["relatedColumns"] = relatedColumns.ToArray();
         metadata["updateRule"] = updateRule;
         metadata["deleteRule"] = deleteRule;

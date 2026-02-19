@@ -99,7 +99,7 @@
     count = 0;
     foreach (var fk in table.ForeignKeys.Where(fk => fk.IsChecked))
     {
-        @("* " + fk.Name + " \u2192 " + fk.RelatedTableName + Environment.NewLine)
+        @("* " + fk.Name + " \u2192 " + fk.RelatedTableFullName + Environment.NewLine)
         count++;
     }
 

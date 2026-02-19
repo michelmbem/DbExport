@@ -79,15 +79,15 @@
         </TextBox>
         <Label Grid.Row="3"
                Grid.Column="0"
-               Content="Database :"
-               Target="DatabaseComboBox"/>
-        <ComboBox Name="DatabaseComboBox"
+               Content="Catalog :"
+               Target="CatalogComboBox"/>
+        <ComboBox Name="CatalogComboBox"
                   Grid.Row="3"
                   Grid.Column="1"
                   IsEditable="True"
                   ItemsSource="{Binding AllCatalogs}"
                   Text="{Binding Catalog}"
-                  DropDownOpened="OnDatabaseComboBoxDropDownOpened"/>
+                  DropDownOpened="OnCatalogComboBoxDropDownOpened"/>
         <Label Grid.Row="3"
                Grid.Column="2"
                Content="Schema :"

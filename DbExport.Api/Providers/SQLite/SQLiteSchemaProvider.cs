@@ -148,7 +148,8 @@ public class SQLiteSchemaProvider : ISchemaProvider
             
             metadata["name"] = fkName;
             metadata["columns"] = ExtractColumnNames(fkSpec, 0);
-            metadata["relatedTable"] = fkAttribs["TARGET_TABLE_NAME"];
+            metadata["relatedName"] = fkAttribs["TARGET_TABLE_NAME"];
+            metadata["relatedOwner"] = string.Empty;
             metadata["relatedColumns"] = ExtractColumnNames(fkSpec, 1);
             metadata["updateRule"] = fkAttribs["UPDATE_RULE"];
             metadata["deleteRule"] = fkAttribs["DELETE_RULE"];

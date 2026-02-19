@@ -13,7 +13,7 @@ public partial class ServerConnectionView : UserControl
 
     private ServerConnectionViewModel? ViewModel => (ServerConnectionViewModel?)DataContext;
 
-    private void OnDatabaseComboBoxDropDownOpened(object? sender, EventArgs e)
+    private void OnCatalogComboBoxDropDownOpened(object? sender, EventArgs e)
     {
         ViewModel?.ReloadCatalogs();
     }

@@ -180,6 +180,7 @@ public class AccessSchemaProvider : ISchemaProvider
         metadata["name"] = fkName;
         metadata["columns"] = columns;
         metadata["relatedTable"] = key.RelatedTable;
+        metadata["relatedOwner"] = string.Empty;
         metadata["relatedColumns"] = relatedColumns;
         metadata["updateRule"] = GetFKRule(key.UpdateRule);
         metadata["deleteRule"] = GetFKRule(key.DeleteRule);
