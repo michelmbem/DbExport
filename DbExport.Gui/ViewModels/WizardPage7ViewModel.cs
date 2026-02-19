@@ -25,10 +25,6 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     [ObservableProperty]
     private MigrationSummary? summary;
 
-    public override bool CanMoveForward => false;
-    
-    public string SqlScript { get; set; } = string.Empty;
-
     public WizardPage7ViewModel()
     {
         Header.Title = "Proceed with migration";
@@ -36,6 +32,10 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
                              "Depending on the target database, you can run it directly from this wizard, " +
                              "or save it to a file and load it in a dedicated tool.";
     }
+
+    public string SqlScript { get; set; } = string.Empty;
+
+    public override bool CanMoveForward => false;
 
     [RelayCommand(CanExecute = nameof(CanExecuteScript))]
     private void ExecuteScript()

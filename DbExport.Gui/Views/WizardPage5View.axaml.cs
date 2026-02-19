@@ -8,4 +8,12 @@ public partial class WizardPage5View : UserControl
     {
         InitializeComponent();
     }
+
+    private void Svg_ActualThemeVariantChanged(object? sender, System.EventArgs e)
+    {
+    }
+
+    private void Svg_ActualThemeVariantChanged_1(object? sender, System.EventArgs e)
+    {
+    }
 }

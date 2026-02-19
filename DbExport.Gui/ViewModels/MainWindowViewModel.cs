@@ -94,6 +94,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
+            wizardPage5.StatusMessage = "Could not load database schema.\nPlease check your connection settings and try again.";
             Log.Error(e, "Error getting database schema");
         }
     }
@@ -106,10 +107,20 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         else if (oldValue == wizardPage4 && newValue == wizardPage5)
         {
+            wizardPage5.Database = null;
+            wizardPage5.StatusMessage = null;
             wizardPage5.IsBusy = true;
+
             Task.Run(LoadDatabaseSchema)
+                .WaitAsync(TimeSpan.FromMinutes(15)) // Hard coded timeout of 15 minutes, which should be more than enough for metadata extraction.
                 .GetAwaiter()
-                .OnCompleted(() => wizardPage5.IsBusy = false);
+                .OnCompleted(() =>
+                {
+                    wizardPage5.IsBusy = false;
+                    if (wizardPage5.Database is not null) return;
+                    wizardPage5.StatusMessage ??= "The operation has timed out. You can reduce the metadata extraction " +
+                                                  "time by selecting a schema on the source database connection page.";
+                });
         }
         else if (oldValue == wizardPage5 && newValue == wizardPage6)
         {

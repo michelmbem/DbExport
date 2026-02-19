@@ -91,13 +91,15 @@
         <Label Grid.Row="3"
                Grid.Column="2"
                Content="Schema :"
-               Target="SchemaComboBox"/>
+               Target="SchemaComboBox"
+               IsVisible="{Binding !IsDestination}"/>
         <ComboBox Name="SchemaComboBox"
                   Grid.Row="3"
                   Grid.Column="3"
                   IsEditable="True"
                   ItemsSource="{Binding AvailableSchemas}"
                   Text="{Binding Schema}"
+                  IsVisible="{Binding !IsDestination}"
                   DropDownOpened="OnSchemaComboBoxDropDownOpened"/>
         <Button Grid.Row="4"
                 Grid.Column="0"

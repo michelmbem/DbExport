@@ -11,6 +11,9 @@ public partial class WizardPage5ViewModel : WizardPageViewModel
     [NotifyPropertyChangedFor(nameof(Roots))]
     private Database? database;
 
+    [ObservableProperty]
+    private string? statusMessage;
+
     public WizardPage5ViewModel()
     {
         Header.Title = "Items selection";

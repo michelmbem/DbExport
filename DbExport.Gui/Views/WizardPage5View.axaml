@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:i="https://github.com/projektanker/icons.avalonia"
+             xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Svg.Controls.Avalonia"
              xmlns:m="using:DbExport.Gui.Models"
              xmlns:vm="using:DbExport.Gui.ViewModels"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,7 +11,7 @@
              x:DataType="vm:WizardPage5ViewModel">
 
     <Design.DataContext>
-        <vm:WizardPage5ViewModel/>
+        <vm:WizardPage5ViewModel StatusMessage="Lorem ipsum dolor sit amet"/>
     </Design.DataContext>
 
     <Grid RowDefinitions="Auto, *">
@@ -20,9 +21,24 @@
                         Content="{Binding Progress}"
                         IsVisible="{Binding IsBusy}"
                         Classes="overlay"/>
+        <Border Grid.Row="1"
+                Padding="20"
+                IsVisible="{Binding Database, Converter={x:Static ObjectConverters.IsNull}}">
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+				<svg:Svg Width="128"
+                         Height="128"
+                         Path="/Assets/Images/warning.svg"/>
+                <TextBlock FontSize="16"
+                           TextWrapping="Wrap"
+                           Text="{Binding StatusMessage}"/>
+            </StackPanel>
+        </Border>
         <TreeView Grid.Row="1"
                   ItemsSource="{Binding Roots}"
-                  SelectionMode="Toggle">
+                  SelectionMode="Toggle"
+                  IsVisible="{Binding Database, Converter={x:Static ObjectConverters.IsNotNull}}">
             <TreeView.Styles>
                 <Style Selector="TreeViewItem" x:DataType="m:TreeNode">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>

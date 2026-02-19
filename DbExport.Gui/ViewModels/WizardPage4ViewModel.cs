@@ -8,7 +8,7 @@ public partial class WizardPage4ViewModel : WizardPageViewModel
     private readonly MySqlOptionsViewModel mysqlOptions = new();
     
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ProviderOptions), nameof(ProviderHasOptions))]
+    [NotifyPropertyChangedFor(nameof(ProviderOptions))]
     private string? providerName;
 
     [ObservableProperty]
@@ -40,8 +40,6 @@ public partial class WizardPage4ViewModel : WizardPageViewModel
         Header.Title = "Migration options";
         Header.Description = "Configure the migration process.";
     }
-
-    public bool ProviderHasOptions => ProviderOptions is not null;
     
     public ProviderOptionsViewModel? ProviderOptions => ProviderName switch
     {

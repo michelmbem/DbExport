@@ -53,7 +53,7 @@
             </WrapPanel>
         </HeaderedContentControl>
         <HeaderedContentControl Grid.Row="3"
-                                IsVisible="{Binding ProviderHasOptions}"
+                                IsVisible="{Binding ProviderOptions, Converter={x:Static ObjectConverters.IsNotNull}}"
                                 Header="{Binding ProviderOptions.Title}">
             <ContentControl Content="{Binding ProviderOptions}"/>
         </HeaderedContentControl>
