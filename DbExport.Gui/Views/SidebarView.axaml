@@ -49,7 +49,7 @@
       <Image Grid.Row="3"
              Source="/Assets/Images/connection.png"
              Stretch="Uniform"
-             Opacity="0.7"/>
+             Opacity="0.8"/>
       <TextBlock Grid.Row="4"
                  Text="{x:Static util:AssemblyInfo.Copyright}"
                  Foreground="White"

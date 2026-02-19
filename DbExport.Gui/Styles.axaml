@@ -20,7 +20,7 @@
                             Classes="colored"
                             Foreground="White"
                             Background="DodgerBlue" />
-                    <ComboBox SelectedIndex="1">
+                    <ComboBox SelectedIndex="1" Width="200">
                         <ComboBoxItem Content="Option 1" />
                         <ComboBoxItem Content="Option 2" />
                         <ComboBoxItem Content="Option 3" />
@@ -96,8 +96,7 @@
     <Style Selector="HeaderedContentControl">
         <Setter Property="Template">
             <ControlTemplate>
-                <Grid RowDefinitions="Auto, *"
-                      ColumnDefinitions="Auto, *">
+                <Grid RowDefinitions="Auto, *" ColumnDefinitions="Auto, *">
                     <!-- Header -->
                     <Border ZIndex="1"
                             Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
@@ -114,8 +113,7 @@
                             Margin="0, 7.5, 0, 0"
                             BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                             BorderThickness="1">
-                        <ContentPresenter Name="PART_ContentPresenter"
-                                          Content="{TemplateBinding Content}" />
+                        <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" />
                     </Border>
                 </Grid>
             </ControlTemplate>
