@@ -25,9 +25,6 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     [ObservableProperty]
     private MigrationSummary? summary;
 
-    [ObservableProperty]
-    private bool isBusy;
-
     public override bool CanMoveForward => false;
     
     public string SqlScript { get; set; } = string.Empty;
@@ -38,8 +35,6 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         Header.Description = "Below is the SQL script that was generated to migrate your database. " +
                              "Depending on the target database, you can run it directly from this wizard, " +
                              "or save it to a file and load it in a dedicated tool.";
-        
-        Progress.IsIndeterminate = true;
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteScript))]

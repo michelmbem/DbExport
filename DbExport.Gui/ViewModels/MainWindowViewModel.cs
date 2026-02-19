@@ -1,9 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Styling;
 using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -26,8 +25,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly WizardPageViewModel[] wizardPages;
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(NavigateToPreviousPageCommand))]
-    [NotifyCanExecuteChangedFor(nameof(NavigateToNextPageCommand))]
+    [NotifyCanExecuteChangedFor(nameof(NavigateToPreviousPageCommand), nameof(NavigateToNextPageCommand))]
     private WizardPageViewModel? currentPage;
     
     [ObservableProperty]
@@ -35,15 +33,14 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
-        wizardPages = [ wizardPage1, wizardPage2, wizardPage3, wizardPage4, wizardPage5, wizardPage6, wizardPage7 ];
+        wizardPages = [wizardPage1, wizardPage2, wizardPage3, wizardPage4, wizardPage5, wizardPage6, wizardPage7];
         Sidebar.Items.AddRange(wizardPages.Select(p => new SidebarItem(p.Header.Title)));
         CurrentPage = wizardPages[0];
         
-        Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
+        App.AddThemeListener(OnThemeChanged);
     }
     
-    public static string ThemeSwitchIcon =>
-        Application.Current?.ActualThemeVariant == ThemeVariant.Dark ? "fa-sun" : "fa-moon";
+    public static string ThemeSwitchIcon => App.IsDarkMode ? "fa-sun" : "fa-moon";
 
     public SidebarViewModel Sidebar { get; } = new();
 
@@ -92,26 +89,13 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         try
         {
-            var schemaProvider = SchemaProvider.GetProvider(wizardPage2.SelectedProvider.Name,
-                                                            wizardPage2.ConnectionString);
-
-            wizardPage5.IsBusy = true;
-            wizardPage5.Database = SchemaProvider.GetDatabase(schemaProvider,
-                                                              wizardPage2.Connection.SelectedSchema);
+            var provider = SchemaProvider.GetProvider(wizardPage2.SelectedProvider.Name, wizardPage2.ConnectionString);
+            wizardPage5.Database = SchemaProvider.GetDatabase(provider, wizardPage2.Connection.SelectedSchema);
         }
         catch (Exception e)
         {
             Log.Error(e, "Error getting database schema");
         }
-        finally
-        {
-            wizardPage5.IsBusy = false;
-        }
-    }
-
-    private void OnThemeChanged(object? sender, EventArgs e)
-    {
-        OnPropertyChanged(nameof(ThemeSwitchIcon));
     }
 
     partial void OnCurrentPageChanging(WizardPageViewModel? oldValue, WizardPageViewModel? newValue)
@@ -122,9 +106,10 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         else if (oldValue == wizardPage4 && newValue == wizardPage5)
         {
+            wizardPage5.IsBusy = true;
             Task.Run(LoadDatabaseSchema)
                 .GetAwaiter()
-                .OnCompleted(NavigateToNextPageCommand.NotifyCanExecuteChanged);
+                .OnCompleted(() => wizardPage5.IsBusy = false);
         }
         else if (oldValue == wizardPage5 && newValue == wizardPage6)
         {
@@ -141,9 +126,25 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    partial void OnCurrentPageChanged(WizardPageViewModel? value)
+    partial void OnCurrentPageChanged(WizardPageViewModel? oldValue, WizardPageViewModel? newValue)
     {
-        var currentIndex = Array.IndexOf(wizardPages, value);
+        oldValue?.PropertyChanged -= OnCurrentPageIsBusyChanged;
+        newValue!.PropertyChanged += OnCurrentPageIsBusyChanged;
+        
+        var currentIndex = Array.IndexOf(wizardPages, newValue);
         Sidebar.SelectedIndex = currentIndex;
+    }
+
+    private void OnCurrentPageIsBusyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(WizardPageViewModel.IsBusy)) return;
+        
+        NavigateToPreviousPageCommand.NotifyCanExecuteChanged();
+        NavigateToNextPageCommand.NotifyCanExecuteChanged();
+    }
+
+    private void OnThemeChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(ThemeSwitchIcon));
     }
 }

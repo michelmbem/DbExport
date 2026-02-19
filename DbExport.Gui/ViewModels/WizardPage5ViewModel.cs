@@ -11,21 +11,17 @@ public partial class WizardPage5ViewModel : WizardPageViewModel
     [NotifyPropertyChangedFor(nameof(Roots))]
     private Database? database;
 
-    [ObservableProperty]
-    private bool isBusy;
-
     public WizardPage5ViewModel()
     {
         Header.Title = "Items selection";
         Header.Description = "Select the database items to migrate.";
         
-        Progress.IsIndeterminate = true;
         Progress.Message = "Analyzing database schema...";
     }
 
     public ObservableCollection<TreeNode> Roots { get; private set; } = [];
 
-    public override bool CanMoveForward => !(IsBusy || Database is null);
+    public override bool CanMoveForward => base.CanMoveForward && Database is not null;
 
     partial void OnDatabaseChanged(Database? value)
     {

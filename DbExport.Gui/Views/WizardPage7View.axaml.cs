@@ -17,8 +17,7 @@ public partial class WizardPage7View : UserControl
         InitializeComponent();
     }
     
-    private static ThemeName EditorThemeName =>
-        App.IsDarkMode ? ThemeName.DarkPlus: ThemeName.LightPlus;
+    private static ThemeName EditorThemeName => App.IsDarkMode ? ThemeName.DarkPlus: ThemeName.LightPlus;
 
     private WizardPage7ViewModel? ViewModel => (WizardPage7ViewModel?)DataContext;
 
@@ -31,7 +30,7 @@ public partial class WizardPage7View : UserControl
         
         SqlEditor.Text = ViewModel?.SqlScript ?? string.Empty;
         
-        Application.Current!.ActualThemeVariantChanged += OnThemeChanged;
+        App.AddThemeListener(OnThemeChanged);
     }
 
     private void InstallTextMate()
@@ -51,6 +50,7 @@ public partial class WizardPage7View : UserControl
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         InitializeSqlEditor();
+        
         ViewModel!.PropertyChanged += OnViewModelPropertyChanged;
     }
 
@@ -61,10 +61,9 @@ public partial class WizardPage7View : UserControl
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        var sqlScript = ViewModel?.SqlScript;
-        if (sqlScript == null) return;
+        if (e.PropertyName != nameof(WizardPageViewModel.IsBusy) || ViewModel!.IsBusy) return;
         
-        SqlEditor.Text = sqlScript;
+        SqlEditor.Text = ViewModel!.SqlScript;
     }
 
     private void OnSqlEditorTextChanged(object? sender, EventArgs e)

@@ -40,7 +40,7 @@ public static class SchemaProvider
         var tablePairs = provider.GetTableNames();
         var filteredTablePairs = string.IsNullOrWhiteSpace(schema)
             ? tablePairs
-            : Array.FindAll(tablePairs, pair => pair.Item2 == schema);
+            : Array.FindAll(tablePairs, pair => schema.Equals(pair.Item2, StringComparison.OrdinalIgnoreCase));
 
         foreach (var (tableName, tableOwner) in filteredTablePairs)
         {

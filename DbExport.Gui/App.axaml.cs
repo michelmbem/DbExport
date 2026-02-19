@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -21,6 +22,11 @@ public partial class App : Application
     public static void ToggleDarkMode()
     {
         Current!.RequestedThemeVariant = IsDarkMode ? ThemeVariant.Light : ThemeVariant.Dark;
+    }
+
+    public static void AddThemeListener(EventHandler listener)
+    {
+        Current!.ActualThemeVariantChanged += listener;
     }
 
     public override void OnFrameworkInitializationCompleted()

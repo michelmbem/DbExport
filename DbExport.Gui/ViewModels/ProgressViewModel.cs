@@ -9,10 +9,10 @@ public partial class ProgressViewModel : ViewModelBase
     private string? message;
     
     [ObservableProperty]
-    private bool isIndeterminate;
+    private bool isIndeterminate = true;
     
     [ObservableProperty]
-    private double minimum = 0;
+    private double minimum;
     
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsComplete))]
@@ -20,7 +20,7 @@ public partial class ProgressViewModel : ViewModelBase
     
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsComplete))]
-    private double value = 0;
+    private double value;
     
     public bool IsComplete => Value >= Maximum;
     

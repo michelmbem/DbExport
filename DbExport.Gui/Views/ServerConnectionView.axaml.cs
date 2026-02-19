@@ -1,7 +1,5 @@
 using System;
-
 using Avalonia.Controls;
-
 using DbExport.Gui.ViewModels;
 
 namespace DbExport.Gui.Views;

@@ -8,8 +8,7 @@ public partial class WizardPage4ViewModel : WizardPageViewModel
     private readonly MySqlOptionsViewModel mysqlOptions = new();
     
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ProviderOptions))]
-    [NotifyPropertyChangedFor(nameof(ProviderHasOptions))]
+    [NotifyPropertyChangedFor(nameof(ProviderOptions), nameof(ProviderHasOptions))]
     private string? providerName;
 
     [ObservableProperty]
