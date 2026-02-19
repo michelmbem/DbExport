@@ -28,7 +28,7 @@
                     </Style>
                 </Grid.Styles>
                 <Label Grid.Column="0"
-                       Content="Select a RDBMS :"
+                       Content="Select a DBMS :"
                        Target="ProviderComboBox" />
                 <ComboBox Name="ProviderComboBox"
                           Grid.Column="1"
