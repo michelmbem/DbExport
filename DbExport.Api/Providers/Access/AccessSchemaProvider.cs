@@ -11,7 +11,7 @@ public class AccessSchemaProvider : ISchemaProvider
 
     public AccessSchemaProvider(string connectionString)
     {
-        this.ConnectionString = connectionString;
+        ConnectionString = connectionString;
         
         var properties = Utility.ParseConnectionString(connectionString);
         DatabaseName = Path.GetFileNameWithoutExtension(properties["data source"]);
@@ -124,17 +124,17 @@ public class AccessSchemaProvider : ISchemaProvider
         if (!Utility.IsEmpty(column.Properties["Description"].Value))
             metadata["description"] = column.Properties["Description"].Value.ToString();
 
-        var attributes = ColumnAttribute.None;
+        var attributes = ColumnAttributes.None;
 
         if (!((bool)column.Properties["Nullable"].Value))
-            attributes |= ColumnAttribute.Required;
+            attributes |= ColumnAttributes.Required;
 
         if (((bool)column.Properties["Fixed Length"].Value))
-            attributes |= ColumnAttribute.FixedLength;
+            attributes |= ColumnAttributes.FixedLength;
 
         if (((bool)column.Properties["Autoincrement"].Value))
         {
-            attributes |= ColumnAttribute.Identity;
+            attributes |= ColumnAttributes.Identity;
             metadata["ident_seed"] = Convert.ToInt64(column.Properties["Seed"].Value);
             metadata["ident_incr"] = Convert.ToInt64(column.Properties["Increment"].Value);
         }

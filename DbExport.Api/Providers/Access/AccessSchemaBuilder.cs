@@ -53,8 +53,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         if (!visitSchema || !visitFKs) return;
 
         foreach (var fk in database.Tables.Where(t => t.IsChecked)
-            .SelectMany(t => t.ForeignKeys.Where(fk => fk.IsChecked &&
-            fk.RelatedTable.IsChecked && fk.AllColumnsAreChecked)))
+            .SelectMany(t => t.ForeignKeys.Where(IsSelected)))
         {
             fk.AcceptVisitor(this);
         }
@@ -87,8 +86,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
         if (!visitIndexes) return;
 
-        foreach (Index index in table.Indexes
-            .Where(i => i.IsChecked && !i.MatchesKey && i.Columns.Count > 0 && i.AllColumnsAreChecked))
+        foreach (Index index in table.Indexes.Where(IsSelected))
         {
             index.AcceptVisitor(this);
         }
@@ -171,28 +169,36 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     #region Utility
 
+    private static bool IsSelected(Index index) =>
+        index.IsChecked && !index.MatchesKey && index.Columns.Count > 0 && index.AllColumnsAreChecked;
+
+    private static bool IsSelected(ForeignKey fk) =>
+        fk.IsChecked && fk.AllColumnsAreChecked && fk.RelatedTable is { IsChecked: true };
+
     private static string Escape(string name) => Utility.Escape(name, ProviderNames.ACCESS);
 
     private static string GetKeyName(Key key)
     {
-        if (key is Index ix)
+        switch (key)
         {
-            var index = key.Table.Indexes.IndexOf(ix);
-            return Escape(key.Table.Name + "_IX" + (index + 1));
+            case Index ix:
+            {
+                var index = key.Table.Indexes.IndexOf(ix);
+                return Escape(key.Table.Name + "_IX" + (index + 1));
+            }
+            case ForeignKey fk:
+            {
+                var index = key.Table.ForeignKeys.IndexOf(fk);
+                return Escape(key.Table.Name + "_FK" + (index + 1));
+            }
+            default:
+                return Escape(key.Name);
         }
-
-        if (key is ForeignKey fk)
-        {
-            var index = key.Table.ForeignKeys.IndexOf(fk);
-            return Escape(key.Table.Name + "_FK" + (index + 1));
-        }
-
-        return Escape(key.Name);
     }
 
     private static string GetTypeName(Column column, ExportOptions options)
     {
-        var visitIdentities = options == null || options.Flags.HasFlag(ExportFlags.ExportIdentities);
+        var visitIdentities = options == null || options.HasFlag(ExportFlags.ExportIdentities);
 
         if (visitIdentities && column.IsIdentity) return "counter";
 
