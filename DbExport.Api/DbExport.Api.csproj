@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4"/>
-    <PackageReference Include="Microsoft.SqlServer.Types" Version="170.1000.7" />
+    <PackageReference Include="Microsoft.SqlServer.Types" Version="170.1000.7"/>
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.100"/>
     <PackageReference Include="MySql.Data" Version="9.6.0"/>
     <PackageReference Include="Npgsql" Version="10.0.1"/>

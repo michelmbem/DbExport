@@ -9,7 +9,7 @@
 
     <Design.DataContext>
         <vm:ProgressViewModel IsIndeterminate="True"
-                              Message="A task is in progress" />
+                              Message="A task is in progress"/>
     </Design.DataContext>
 
     <StackPanel HorizontalAlignment="Center"
@@ -19,8 +19,8 @@
                      Minimum="{Binding Minimum}"
                      Maximum="{Binding Maximum}"
                      Value="{Binding Value}"
-                     Width="150" />
+                     Width="150"/>
         <TextBlock Text="{Binding Message}"
-                   HorizontalAlignment="Center" />
+                   HorizontalAlignment="Center"/>
     </StackPanel>
 </UserControl>

@@ -9,7 +9,7 @@
 
     <Design.DataContext>
         <vm:PageHeaderViewModel Title="Page title"
-                                Description="Lorem ipsum dolor sit amet, consectetur adipiscing elit." />
+                                Description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."/>
     </Design.DataContext>
 
     <Border BorderBrush="Gray"
@@ -17,9 +17,9 @@
             Padding="15">
         <StackPanel Spacing="10">
             <TextBlock Text="{Binding Title}"
-                       FontSize="48" />
+                       FontSize="48"/>
             <TextBlock Text="{Binding Description}"
-                       TextWrapping="Wrap" />
+                       TextWrapping="Wrap"/>
         </StackPanel>
     </Border>
 </UserControl>

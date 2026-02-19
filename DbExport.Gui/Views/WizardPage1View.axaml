@@ -9,12 +9,12 @@
              x:DataType="vm:WizardPage1ViewModel">
 
     <Design.DataContext>
-        <vm:WizardPage1ViewModel />
+        <vm:WizardPage1ViewModel/>
     </Design.DataContext>
 
     <Border HorizontalAlignment="Center"
             VerticalAlignment="Center">
         <md:MarkdownScrollViewer Markdown="{Binding Header.Description}"
-                                 Margin="30" />
+                                 Margin="30"/>
     </Border>
 </UserControl>
