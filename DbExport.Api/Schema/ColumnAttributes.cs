@@ -3,7 +3,7 @@
 namespace DbExport.Schema;
 
 [Flags]
-public enum ColumnAttribute
+public enum ColumnAttributes
 {
     None        = 0,
     Required    = 1,

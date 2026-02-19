@@ -1,88 +1,84 @@
 ﻿namespace DbExport.Schema;
 
-public class Column : SchemaItem, ICheckable
+public class Column(
+    Table table,
+    string name,
+    ColumnType type,
+    string nativeType,
+    short size,
+    byte precision,
+    byte scale,
+    ColumnAttributes attributes,
+    object defaultValue,
+    string description)
+    : SchemaItem(table, name), ICheckable
 {
-    public Column(Table table, string name, ColumnType type, string nativeType,
-                  short size, byte precision, byte scale, ColumnAttribute attributes,
-                  object defaultValue, string description) :
-        base(table, name)
-    {
-        ColumnType = type;
-        NativeType = nativeType;
-        Size = size;
-        Precision = precision;
-        Scale = scale;
-        Attributes = attributes | GetAttributesFromType(type);
-        DefaultValue = defaultValue;
-        Description = description;
-    }
+    public ColumnType ColumnType { get; } = type;
 
-    public bool IsChecked { get; set; }
+    public string NativeType { get; } = nativeType;
 
-    public ColumnType ColumnType { get; }
+    public short Size { get; } = size;
 
-    public string NativeType { get; }
+    public byte Precision { get; } = precision;
 
-    public short Size { get; }
+    public byte Scale { get; } = scale;
 
-    public byte Precision { get; }
+    public ColumnAttributes Attributes { get; private set; } = attributes | GetAttributesFromType(type);
 
-    public byte Scale { get; }
+    public object DefaultValue { get; } = defaultValue;
+
+    public string Description { get; } = description;
 
     public long IdentitySeed { get; private set; }
 
     public long IdentityIncrement { get; private set; }
 
-    public ColumnAttribute Attributes { get; private set; }
+    public Table Table => (Table)Parent;
 
-    public object DefaultValue { get; }
+    public bool IsRequired => Attributes.HasFlag(ColumnAttributes.Required);
 
-    public string Description { get; }
+    public bool IsComputed => Attributes.HasFlag(ColumnAttributes.Computed);
 
-    public Table Table => (Table) Parent;
-
-    public bool IsRequired => Attributes.HasFlag(ColumnAttribute.Required);
-
-    public bool IsComputed => Attributes.HasFlag(ColumnAttribute.Computed);
-
-    public bool IsIdentity => Attributes.HasFlag(ColumnAttribute.Identity);
+    public bool IsIdentity => Attributes.HasFlag(ColumnAttributes.Identity);
 
     public bool IsGenerated => IsComputed || IsIdentity || ColumnType == ColumnType.RowVersion;
 
-    public bool IsPKColumn => Attributes.HasFlag(ColumnAttribute.PKColumn);
+    public bool IsPKColumn => Attributes.HasFlag(ColumnAttributes.PKColumn);
 
-    public bool IsFKColumn => Attributes.HasFlag(ColumnAttribute.FKColumn);
+    public bool IsFKColumn => Attributes.HasFlag(ColumnAttributes.FKColumn);
 
     public bool IsKeyColumn => IsPKColumn || IsFKColumn;
 
-    public bool IsIndexColumn => Attributes.HasFlag(ColumnAttribute.IXColumn);
+    public bool IsIndexColumn => Attributes.HasFlag(ColumnAttributes.IXColumn);
 
-    public bool IsNumeric => Attributes.HasFlag(ColumnAttribute.Numeric);
+    public bool IsNumeric => Attributes.HasFlag(ColumnAttributes.Numeric);
 
-    public bool IsAlphabetic => Attributes.HasFlag(ColumnAttribute.Alphabetic);
+    public bool IsAlphabetic => Attributes.HasFlag(ColumnAttributes.Alphabetic);
 
-    public bool IsFixedLength => Attributes.HasFlag(ColumnAttribute.FixedLength);
+    public bool IsFixedLength => Attributes.HasFlag(ColumnAttributes.FixedLength);
 
-    public bool IsUnsigned => Attributes.HasFlag(ColumnAttribute.Unsigned);
+    public bool IsUnsigned => Attributes.HasFlag(ColumnAttributes.Unsigned);
 
-    public bool IsUnicode => Attributes.HasFlag(ColumnAttribute.Unicode);
+    public bool IsUnicode => Attributes.HasFlag(ColumnAttributes.Unicode);
 
     public bool IsIntegral => IsNumeric && IsFixedLength;
 
     public bool IsNatural => IsIntegral && IsUnsigned;
 
-    public bool IsTemporal => Attributes.HasFlag(ColumnAttribute.Temporal);
+    public bool IsTemporal => Attributes.HasFlag(ColumnAttributes.Temporal);
 
-    public bool IsBinary => Attributes.HasFlag(ColumnAttribute.Binary);
+    public bool IsBinary => Attributes.HasFlag(ColumnAttributes.Binary);
 
-    public void SetAttribute(ColumnAttribute attribute)
+    public bool IsChecked { get; set; }
+
+    public void SetAttribute(ColumnAttributes attribute)
     {
         Attributes |= attribute;
     }
 
     public void MakeIdentity(long seed, long increment)
     {
-        SetAttribute(ColumnAttribute.Identity);
+        SetAttribute(ColumnAttributes.Identity);
         IdentitySeed = seed;
         IdentityIncrement = increment;
     }
@@ -92,46 +88,46 @@ public class Column : SchemaItem, ICheckable
         visitor.VisitColumn(this);
     }
 
-    private static ColumnAttribute GetAttributesFromType(ColumnType type)
+    private static ColumnAttributes GetAttributesFromType(ColumnType type)
     {
-        var attributes = ColumnAttribute.None;
+        var attributes = ColumnAttributes.None;
 
         switch (type)
         {
             case ColumnType.TinyInt or ColumnType.SmallInt or ColumnType.Integer or
                 ColumnType.BigInt or ColumnType.Currency or ColumnType.Decimal:
-                attributes |= ColumnAttribute.Numeric | ColumnAttribute.FixedLength;
+                attributes |= ColumnAttributes.Numeric | ColumnAttributes.FixedLength;
                 break;
             case ColumnType.UnsignedTinyInt or ColumnType.UnsignedSmallInt or
                 ColumnType.UnsignedInt or ColumnType.UnsignedBigInt:
-                attributes |= ColumnAttribute.Numeric | ColumnAttribute.FixedLength | ColumnAttribute.Unsigned;
+                attributes |= ColumnAttributes.Numeric | ColumnAttributes.FixedLength | ColumnAttributes.Unsigned;
                 break;
             case ColumnType.SinglePrecision or ColumnType.DoublePrecision:
-                attributes |= ColumnAttribute.Numeric;
+                attributes |= ColumnAttributes.Numeric;
                 break;
             case ColumnType.Char:
-                attributes |= ColumnAttribute.Alphabetic | ColumnAttribute.FixedLength;
+                attributes |= ColumnAttributes.Alphabetic | ColumnAttributes.FixedLength;
                 break;
             case ColumnType.NChar:
-                attributes |= ColumnAttribute.Alphabetic | ColumnAttribute.FixedLength | ColumnAttribute.Unicode;
+                attributes |= ColumnAttributes.Alphabetic | ColumnAttributes.FixedLength | ColumnAttributes.Unicode;
                 break;
             case ColumnType.VarChar:
-                attributes |= ColumnAttribute.Alphabetic;
+                attributes |= ColumnAttributes.Alphabetic;
                 break;
             case ColumnType.NVarChar:
-                attributes |= ColumnAttribute.Alphabetic | ColumnAttribute.Unicode;
+                attributes |= ColumnAttributes.Alphabetic | ColumnAttributes.Unicode;
                 break;
             case ColumnType.Text:
-                attributes |= ColumnAttribute.Alphabetic | ColumnAttribute.Binary;
+                attributes |= ColumnAttributes.Alphabetic | ColumnAttributes.Binary;
                 break;
             case ColumnType.NText:
-                attributes |= ColumnAttribute.Alphabetic | ColumnAttribute.Binary | ColumnAttribute.Unicode;
+                attributes |= ColumnAttributes.Alphabetic | ColumnAttributes.Binary | ColumnAttributes.Unicode;
                 break;
             case ColumnType.Date or ColumnType.Time or ColumnType.DateTime or ColumnType.Interval:
-                attributes |= ColumnAttribute.Temporal;
+                attributes |= ColumnAttributes.Temporal;
                 break;
             case ColumnType.Bit or ColumnType.Blob or ColumnType.File:
-                attributes |= ColumnAttribute.Binary;
+                attributes |= ColumnAttributes.Binary;
                 break;
         }
 

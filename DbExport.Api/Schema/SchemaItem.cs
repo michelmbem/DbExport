@@ -21,9 +21,7 @@ public abstract class SchemaItem : IVisitorAcceptor
 
     #region Implementation of IVisitorAcceptor
 
-    public virtual void AcceptVisitor(IVisitor visitor)
-    {
-    }
+    public virtual void AcceptVisitor(IVisitor visitor) { }
 
     #endregion
 

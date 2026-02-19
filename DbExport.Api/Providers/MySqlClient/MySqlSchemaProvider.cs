@@ -178,7 +178,7 @@ public class MySqlSchemaProvider : ISchemaProvider
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var attributes = ColumnAttribute.None;
+        var attributes = ColumnAttributes.None;
         var values = helper.Query(string.Format(sql, DatabaseName, tableName, columnName), SqlHelper.ToArray);
 
         metadata["type"] = GetColumnType(values[0].ToString());
@@ -190,14 +190,14 @@ public class MySqlSchemaProvider : ISchemaProvider
         metadata["description"] = Convert.ToString(values[5]);
 
         if (values[6].Equals("NO"))
-            attributes |= ColumnAttribute.Required;
+            attributes |= ColumnAttributes.Required;
 
         if (Regex.IsMatch(Convert.ToString(values[7]), "utf8", RegexOptions.IgnoreCase))
-            attributes |= ColumnAttribute.Unicode;
+            attributes |= ColumnAttributes.Unicode;
 
         if (values[8].Equals("auto_increment"))
         {
-            attributes |= ColumnAttribute.Identity;
+            attributes |= ColumnAttributes.Identity;
             metadata["ident_seed"] = metadata["ident_incr"] = 1L;
         }
 

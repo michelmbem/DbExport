@@ -45,7 +45,7 @@ public class NpgsqlCodeGenerator : CodeGenerator
             ColumnType.UnsignedSmallInt or ColumnType.Integer => "integer",
             ColumnType.UnsignedInt or ColumnType.BigInt => "bigint",
             ColumnType.UnsignedBigInt => "numeric(20)",
-            ColumnType.Currency => "numeric(16, 4)",
+            ColumnType.Currency => "numeric(19, 4)",
             ColumnType.Decimal when column.Precision == 0 => "numeric",
             ColumnType.Decimal when column.Scale == 0 => $"numeric({column.Precision})",
             ColumnType.Decimal => $"numeric({column.Precision}, {column.Scale})",

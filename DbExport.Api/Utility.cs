@@ -108,10 +108,10 @@ public static partial class Utility
         DateTime.TryParse(value?.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
 
     public static byte ToByte(object value) =>
-        byte.TryParse(value?.ToString(), out var res) ? res : (byte)0;
+        byte.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var res) ? res : (byte)0;
 
     public static short ToInt16(object value) =>
-        short.TryParse(value?.ToString(), out var res) ? res : (short)0;
+        short.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var res) ? res : (short)0;
 
     public static string QuotedStr(object value, char quote = '\'') =>
         $"{quote}{value.ToString()?.Replace(quote.ToString(), new string(quote, 2))}{quote}";

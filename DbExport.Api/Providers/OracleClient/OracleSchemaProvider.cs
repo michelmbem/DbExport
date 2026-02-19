@@ -179,7 +179,7 @@ public class OracleSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var values = helper.Query(string.Format(sql, tableName, tableOwner, columnName), SqlHelper.ToArray);
-        var attributes = ColumnAttribute.None;
+        var attributes = ColumnAttributes.None;
         ColumnType columnType;
 
         metadata["nativeType"] = values[0].ToString();
@@ -190,7 +190,7 @@ public class OracleSchemaProvider : ISchemaProvider
             (string)metadata["nativeType"], (byte)metadata["precision"], (byte)metadata["scale"]);
         metadata["defaultValue"] = Parse(Convert.ToString(values[4]), columnType);
                 
-        if (values[5].Equals("N")) attributes |= ColumnAttribute.Required;
+        if (values[5].Equals("N")) attributes |= ColumnAttributes.Required;
         metadata["attributes"] =  attributes;
 
         return metadata;

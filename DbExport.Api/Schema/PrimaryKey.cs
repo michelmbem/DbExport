@@ -8,7 +8,7 @@ public class PrimaryKey : Key
         base(table, name, columnNames)
     {
         foreach (var column in Columns)
-            column.SetAttribute(ColumnAttribute.PKColumn);
+            column.SetAttribute(ColumnAttributes.PKColumn);
     }
 
     public bool IsComputed => Columns.Count == 1 && Columns[0].IsComputed;

@@ -181,7 +181,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var values = helper.Query(string.Format(sql1, tableName, tableOwner, columnName), SqlHelper.ToArray);
-        var attributes = ColumnAttribute.None;
+        var attributes = ColumnAttributes.None;
         ColumnType columnType;
                 
         metadata["type"] = columnType = GetColumnType(values[0].ToString());
@@ -197,18 +197,18 @@ public partial class SqlSchemaProvider : ISchemaProvider
         }
 
         if (values[5].Equals("NO"))
-            attributes |= ColumnAttribute.Required;
+            attributes |= ColumnAttributes.Required;
 
         if (values[6].Equals(1))
-            attributes |= ColumnAttribute.Identity;
+            attributes |= ColumnAttributes.Identity;
 
         if (values[7].Equals(1))
-            attributes |= ColumnAttribute.Computed;
+            attributes |= ColumnAttributes.Computed;
 
         metadata["attributes"] = attributes;
         metadata["description"] = Convert.ToString(helper.QueryScalar(string.Format(sql2, tableName, columnName)));
 
-        if (attributes.HasFlag(ColumnAttribute.Identity))
+        if (attributes.HasFlag(ColumnAttributes.Identity))
         {
             metadata["ident_seed"] = Convert.ToInt64(helper.QueryScalar($"SELECT IDENT_SEED('{tableOwner}.{tableName}')"));
             metadata["ident_incr"] = Convert.ToInt64(helper.QueryScalar($"SELECT IDENT_INCR('{tableOwner}.{tableName}')"));

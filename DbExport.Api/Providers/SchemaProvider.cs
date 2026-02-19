@@ -91,7 +91,7 @@ public static class SchemaProvider
         var metadata = provider.GetColumnMeta(table.Name, table.Owner, columnName);
         var column = new Column(table, columnName, (ColumnType)metadata["type"], (string)metadata["nativeType"],
                                 (short)metadata["size"], (byte)metadata["precision"], (byte)metadata["scale"],
-                                (ColumnAttribute)metadata["attributes"], metadata["defaultValue"],
+                                (ColumnAttributes)metadata["attributes"], metadata["defaultValue"],
                                 (string)metadata["description"]);
 
         if (metadata.TryGetValue("ident_seed", out var identSeed))

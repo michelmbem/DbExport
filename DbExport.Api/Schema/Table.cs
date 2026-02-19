@@ -40,7 +40,7 @@ public class Table(Database db, string name, string owner) : ColumnSet(db, name)
     }
 
     public ForeignKey GetReferencingKey(Table table) =>
-        ForeignKeys.FirstOrDefault(fk => fk.RelatedTable.Equals(table));
+        ForeignKeys.FirstOrDefault(fk => Equals(table, fk.RelatedTable));
 
     public bool IsAssociationTable() =>
         ReferencedTables.Count > 1 && Columns.All(column => column.IsFKColumn || column.IsGenerated);

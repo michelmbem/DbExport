@@ -17,7 +17,7 @@ public class MySqlCodeGenerator : CodeGenerator
 
     #region New Properties
 
-    public MySqlOptions MySqlOptions => ExportOptions?.ProviderSpecific as MySqlOptions;
+    public MySqlOptions MySqlOptions => (MySqlOptions)ExportOptions?.ProviderSpecific;
 
     #endregion
 
@@ -52,7 +52,7 @@ public class MySqlCodeGenerator : CodeGenerator
             ColumnType.UnsignedInt => "int unsigned",
             ColumnType.BigInt => "bigint",
             ColumnType.UnsignedBigInt => "bigint unsigned",
-            ColumnType.Currency => "decimal(16, 4)",
+            ColumnType.Currency => "decimal(19, 4)",
             ColumnType.Decimal when column.Precision == 0 => "decimal",
             ColumnType.Decimal when column.Scale == 0 => $"decimal({column.Precision})",
             ColumnType.Decimal => $"decimal({column.Precision}, {column.Scale})",
@@ -67,42 +67,34 @@ public class MySqlCodeGenerator : CodeGenerator
             ColumnType.Bit => $"bit({column.Size})",
             ColumnType.Blob => "longblob",
             ColumnType.Guid => "char(36)",
-            ColumnType.RowVersion => "timestamp",
+            ColumnType.RowVersion => "tinyblob",
             _ => column.NativeType
         };
 
     protected override void WriteTableCreationSuffix(Table table)
     {
-        string engine = null, charset = null, sortOrder = null;
-            
-        if (MySqlOptions != null)
-        {
-            engine = MySqlOptions.StorageEngine;
-            charset = MySqlOptions.CharacterSet.Name;
-            sortOrder = MySqlOptions.Collation;
-        }
+        var engine = MySqlOptions?.StorageEngine;
+        var charset = MySqlOptions?.CharacterSet.Name;
+        var collation = MySqlOptions?.Collation;
 
         if (!string.IsNullOrEmpty(engine))
         {
             WriteLine();
             WriteLine("ENGINE = {0}", engine);
-
-            if (!string.IsNullOrEmpty(charset))
-            {
-                if (string.IsNullOrEmpty(sortOrder))
-                    Write("DEFAULT CHARSET = {0}", charset);
-                else
-                    Write("DEFAULT CHARSET = {0} COLLATE = {1}", charset, sortOrder);
-            }
+            
+            if (string.IsNullOrEmpty(charset)) return;
+            Write("DEFAULT CHARSET = {0}", charset);
+            
+            if (string.IsNullOrEmpty(collation)) return;
+            Write(" COLLATE = {0}", collation);
         }
         else if (!string.IsNullOrEmpty(charset))
         {
             WriteLine();
-
-            if (string.IsNullOrEmpty(sortOrder))
-                Write("DEFAULT CHARSET = {0}", charset);
-            else
-                Write("DEFAULT CHARSET = {0} COLLATE = {1}", charset, sortOrder);
+            Write("DEFAULT CHARSET = {0}", charset);
+            
+            if (string.IsNullOrEmpty(collation)) return;
+            Write("DEFAULT CHARSET = {0} COLLATE = {1}", charset, collation);
         }
     }
 

@@ -271,20 +271,18 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         var typeName = column.ColumnType.ToString().ToLower();
 
         if (typeName.StartsWith("unsigned"))
-            return typeName[8..] + " unsigned";
+            return $"{typeName[8..]} unsigned";
 
         if (column.ColumnType == ColumnType.Bit || typeName.EndsWith("char"))
             return $"{typeName}({column.Size})";
 
-        if (column.ColumnType == ColumnType.Decimal)
-        {
-            if (column.Precision == 0) return typeName;
-            return column.Scale == 0
-                 ? $"{typeName}({column.Precision})"
-                 : $"{typeName}({column.Precision}, {column.Scale})";
-        }
+        if (column.ColumnType != ColumnType.Decimal || column.Precision == 0)
+            return typeName;
+        
+        return column.Scale == 0
+             ? $"{typeName}({column.Precision})"
+             : $"{typeName}({column.Precision}, {column.Scale})";
 
-        return typeName;
     }
 
     protected virtual string GetKeyName(Key key) => Escape(key.Name);
@@ -318,7 +316,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     protected virtual void WriteComment(string format, params object[] args)
     {
-        WriteLine("-- " + format, args);
+        WriteLine($"-- {format}", args);
     }
 
     protected virtual void WriteDelimiter()
@@ -344,12 +342,12 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     protected virtual void WriteUpdateRule(ForeignKeyRule updateRule)
     {
-        Write(" ON UPDATE " + GetForeignKeyRuleText(updateRule));
+        Write($" ON UPDATE {GetForeignKeyRuleText(updateRule)}");
     }
 
     protected virtual void WriteDeleteRule(ForeignKeyRule deleteRule)
     {
-        Write(" ON DELETE " + GetForeignKeyRuleText(deleteRule));
+        Write($" ON DELETE {GetForeignKeyRuleText(deleteRule)}");
     }
 
     protected virtual string GetForeignKeyRuleText(ForeignKeyRule rule) =>

@@ -42,7 +42,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
         for (var i = 0; i < colNames.Length; ++i)
         {
-            var colAttribs = colSpecList.Children[i].Data as Dictionary<string, object>;
+            var colAttribs = (Dictionary<string, object>)colSpecList.Children[i].Data;
             colNames[i] = colAttribs["COLUMN_NAME"].ToString();
         }
 
@@ -102,6 +102,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         var colAttribs = tableDef.Children[0].Children
                                  .Select(colSpec => (Dictionary<string, object>)colSpec.Data)
                                  .FirstOrDefault(colAttribs => colAttribs["COLUMN_NAME"].Equals(columnName));
+        
         if (colAttribs == null) return metadata;
         
         ColumnType columnType;
@@ -113,15 +114,15 @@ public class SQLiteSchemaProvider : ISchemaProvider
         metadata["defaultValue"] = colAttribs["DEFAULT_VALUE"];
         metadata["description"] = string.Empty;
                     
-        var attributes = ColumnAttribute.None;
+        var attributes = ColumnAttributes.None;
         if (Convert.ToBoolean(colAttribs["PRIMARY_KEY"]) ||
             !Convert.ToBoolean(colAttribs["ALLOW_DBNULL"]))
         {
-            attributes |= ColumnAttribute.Required;
+            attributes |= ColumnAttributes.Required;
             if (Convert.ToBoolean(colAttribs["AUTO_INCREMENT"]) ||
                 (columnType == ColumnType.Integer && Convert.ToBoolean(colAttribs["UNIQUE"])))
             {
-                attributes |= ColumnAttribute.Identity;
+                attributes |= ColumnAttributes.Identity;
                 metadata["ident_seed"] = metadata["ident_incr"] = 1L;
             }
         }
@@ -203,11 +204,11 @@ public class SQLiteSchemaProvider : ISchemaProvider
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(sql, SqlHelper.ToArrayList);
         
-        foreach (object[] values in list)
+        foreach (var values in list)
         {
             var parser = new Parser(new Scanner(values[1].ToString()));
-            var tabelDef = parser.CreateTable();
-            tableDefinitions.Add(values[0].ToString()!, tabelDef);
+            var tableDef = parser.CreateTable();
+            tableDefinitions.Add(values[0].ToString()!, tableDef);
         }
     }
 

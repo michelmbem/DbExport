@@ -16,7 +16,6 @@ public class Key : ColumnSet
     public bool MatchesSignature(Key other)
     {
         if (Columns.Count != other.Columns.Count) return false;
-        return !Columns.Where((t, i) => t.Name != other.Columns[i].Name)
-                       .Any();
+        return !Columns.Where((c, i) => c.Name != other.Columns[i].Name).Any();
     }
 }

@@ -25,7 +25,7 @@ public abstract class SchemaItemCollection<TItem> : List<TItem> where TItem : Sc
         ArgumentNullException.ThrowIfNull(item);
 
         if (dictionary.ContainsKey(item.FullName))
-            throw new ArgumentException($"Item '{item.FullName}' is already contained in the collection");
+            throw new ArgumentException($"Item '{item.FullName}' is already present in the collection");
             
         base.Add(item);
         dictionary.Add(item.FullName, item);

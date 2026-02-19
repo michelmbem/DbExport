@@ -177,7 +177,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         ColumnType columnType;
-        var attributes = ColumnAttribute.None;
+        var attributes = ColumnAttributes.None;
         var values = helper.Query(string.Format(sql, tableName, tableOwner, columnName), SqlHelper.ToArray);
                 
         metadata["type"] = columnType = GetColumnType(values[0].ToString());
@@ -188,26 +188,26 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         metadata["defaultValue"] = Parse(Convert.ToString(values[4]), columnType);
 
         if (Utf8Regex().IsMatch(Convert.ToString(values[5])!))
-            attributes |= ColumnAttribute.Unicode;
+            attributes |= ColumnAttributes.Unicode;
 
         if (values[6].Equals("NO"))
-            attributes |= ColumnAttribute.Required;
+            attributes |= ColumnAttributes.Required;
 
         if (values[7].Equals("YES"))
         {
-            attributes |= ColumnAttribute.Identity;
+            attributes |= ColumnAttributes.Identity;
             metadata["ident_seed"] = Convert.ToString(values[8]);
             metadata["ident_incr"] = Convert.ToString(values[9]);
         }
         else if (values[0].Equals("serial"))
         {
-            attributes |= ColumnAttribute.Identity;
+            attributes |= ColumnAttributes.Identity;
             metadata["ident_seed"] = metadata["ident_incr"] = 1L;
         }
 
         if (values[10].Equals("YES"))
         {
-            attributes |= ColumnAttribute.Computed;
+            attributes |= ColumnAttributes.Computed;
             metadata["expression"] = Convert.ToString(values[11]);
         }
 

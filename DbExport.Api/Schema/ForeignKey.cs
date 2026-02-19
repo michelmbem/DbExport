@@ -15,7 +15,7 @@ public class ForeignKey : Key
         DeleteRule = deleteRule;
 
         foreach (var column in Columns)
-            column.SetAttribute(ColumnAttribute.FKColumn);
+            column.SetAttribute(ColumnAttributes.FKColumn);
     }
 
     public string RelatedTableName { get; }

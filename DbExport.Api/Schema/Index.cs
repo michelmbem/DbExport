@@ -12,7 +12,7 @@ public class Index : Key
         IsPrimaryKey = primaryKey;
 
         foreach (var column in Columns)
-            column.SetAttribute(ColumnAttribute.IXColumn);
+            column.SetAttribute(ColumnAttributes.IXColumn);
     }
 
     public bool IsUnique { get; }
