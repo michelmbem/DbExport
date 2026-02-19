@@ -9,7 +9,7 @@
              x:DataType="vm:ServerConnectionViewModel">
 
     <Design.DataContext>
-        <vm:ServerConnectionViewModel />
+        <vm:ServerConnectionViewModel/>
     </Design.DataContext>
 
     <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto"
@@ -18,42 +18,42 @@
           ColumnSpacing="10">
         <Grid.Styles>
             <Style Selector="Label">
-                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
             <Style Selector="ComboBox">
-                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
             </Style>
             <Style Selector="Button > StackPanel">
-                <Setter Property="Orientation" Value="Horizontal" />
-                <Setter Property="Spacing" Value="5" />
+                <Setter Property="Orientation" Value="Horizontal"/>
+                <Setter Property="Spacing" Value="5"/>
             </Style>
         </Grid.Styles>
         <Label Grid.Row="0"
                Grid.Column="0"
                Content="Host :"
-               Target="HostTextBox" />
+               Target="HostTextBox"/>
         <TextBox Name="HostTextBox"
                  Grid.Row="0"
                  Grid.Column="1"
                  Grid.ColumnSpan="3"
-                 Text="{Binding Host}" />
+                 Text="{Binding Host}"/>
         <Label Grid.Row="1"
                Grid.Column="0"
                Content="Port :"
-               Target="PortTextBox" />
+               Target="PortTextBox"/>
         <TextBox Grid.Row="1"
                  Grid.Column="1"
                  Name="PortTextBox"
-                 Text="{Binding Port}" />
+                 Text="{Binding Port}"/>
         <CheckBox Grid.Row="1"
                   Grid.Column="3"
                   Content="Use trusted connection"
                   IsChecked="{Binding TrustedConnection}"
-                  IsEnabled="{Binding SupportsTrustedConnection}" />
+                  IsEnabled="{Binding SupportsTrustedConnection}"/>
         <Label Grid.Row="2"
                Grid.Column="0"
                Content="Username :"
-               Target="UsernameTextBox" />
+               Target="UsernameTextBox"/>
         <TextBox Name="UsernameTextBox"
                  Grid.Row="2"
                  Grid.Column="1"
@@ -66,7 +66,7 @@
         <Label Grid.Row="2"
                Grid.Column="2"
                Content="Password :"
-               Target="PasswordTextBox" />
+               Target="PasswordTextBox"/>
         <TextBox Name="PasswordTextBox"
                  Grid.Row="2"
                  Grid.Column="3"
@@ -80,25 +80,25 @@
         <Label Grid.Row="3"
                Grid.Column="0"
                Content="Database :"
-               Target="DatabaseComboBox" />
+               Target="DatabaseComboBox"/>
         <ComboBox Name="DatabaseComboBox"
                   Grid.Row="3"
                   Grid.Column="1"
                   IsEditable="True"
                   ItemsSource="{Binding AllCatalogs}"
                   Text="{Binding Catalog}"
-                  DropDownOpened="OnDatabaseComboBoxDropDownOpened" />
+                  DropDownOpened="OnDatabaseComboBoxDropDownOpened"/>
         <Label Grid.Row="3"
                Grid.Column="2"
                Content="Schema :"
-               Target="SchemaComboBox" />
+               Target="SchemaComboBox"/>
         <ComboBox Name="SchemaComboBox"
                   Grid.Row="3"
                   Grid.Column="3"
                   IsEditable="True"
                   ItemsSource="{Binding AvailableSchemas}"
                   Text="{Binding Schema}"
-                  DropDownOpened="OnSchemaComboBoxDropDownOpened" />
+                  DropDownOpened="OnSchemaComboBoxDropDownOpened"/>
         <Button Grid.Row="4"
                 Grid.Column="0"
                 Grid.ColumnSpan="4"
@@ -107,6 +107,6 @@
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center"
                 Padding="15, 5"
-                Command="{Binding TestConnectionCommand}" />
+                Command="{Binding TestConnectionCommand}"/>
     </Grid>
 </UserControl>
