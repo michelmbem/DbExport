@@ -101,6 +101,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnCurrentPageChanging(WizardPageViewModel? oldValue, WizardPageViewModel? newValue)
     {
+        oldValue?.PropertyChanged -= OnCurrentPageIsBusyChanged;
+        newValue!.PropertyChanged += OnCurrentPageIsBusyChanged;
+        
         if (oldValue == wizardPage3 && newValue == wizardPage4)
         {
             wizardPage4.ProviderName = wizardPage3.SelectedProvider.Name;
@@ -137,12 +140,9 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    partial void OnCurrentPageChanged(WizardPageViewModel? oldValue, WizardPageViewModel? newValue)
+    partial void OnCurrentPageChanged(WizardPageViewModel? value)
     {
-        oldValue?.PropertyChanged -= OnCurrentPageIsBusyChanged;
-        newValue!.PropertyChanged += OnCurrentPageIsBusyChanged;
-        
-        var currentIndex = Array.IndexOf(wizardPages, newValue);
+        var currentIndex = Array.IndexOf(wizardPages, value);
         Sidebar.SelectedIndex = currentIndex;
     }
 
