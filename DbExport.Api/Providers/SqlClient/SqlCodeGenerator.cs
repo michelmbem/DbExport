@@ -28,7 +28,7 @@ public class SqlCodeGenerator : CodeGenerator
 
     protected override bool SupportsDbCreation => !IsLocalDb;
 
-    protected override bool SupportsRowVersion => true;
+    protected override bool GeneratesRowVersion => true;
 
     #endregion
 

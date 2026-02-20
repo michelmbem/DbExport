@@ -25,7 +25,7 @@ public class MySqlCodeGenerator : CodeGenerator
 
     public override string ProviderName => ProviderNames.MYSQL;
 
-    protected override bool SupportsRowVersion => true;
+    protected override bool GeneratesRowVersion => true;
 
     #endregion
 

@@ -56,7 +56,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     protected virtual bool SupportsDbCreation => true;
 
-    protected virtual bool SupportsRowVersion => false;
+    protected virtual bool GeneratesRowVersion => false;
 
     protected virtual bool RequireInlineConstraints => false;
 
@@ -104,7 +104,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
             
             foreach (var table in database.Tables.Where(table => table.IsChecked))
             {
-                var (dr, con) = SqlHelper.OpenTable(table, visitIdent, SupportsRowVersion);
+                var (dr, con) = SqlHelper.OpenTable(table, visitIdent, GeneratesRowVersion);
                 var rowsInserted = false;
 
                 using (con)
@@ -364,10 +364,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     protected virtual void WriteInsertDirective(Table table, DbDataReader dr)
     {
         var skipIdentity = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
-        var insertableColumns = table.Columns.Where(
-            column => (!skipIdentity || !column.IsIdentity) &&
-                      (!SupportsRowVersion || column.ColumnType != ColumnType.RowVersion)
-                      ).ToImmutableList();
+        var insertableColumns = table.Columns.Where(IsSelected).ToImmutableList();
         
         Write("INSERT INTO {0} (", Escape(table.Name));
 
@@ -391,6 +388,10 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
         Write(")");
         WriteDelimiter();
+
+        bool IsSelected(Column c) =>
+            !((skipIdentity && c.IsIdentity) ||
+            (GeneratesRowVersion && c.ColumnType == ColumnType.RowVersion));
     }
 
     #endregion
