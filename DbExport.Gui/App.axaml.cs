@@ -10,7 +10,7 @@ using DbExport.Gui.Views;
 
 namespace DbExport.Gui;
 
-public partial class App : Application
+public class App : Application
 {
     public override void Initialize()
     {
