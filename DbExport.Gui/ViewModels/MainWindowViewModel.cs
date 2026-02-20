@@ -85,12 +85,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private bool CanNavigateToNextPage() => CurrentPage is { CanMoveForward: true };
 
-    private void LoadDatabaseSchema()
+    private void LoadDatabaseSchema(ref bool canceled)
     {
         try
         {
             var provider = SchemaProvider.GetProvider(wizardPage2.SelectedProvider.Name, wizardPage2.ConnectionString);
-            wizardPage5.Database = SchemaProvider.GetDatabase(provider, wizardPage2.Connection.SelectedSchema);
+            var database = SchemaProvider.GetDatabase(provider, wizardPage2.Connection.SelectedSchema);
+            if (!canceled) wizardPage5.Database = database;
         }
         catch (Exception e)
         {
@@ -114,13 +115,16 @@ public partial class MainWindowViewModel : ViewModelBase
             wizardPage5.StatusMessage = null;
             wizardPage5.IsBusy = true;
 
-            Task.Run(LoadDatabaseSchema)
+            bool canceled = false;
+
+            Task.Run(() => LoadDatabaseSchema(ref canceled))
                 .WaitAsync(TimeSpan.FromMinutes(15)) // Hard coded timeout of 15 minutes, which should be more than enough for metadata extraction.
                 .GetAwaiter()
                 .OnCompleted(() =>
                 {
                     wizardPage5.IsBusy = false;
                     if (wizardPage5.Database is not null) return;
+                    canceled = true;
                     wizardPage5.StatusMessage ??= "The operation has timed out. You can reduce the metadata extraction " +
                                                   "time by selecting a schema on the source database connection page.";
                 });
