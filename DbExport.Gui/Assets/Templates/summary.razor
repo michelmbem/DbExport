@@ -12,23 +12,23 @@
         return column.IsPKColumn ? $"{column.Name} \u26BF" : column.Name;
     }
     
-    string FullTypeName(Column column)
+    string FullTypeName(dynamic item)
     {
-        switch (column.ColumnType)
+        switch (item.ColumnType)
         {
             case ColumnType.Char:
             case ColumnType.NChar:
             case ColumnType.VarChar:
             case ColumnType.NVarChar:
-                return $"{column.NativeType}({column.Size})";
-            case ColumnType.Decimal when column.Precision == 0:
-                return $"{column.NativeType}";
-            case ColumnType.Decimal when column.Scale == 0:
-                return $"{column.NativeType}({column.Precision})";
+                return $"{item.NativeType}({item.Size})";
+            case ColumnType.Decimal when item.Precision == 0:
+                return $"{item.NativeType}";
+            case ColumnType.Decimal when item.Scale == 0:
+                return $"{item.NativeType}({item.Precision})";
             case ColumnType.Decimal:
-                return $"{column.NativeType}({column.Precision}, {column.Scale})";
+                return $"{item.NativeType}({item.Precision}, {item.Scale})";
             default:
-                return column.NativeType;
+                return item.NativeType;
         }
     }
 }
@@ -67,9 +67,27 @@
 
 ## Exported items
 
+@if (Model.Database.DataTypes.Count > 0 && Model.Database.DataTypes.Any(t => t.IsChecked))
+{
+    @("### Data types" + Environment.NewLine + Environment.NewLine)
+
+    @("| Type name | Base type | Nullable | Enumerated | Default value |" + Environment.NewLine)
+    @("|-----------|-----------|----------|------------|---------------|" + Environment.NewLine)
+    
+    @foreach (var dataType in Model.Database.DataTypes.Where(t => t.IsChecked))
+    {
+        @("| " + dataType.FullName + " | " + FullTypeName(dataType) + " | " + Bool2Str(dataType.IsNullable) +
+        " | " + Bool2Str(dataType.IsEnumerated) + " | " + dataType.DefaultValue + " |" + Environment.NewLine)
+    }
+    
+    @(Environment.NewLine)
+}
+
+### Tables
+
 @foreach (var table in Model.Database.Tables.Where(t => t.IsChecked))
 {
-    @("### " + table.FullName + Environment.NewLine + Environment.NewLine)
+    @("#### " + table.FullName + Environment.NewLine + Environment.NewLine)
 
     @("| Column | Type | Nullable | Default |" + Environment.NewLine)
     @("|--------|------|----------|---------|" + Environment.NewLine)

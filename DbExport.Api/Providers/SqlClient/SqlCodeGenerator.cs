@@ -59,17 +59,16 @@ public class SqlCodeGenerator : CodeGenerator
             ColumnType.Decimal => $"decimal({column.Precision}, {column.Scale})",
             ColumnType.SinglePrecision => "real",
             ColumnType.DoublePrecision or ColumnType.Interval => "float",
-            ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "datetime",
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar =>
                 $"{column.ColumnType.ToString().ToLower()}({column.Size})",
-            ColumnType.Text or ColumnType.NText => column.ColumnType.ToString().ToLower(),
+            ColumnType.DateTime or ColumnType.Date or ColumnType.Time or ColumnType.Text or
+                ColumnType.NText or ColumnType.Xml or ColumnType.Geometry =>
+                column.ColumnType.ToString().ToLower(),
             ColumnType.Bit => $"binary ({(column.Size + 7) / 8})",
             ColumnType.Blob => "image",
             ColumnType.Guid => "uniqueidentifier",
             ColumnType.RowVersion => "timestamp",
-            ColumnType.Xml => "xml",
             ColumnType.Json => "nvarchar(max)",
-            ColumnType.Geometry => "geometry",
             _ => column.NativeType
         };
 

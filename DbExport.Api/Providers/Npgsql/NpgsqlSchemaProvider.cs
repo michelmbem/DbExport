@@ -161,7 +161,8 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                            	    IDENTITY_START,
                            	    IDENTITY_INCREMENT,
                            	    IS_GENERATED,
-                           	    GENERATION_EXPRESSION
+                           	    GENERATION_EXPRESSION,
+                           	    UDT_NAME
                            FROM
                            	    INFORMATION_SCHEMA.COLUMNS
                            WHERE
@@ -177,17 +178,27 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        ColumnType columnType;
-        var attributes = ColumnAttributes.None;
         var values = helper.Query(string.Format(sql, tableName, tableOwner, columnName), SqlHelper.ToArray);
-                
-        metadata["type"] = columnType = GetColumnType(values[0].ToString());
-        metadata["nativeType"] = values[0].ToString();
+        var nativeType = values[0].ToString()!;
+
+        if ("USER-DEFINED".Equals(nativeType, StringComparison.OrdinalIgnoreCase))
+        {
+            metadata["type"] = ColumnType.UserDefined;
+            metadata["nativeType"] = values[12].ToString();
+        }
+        else
+        {
+            metadata["type"] = GetColumnType(nativeType);
+            metadata["nativeType"] = nativeType;
+        }
+
         metadata["size"] = Utility.ToInt16(values[1]);
         metadata["precision"] = Utility.ToByte(values[2]);
         metadata["scale"] = Utility.ToByte(values[3]);
-        metadata["defaultValue"] = Parse(Convert.ToString(values[4]), columnType);
+        metadata["defaultValue"] = Parse(Convert.ToString(values[4]), (ColumnType)metadata["type"]);
 
+        var attributes = ColumnAttributes.None;
+        
         if (Utf8Regex().IsMatch(Convert.ToString(values[5])!))
             attributes |= ColumnAttributes.Unicode;
 
@@ -328,9 +339,21 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
     public (string, string)[] GetTypeNames()
     {
         const string sql = """
-                           SELECT DOMAIN_SCHEMA, DOMAIN_NAME
-                           FROM INFORMATION_SCHEMA.DOMAINS
-                           WHERE DOMAIN_SCHEMA NOT IN ('pg_catalog', 'information_schema')
+                           SELECT *
+                           FROM (
+                           	(
+                           		SELECT DOMAIN_SCHEMA, DOMAIN_NAME
+                           		FROM INFORMATION_SCHEMA.DOMAINS
+                           		WHERE DOMAIN_SCHEMA NOT IN ('pg_catalog', 'information_schema')
+                           	) UNION (
+                           		SELECT
+                           		    n.nspname AS DOMAIN_SCHEMA,
+                           		    t.typname AS DOMAIN_NAME
+                           		FROM pg_type t
+                           		    JOIN pg_namespace n ON n.oid = t.typnamespace
+                           		WHERE t.typtype = 'e'
+                           	)
+                           )
                            ORDER BY DOMAIN_SCHEMA, DOMAIN_NAME
                            """;
 
@@ -347,25 +370,58 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                            WHERE DOMAIN_SCHEMA = '{1}' AND DOMAIN_NAME = '{0}'
                            """;
 
+        const string sqlEnum = """
+                               SELECT t.typlen, t.typnotnull, t.typdefault
+                               FROM pg_type t
+                               JOIN pg_namespace n ON n.oid = t.typnamespace
+                               WHERE n.nspname = '{1}' AND t.typname = '{0}'
+                               """;
+
+        const string sqlEnumMembers = """
+                                      SELECT e.enumlabel
+                                      FROM pg_type t
+                                      JOIN pg_enum e ON t.oid = e.enumtypid
+                                      JOIN pg_namespace n ON n.oid = t.typnamespace
+                                      WHERE t.typname = '{0}' AND n.nspname = '{1}'
+                                      ORDER BY e.enumsortorder
+                                      """;
+
         Dictionary<string, object> metadata = new()
         {
             ["name"] = typeName,
             ["owner"] = typeOwner,
-            ["nullable"] = false,
-            ["enumerated"] = false,
-            ["possibleValues"] = Array.Empty<object>()
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        ColumnType columnType;
         var values = helper.Query(string.Format(sql, typeName, typeOwner), SqlHelper.ToDictionary);
-                
-        metadata["type"] = columnType = GetColumnType(values["data_type"].ToString());
-        metadata["nativeType"] = values["data_type"].ToString();
-        metadata["size"] = Utility.ToInt16(values["character_maximum_length"]);
-        metadata["precision"] = Utility.ToByte(values["numeric_precision"]);
-        metadata["scale"] = Utility.ToByte(values["numeric_scale"]);
-        metadata["defaultValue"] = Parse(Convert.ToString(values["domain_default"]), columnType);
+
+        if (values != null)
+        {
+            string nativeType;
+            ColumnType columnType;
+
+            metadata["size"] = Utility.ToInt16(values["character_maximum_length"]);
+            metadata["precision"] = Utility.ToByte(values["numeric_precision"]);
+            metadata["scale"] = Utility.ToByte(values["numeric_scale"]);
+            metadata["nativeType"] = nativeType= values["data_type"].ToString();
+            metadata["type"] = columnType = GetColumnType(nativeType);
+            metadata["defaultValue"] = Parse(Convert.ToString(values["domain_default"]), columnType);
+            metadata["nullable"] = false;
+            metadata["enumerated"] = false;
+            metadata["possibleValues"] = Array.Empty<object>();
+        }
+        else
+        {
+            values = helper.Query(string.Format(sqlEnum, typeName, typeOwner), SqlHelper.ToDictionary);
+            metadata["size"] = Utility.ToInt16(values["typlen"]);
+            metadata["precision"] =  metadata["scale"] = (byte)0;
+            metadata["nativeType"] = "character varying";
+            metadata["type"] = ColumnType.VarChar;
+            metadata["defaultValue"] = Parse(Convert.ToString(values["typdefault"]), ColumnType.VarChar);
+            metadata["nullable"] = !(bool)values["typnotnull"];
+            metadata["enumerated"] = true;
+            metadata["possibleValues"] = helper.Query(string.Format(sqlEnumMembers, typeName, typeOwner), SqlHelper.ToList);
+        }
 
         return metadata;
     }
@@ -398,7 +454,6 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
             "xml" => ColumnType.Xml,
             "json" or "jsonb" => ColumnType.Json,
             "geometry" or "geography" => ColumnType.Geometry,
-            "user-defined" => ColumnType.UserDefined,
             _ when npgsqlType.StartsWith("timestamp") => ColumnType.DateTime,
             _ => ColumnType.Unknown
         };
@@ -427,7 +482,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                 ? Convert.ToDecimal(value, ci)
                 : DBNull.Value,
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => Utility.IsDate(value)
-                ? Convert.ToDateTime(value, ci)
+                ? DateTime.Parse(value.ToString(ci), ci)
                 : DBNull.Value,
             ColumnType.Char or ColumnType.VarChar or ColumnType.Text => value,
             ColumnType.Bit => Utility.FromBitString(value),

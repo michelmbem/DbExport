@@ -7,7 +7,7 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.MySqlClient;
 
-public class MySqlSchemaProvider : ISchemaProvider
+public partial class MySqlSchemaProvider : ISchemaProvider
 {
     public MySqlSchemaProvider(string connectionString)
     {
@@ -178,21 +178,33 @@ public class MySqlSchemaProvider : ISchemaProvider
         };
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var attributes = ColumnAttributes.None;
         var values = helper.Query(string.Format(sql, DatabaseName, tableName, columnName), SqlHelper.ToArray);
+        var nativeType = values[0].ToString()!;
 
-        metadata["type"] = GetColumnType(values[0].ToString());
-        metadata["nativeType"] = values[0].ToString();
+        if (nativeType.StartsWith("enum(", StringComparison.OrdinalIgnoreCase) ||
+            nativeType.StartsWith("set(", StringComparison.OrdinalIgnoreCase))
+        {
+            metadata["type"] = ColumnType.UserDefined;
+            metadata["nativeType"] = $"{tableName}_{columnName}";
+        }
+        else
+        {
+            metadata["type"] = GetColumnType(nativeType);
+            metadata["nativeType"] = nativeType;
+        }
+
         metadata["size"] = Utility.ToInt16(values[1]);
         metadata["precision"] = Utility.ToByte(values[2]);
         metadata["scale"] = Utility.ToByte(values[3]);
         metadata["defaultValue"] = Parse(Convert.ToString(values[4]), (ColumnType)metadata["type"]);
         metadata["description"] = Convert.ToString(values[5]);
 
+        var attributes = ColumnAttributes.None;
+        
         if (values[6].Equals("NO"))
             attributes |= ColumnAttributes.Required;
 
-        if (Regex.IsMatch(Convert.ToString(values[7]), "utf8", RegexOptions.IgnoreCase))
+        if (Utf8Regex().IsMatch(Convert.ToString(values[7])!))
             attributes |= ColumnAttributes.Unicode;
 
         if (values[8].Equals("auto_increment"))
@@ -306,6 +318,62 @@ public class MySqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    public (string, string)[] GetTypeNames()
+    {
+        const string sql = """
+                           SELECT
+                               CONCAT(C.TABLE_NAME, '_', C.COLUMN_NAME) AS DOMAIN_NAME
+                           FROM
+                               INFORMATION_SCHEMA.COLUMNS C
+                           JOIN INFORMATION_SCHEMA.TABLES T ON
+                               C.TABLE_SCHEMA = T.TABLE_SCHEMA
+                                   AND C.TABLE_NAME = T.TABLE_NAME
+                                   AND T.TABLE_TYPE = 'BASE TABLE'
+                           WHERE
+                               C.DATA_TYPE IN('enum', 'set') AND C.TABLE_SCHEMA = '{0}'
+                           ORDER BY
+                               DOMAIN_NAME
+                           """;
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(string.Format(sql, DatabaseName), SqlHelper.ToList);
+        return [..list.Select(item => (item.ToString(), string.Empty))];
+    }
+
+    public Dictionary<string, object> GetTypeMeta(string typeName, string typeOwner)
+    {
+        const string sql = """
+                           SELECT *
+                           FROM INFORMATION_SCHEMA.COLUMNS
+                           WHERE TABLE_SCHEMA = '{1}' AND CONCAT(TABLE_NAME, '_', COLUMN_NAME) = '{0}'
+                           """;
+
+        Dictionary<string, object> metadata = new()
+        {
+            ["name"] = typeName,
+            ["owner"] = typeOwner
+        };
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var values = helper.Query(string.Format(sql, typeName, DatabaseName), SqlHelper.ToDictionary);
+        var nativeType = values["COLUMN_TYPE"].ToString();
+        var isEnum = nativeType!.StartsWith("enum(", StringComparison.OrdinalIgnoreCase);
+                
+        metadata["type"] = ColumnType.UserDefined;
+        metadata["nativeType"] = "varchar";
+        metadata["size"] = Utility.ToInt16(values["character_maximum_length"]);
+        metadata["precision"] = Utility.ToByte(values["numeric_precision"]);
+        metadata["scale"] = Utility.ToByte(values["numeric_scale"]);
+        metadata["defaultValue"] = Parse(Convert.ToString(values["column_default"]), ColumnType.VarChar);
+        metadata["nullable"] = "YES".Equals(values["is_nullable"].ToString(), StringComparison.OrdinalIgnoreCase);
+        metadata["enumerated"] = isEnum;
+        metadata["possibleValues"] = isEnum
+            ? nativeType[5..^1].Split(',').Select(s => Parse(s, ColumnType.VarChar)).ToArray()
+            : nativeType[4..^1].Split(',').Select(s => Parse(s, ColumnType.VarChar)).ToArray();
+
+        return metadata;
+    }
+
     #endregion
 
     #region Utility
@@ -329,7 +397,7 @@ public class MySqlSchemaProvider : ISchemaProvider
             "time" => ColumnType.Time,
             "datetime" or "timestamp" => ColumnType.DateTime,
             "char" => ColumnType.Char,
-            "varchar" or "enum" or "set" => ColumnType.VarChar,
+            "varchar" => ColumnType.VarChar,
             "text" or "tinytext" or "mediumtext" or "longtext" => ColumnType.Text,
             "bit" => ColumnType.Bit,
             "blob" or "tinyblob" or "mediumblob" or "longblob" => ColumnType.Blob,
@@ -367,7 +435,7 @@ public class MySqlSchemaProvider : ISchemaProvider
                 ? Convert.ToDecimal(value, ci)
                 : DBNull.Value,
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => Utility.IsDate(value)
-                ? Convert.ToDateTime(value, ci)
+                ? DateTime.Parse(value.ToString(ci), ci)
                 : DBNull.Value,
             ColumnType.Char or ColumnType.VarChar or ColumnType.Text => Utility.UnquotedStr(value),
             ColumnType.Bit => Utility.FromBitString(value),
@@ -384,6 +452,9 @@ public class MySqlSchemaProvider : ISchemaProvider
             "SET NULL" => ForeignKeyRule.SetNull,
             _ => ForeignKeyRule.None
         };
+    
+    [GeneratedRegex("utf8", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+    private static partial Regex Utf8Regex();
 
     #endregion
 }

@@ -298,7 +298,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
                 ColumnType.Guid or ColumnType.Geometry:
                 return Utility.QuotedStr(value);
             case ColumnType.Date or ColumnType.Time or ColumnType.DateTime:
-                return $"'{((DateTime)value):yyyy-MM-dd HH:mm:ss}'";
+                return $"'{(Convert.ToString(value, CultureInfo.InvariantCulture))}'";
             case ColumnType.Bit:
                 return $"B'{Utility.ToBitString((byte[])value)}'";
             case ColumnType.Blob:

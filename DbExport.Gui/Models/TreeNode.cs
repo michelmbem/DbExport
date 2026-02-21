@@ -7,12 +7,14 @@ namespace DbExport.Gui.Models;
 
 public enum TreeNodeType
 {
+    Schema,
     Group,
     Table,
     Column,
     PrimaryKey,
     ForeignKey,
     Index,
+    DataType
 }
 
 public partial class TreeNode : ObservableObject
@@ -67,6 +69,12 @@ public partial class TreeNode : ObservableObject
     {
         checkable = fk;
     }
+
+    public TreeNode(TreeNode? parent, DataType dataType) :
+        this(parent, dataType.Name, TreeNodeType.DataType)
+    {
+        checkable = dataType;
+    }
     
     public TreeNode? Parent { get; }
     
@@ -76,12 +84,14 @@ public partial class TreeNode : ObservableObject
 
     public string Icon => Type switch
     {
+        TreeNodeType.Schema => "fa-database",
         TreeNodeType.Group => "fa-folder",
         TreeNodeType.Table => "fa-table",
         TreeNodeType.Column => "fa-table-columns",
         TreeNodeType.PrimaryKey => "fa-key",
         TreeNodeType.ForeignKey => "fa-link",
         TreeNodeType.Index => "fa-sort",
+        TreeNodeType.DataType => "fa-shapes",
         _ => string.Empty
     };
     
@@ -93,11 +103,20 @@ public partial class TreeNode : ObservableObject
 
         foreach (var schema in schemas)
         {
-            var schemaName = string.IsNullOrEmpty(schema.Key) ? "Tables" : schema.Key;
-            var schemaNode = new TreeNode(null, schemaName, TreeNodeType.Group);
-            schemaNode.Children.AddRange(schema.Select(t => new TreeNode(schemaNode, t)));
+            var schemaName = string.IsNullOrEmpty(schema.Key) ? "Default schema" : schema.Key;
+            var schemaNode = new TreeNode(null, schemaName, TreeNodeType.Schema);
+            
+            var tablesNode = new TreeNode(schemaNode, "Tables", TreeNodeType.Group);
+            tablesNode.Children.AddRange(schema.Select(t => new TreeNode(tablesNode, t)));
+            schemaNode.Children.Add(tablesNode);
+            
+            var dataTypesNode = new TreeNode(schemaNode, "Data types", TreeNodeType.Group);
+            var schemaDataTypes = database.DataTypes.Where(t => t.Owner == schema.Key);
+            dataTypesNode.Children.AddRange(schemaDataTypes.Select(t => new TreeNode(dataTypesNode, t)));
+            schemaNode.Children.Add(dataTypesNode);
+            
             schemaNode.IsChecked = schemaNode.IsExpanded = true;
-
+            
             yield return schemaNode;
         }
     }

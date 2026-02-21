@@ -366,6 +366,8 @@ public partial class SqlSchemaProvider : ISchemaProvider
             "money" or "smallmoney" => ColumnType.Currency,
             "decimal" or "numeric" => ColumnType.Decimal,
             "datetime" or "smalldatetime" => ColumnType.DateTime,
+            "date" => ColumnType.Date,
+            "time" => ColumnType.Time,
             "char" => ColumnType.Char,
             "nchar" => ColumnType.NChar,
             "varchar" => ColumnType.VarChar,
@@ -377,7 +379,6 @@ public partial class SqlSchemaProvider : ISchemaProvider
             "rowversion" or "timestamp" => ColumnType.RowVersion,
             "xml" => ColumnType.Xml,
             "geometry" or "geography" => ColumnType.Geometry,
-            "udt" => ColumnType.UserDefined,
             _ => ColumnType.Unknown
         };
 
@@ -405,7 +406,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
             ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value)
                 ? Convert.ToDecimal(value, ci)
                 : DBNull.Value,
-            ColumnType.DateTime => Utility.IsDate(value) ? Convert.ToDateTime(value, ci) : DBNull.Value,
+            ColumnType.DateTime => Utility.IsDate(value) ? DateTime.Parse(value.ToString(ci), ci) : DBNull.Value,
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or ColumnType.Text
                 or ColumnType.NText => value,
             _ => DBNull.Value
