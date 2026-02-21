@@ -350,8 +350,8 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
             "bytea" => ColumnType.Blob,
             "uuid" => ColumnType.Guid,
             "xml" => ColumnType.Xml,
-            "geometry" => ColumnType.Geometry,
-            "geography" => ColumnType.Geography,
+            "json" or "jsonb" => ColumnType.Json,
+            "geometry" or "geography" => ColumnType.Geometry,
             "user-defined" => ColumnType.UserDefined,
             _ when npgsqlType.StartsWith("timestamp") => ColumnType.DateTime,
             _ => ColumnType.Unknown

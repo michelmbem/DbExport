@@ -96,11 +96,10 @@ public class SQLiteCodeGenerator : CodeGenerator
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "datetime",
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar =>
                 $"{column.ColumnType.ToString().ToLower()}({column.Size})",
-            ColumnType.Text or ColumnType.NText => column.ColumnType.ToString().ToLower(),
+            ColumnType.Text or ColumnType.NText or ColumnType.Guid => column.ColumnType.ToString().ToLower(),
+            ColumnType.Xml or ColumnType.Json => "ntext",
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "image",
-            ColumnType.Guid => "guid",
-            ColumnType.Geometry or ColumnType.Geography => "geometry",
-            ColumnType.HierarchyId => "text",
+            ColumnType.Geometry => "geometry",
             _ => column.NativeType
         };
 

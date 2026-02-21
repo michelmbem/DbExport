@@ -294,18 +294,17 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         switch (columnType)
         {
             case ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or
-                ColumnType.Text or ColumnType.NText or ColumnType.Guid or ColumnType.Xml or
-                ColumnType.Geometry or ColumnType.Geography or ColumnType.HierarchyId:
+                ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Json or
+                ColumnType.Guid or ColumnType.Geometry:
                 return Utility.QuotedStr(value);
             case ColumnType.Date or ColumnType.Time or ColumnType.DateTime:
-                return "'" + ((DateTime) value).ToString("yyyy-MM-dd HH:mm:ss") + "'";
+                return $"'{((DateTime)value):yyyy-MM-dd HH:mm:ss}'";
             case ColumnType.Bit:
-                return "B'" + Utility.ToBitString((byte[]) value) + "'";
+                return $"B'{Utility.ToBitString((byte[])value)}'";
             case ColumnType.Blob:
             {
                 var bytes = (byte[])value;
-                if (bytes.Length <= 0) return "''";
-                return "0x" + Utility.BinToHex(bytes);
+                return bytes.Length <= 0 ? "''" : $"0x{Utility.BinToHex(bytes)}";
             }
             case ColumnType.Boolean:
             case var _ when Utility.IsBoolean(value):
@@ -390,9 +389,8 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         Write(")");
         WriteDelimiter();
 
-        bool IsSelected(Column c) =>
-            !((skipIdentity && c.IsIdentity) ||
-            (GeneratesRowVersion && c.ColumnType == ColumnType.RowVersion));
+        bool IsSelected(Column c) => !((skipIdentity && c.IsIdentity) ||
+                                       (GeneratesRowVersion && c.ColumnType == ColumnType.RowVersion));
     }
 
     #endregion

@@ -30,10 +30,9 @@ public enum ColumnType
     Blob,
     File,
     Xml,
+    Json,
+    Geometry,
     Guid,
     RowVersion,
-    Geometry,
-    Geography,
-    HierarchyId,
     UserDefined
 }

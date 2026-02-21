@@ -220,7 +220,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "datetime",
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar =>
                 0 < column.Size && column.Size <= 255 ? $"text({column.Size})" : "text",
-            ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.HierarchyId => "text",
+            ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Json or ColumnType.Geometry => "text",
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "oleobject",
             ColumnType.Guid => "uniqueidentifier",
             _ => column.NativeType,
@@ -237,7 +237,8 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
             case { } when Utility.IsBoolean(value):
                 return Convert.ToBoolean(value) ? "1" : "0";
             case ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or
-                 ColumnType.Text or ColumnType.NText or ColumnType.Guid or ColumnType.Xml:
+                 ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Json or
+                 ColumnType.Guid or ColumnType.Geometry:
                 return Utility.QuotedStr(value);
             case ColumnType.Date or ColumnType.Time or ColumnType.DateTime:
             case ColumnType.RowVersion when value is DateTime:

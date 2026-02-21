@@ -55,13 +55,14 @@ public class OracleCodeGenerator : CodeGenerator
             ColumnType.NChar => $"NCHAR({column.Size})",
             ColumnType.VarChar => $"VARCHAR2({column.Size})",
             ColumnType.NVarChar => $"NVARCHAR2({column.Size})",
-            ColumnType.Text or ColumnType.HierarchyId => "CLOB",
+            ColumnType.Text => "CLOB",
             ColumnType.NText => "NCLOB",
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "BLOB",
             ColumnType.File => "BFILE",
             ColumnType.Guid => "CHAR(36)",
             ColumnType.Xml => "XMLType",
-            ColumnType.Geometry or ColumnType.Geography => "SDO_GEOMETRY",
+            ColumnType.Json => "JSON",
+            ColumnType.Geometry => "SDO_GEOMETRY",
             _ => column.NativeType
         };
 

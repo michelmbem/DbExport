@@ -343,6 +343,7 @@ public class OracleSchemaProvider : ISchemaProvider
             "BLOB" or "RAW" or "LONG RAW" => ColumnType.Blob,
             "BFILE" => ColumnType.File,
             "XMLType" => ColumnType.Xml,
+            "JSON" => ColumnType.Json,
             "SDO_GEOMETRY" => ColumnType.Geometry,
             _ when oracleType.StartsWith("TIMESTAMP") => ColumnType.DateTime,
             _ => ColumnType.Unknown
