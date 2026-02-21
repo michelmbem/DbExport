@@ -34,6 +34,9 @@ public class Column(
     public long IdentityIncrement { get; private set; }
 
     public Table Table => (Table)Parent;
+    
+    public DataType DataType =>
+        Table.Database.DataTypes.TryGetValue(NativeType, out var dataType) ? dataType : null;
 
     public bool IsRequired => Attributes.HasFlag(ColumnAttributes.Required);
 

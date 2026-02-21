@@ -15,4 +15,6 @@ public interface IVisitor
     void VisitIndex(Index index);
 
     void VisitForeignKey(ForeignKey foreignKey);
+    
+    void VisitDataType(DataType dataType) { }
 }

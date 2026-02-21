@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DbExport.Schema;
@@ -324,6 +325,51 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    public (string, string)[] GetTypeNames()
+    {
+        const string sql = """
+                           SELECT DOMAIN_SCHEMA, DOMAIN_NAME
+                           FROM INFORMATION_SCHEMA.DOMAINS
+                           WHERE DOMAIN_SCHEMA NOT IN ('pg_catalog', 'information_schema')
+                           ORDER BY DOMAIN_SCHEMA, DOMAIN_NAME
+                           """;
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(sql, SqlHelper.ToArrayList);
+        return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
+    }
+
+    public Dictionary<string, object> GetTypeMeta(string typeName, string typeOwner)
+    {
+        const string sql = """
+                           SELECT *
+                           FROM INFORMATION_SCHEMA.DOMAINS
+                           WHERE DOMAIN_SCHEMA = '{1}' AND DOMAIN_NAME = '{0}'
+                           """;
+
+        Dictionary<string, object> metadata = new()
+        {
+            ["name"] = typeName,
+            ["owner"] = typeOwner,
+            ["nullable"] = false,
+            ["enumerated"] = false,
+            ["possibleValues"] = Array.Empty<object>()
+        };
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        ColumnType columnType;
+        var values = helper.Query(string.Format(sql, typeName, typeOwner), SqlHelper.ToDictionary);
+                
+        metadata["type"] = columnType = GetColumnType(values["data_type"].ToString());
+        metadata["nativeType"] = values["data_type"].ToString();
+        metadata["size"] = Utility.ToInt16(values["character_maximum_length"]);
+        metadata["precision"] = Utility.ToByte(values["numeric_precision"]);
+        metadata["scale"] = Utility.ToByte(values["numeric_scale"]);
+        metadata["defaultValue"] = Parse(Convert.ToString(values["domain_default"]), columnType);
+
+        return metadata;
+    }
+
     #endregion
 
     #region Utility
@@ -361,6 +407,8 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
     {
         if (Utility.IsEmpty(value) || value.ToUpper() == "NULL")
             return DBNull.Value;
+        
+        var ci = CultureInfo.InvariantCulture;
 
         return columnType switch
         {
@@ -370,16 +418,16 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                 "1" or "y" or "yes" or "t" or "true" => true,
                 _ => DBNull.Value
             },
-            ColumnType.SmallInt => Utility.IsNumeric(value) ? Convert.ToInt16(value) : DBNull.Value,
-            ColumnType.Integer => Utility.IsNumeric(value) ? Convert.ToInt32(value) : DBNull.Value,
-            ColumnType.BigInt => Utility.IsNumeric(value) ? Convert.ToInt64(value) : DBNull.Value,
-            ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value) : DBNull.Value,
-            ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value) : DBNull.Value,
+            ColumnType.SmallInt => Utility.IsNumeric(value) ? Convert.ToInt16(value, ci) : DBNull.Value,
+            ColumnType.Integer => Utility.IsNumeric(value) ? Convert.ToInt32(value, ci) : DBNull.Value,
+            ColumnType.BigInt => Utility.IsNumeric(value) ? Convert.ToInt64(value, ci) : DBNull.Value,
+            ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value, ci) : DBNull.Value,
+            ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value, ci) : DBNull.Value,
             ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value)
-                ? Convert.ToDecimal(value)
+                ? Convert.ToDecimal(value, ci)
                 : DBNull.Value,
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => Utility.IsDate(value)
-                ? Convert.ToDateTime(value)
+                ? Convert.ToDateTime(value, ci)
                 : DBNull.Value,
             ColumnType.Char or ColumnType.VarChar or ColumnType.Text => value,
             ColumnType.Bit => Utility.FromBitString(value),

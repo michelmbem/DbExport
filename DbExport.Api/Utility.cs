@@ -115,6 +115,9 @@ public static partial class Utility
 
     public static string QuotedStr(object value, char quote = '\'') =>
         $"{quote}{value.ToString()?.Replace(quote.ToString(), new string(quote, 2))}{quote}";
+    
+    public static string UnquotedStr(object value, char quote = '\'') =>
+        value.ToString()?[1..^1].Replace(new string(quote, 2), quote.ToString());
 
     public static string BinToHex(byte[] bytes)
     {

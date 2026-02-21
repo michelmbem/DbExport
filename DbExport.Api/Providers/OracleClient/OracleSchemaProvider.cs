@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using DbExport.Schema;
 
@@ -42,7 +43,7 @@ public class OracleSchemaProvider : ISchemaProvider
                                AND OWNER NOT IN (
                                     'SYS', 'SYSTEM', 'XDB', 'CTXSYS', 'MDSYS', 'ORDSYS', 'OLAPSYS',
                                     'WMSYS', 'LBACSYS', 'OUTLN', 'DBSNMP', 'APPQOSSYS', 'AUDSYS',
-                                    'DBSFWUSER'
+                                    'DBSFWUSER', 'GSMADMIN_INTERNAL'
                                )
                            ORDER BY
                                OWNER,
@@ -314,6 +315,62 @@ public class OracleSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    public (string, string)[] GetTypeNames()
+    {
+        const string sql = """
+                           SELECT
+                              OWNER,
+                              TYPE_NAME
+                           FROM
+                              ALL_TYPES
+                           WHERE
+                              OWNER NOT IN (
+                                   'SYS', 'SYSTEM', 'XDB', 'CTXSYS', 'MDSYS', 'ORDSYS', 'OLAPSYS',
+                                   'WMSYS', 'LBACSYS', 'OUTLN', 'DBSNMP', 'APPQOSSYS', 'AUDSYS',
+                                   'DBSFWUSER', 'GSMADMIN_INTERNAL'
+                              )
+                           ORDER BY
+                              OWNER,
+                              TYPE_NAME
+                           """;
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(sql, SqlHelper.ToArrayList);
+        return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
+    }
+
+    public Dictionary<string, object> GetTypeMeta(string typeName, string typeOwner)
+    {
+        const string sql = """
+                           SELECT *
+                           FROM ALL_TYPE_ATTRS
+                           WHERE OWNER = '{1}' AND TYPE_NAME = '{0}'
+                           """;
+
+        Dictionary<string, object> metadata = new()
+        {
+            ["name"] = typeName,
+            ["owner"] = typeOwner,
+            ["nullable"] = false,
+            ["enumerated"] = false,
+            ["defaultValue"] = null,
+            ["possibleValues"] = Array.Empty<object>()
+        };
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        string nativeType;
+        byte precision, scale;
+        var values = helper.Query(string.Format(sql, typeName, typeOwner), SqlHelper.ToDictionary);
+                
+        metadata["size"] = Utility.ToInt16(values["LENGTH"]);
+        metadata["precision"] = precision = Utility.ToByte(values["PRECISION"]);
+        metadata["scale"] = scale = Utility.ToByte(values["SCALE"]);
+        metadata["nativeType"] = nativeType = values["ATTR_TYPE_NAME"].ToString();
+        metadata["type"] = GetColumnType(nativeType, precision, scale);
+
+        return metadata;
+    }
+
     #endregion
 
     #region Utility
@@ -354,17 +411,19 @@ public class OracleSchemaProvider : ISchemaProvider
     {
         if (Utility.IsEmpty(value) || value.ToUpper() == "NULL")
             return DBNull.Value;
+        
+        var ci = CultureInfo.InvariantCulture;
 
         return columnType switch
         {
-            ColumnType.TinyInt => Utility.IsNumeric(value) ? Convert.ToSByte(value) : DBNull.Value,
-            ColumnType.SmallInt => Utility.IsNumeric(value) ? Convert.ToInt16(value) : DBNull.Value,
-            ColumnType.Integer => Utility.IsNumeric(value) ? Convert.ToInt32(value) : DBNull.Value,
-            ColumnType.BigInt => Utility.IsNumeric(value) ? Convert.ToInt64(value) : DBNull.Value,
-            ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value) : DBNull.Value,
-            ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value) : DBNull.Value,
-            ColumnType.Decimal => Utility.IsNumeric(value) ? Convert.ToDecimal(value) : DBNull.Value,
-            ColumnType.DateTime => Utility.IsDate(value) ? Convert.ToDateTime(value) : DBNull.Value,
+            ColumnType.TinyInt => Utility.IsNumeric(value) ? Convert.ToSByte(value, ci) : DBNull.Value,
+            ColumnType.SmallInt => Utility.IsNumeric(value) ? Convert.ToInt16(value, ci) : DBNull.Value,
+            ColumnType.Integer => Utility.IsNumeric(value) ? Convert.ToInt32(value, ci) : DBNull.Value,
+            ColumnType.BigInt => Utility.IsNumeric(value) ? Convert.ToInt64(value, ci) : DBNull.Value,
+            ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value, ci) : DBNull.Value,
+            ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value, ci) : DBNull.Value,
+            ColumnType.Decimal => Utility.IsNumeric(value) ? Convert.ToDecimal(value, ci) : DBNull.Value,
+            ColumnType.DateTime => Utility.IsDate(value) ? Convert.ToDateTime(value, ci) : DBNull.Value,
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or ColumnType.Text
                 or ColumnType.NText => value,
             _ => DBNull.Value

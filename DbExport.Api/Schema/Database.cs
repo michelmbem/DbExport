@@ -5,6 +5,8 @@ public class Database(string name, string providerName, string connectionString)
     public string ProviderName { get; } = providerName;
 
     public string ConnectionString { get; } = connectionString;
+    
+    public DataTypeCollection DataTypes { get; } = [];
 
     public TableCollection Tables { get; } = [];
 

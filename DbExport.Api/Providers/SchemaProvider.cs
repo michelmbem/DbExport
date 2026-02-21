@@ -37,18 +37,28 @@ public static class SchemaProvider
     public static Database GetDatabase(ISchemaProvider provider, string schema)
     {
         var database = new Database(provider.DatabaseName, provider.ProviderName, provider.ConnectionString);
-        var tablePairs = provider.GetTableNames();
-        var filteredTablePairs = string.IsNullOrWhiteSpace(schema)
-            ? tablePairs
-            : Array.FindAll(tablePairs, pair => schema.Equals(pair.Item2, StringComparison.OrdinalIgnoreCase));
+        var allPairs = provider.GetTableNames();
+        var filteredPairs = string.IsNullOrWhiteSpace(schema) ? allPairs : Array.FindAll(allPairs, IsInSchema);
 
-        foreach (var (tableName, tableOwner) in filteredTablePairs)
+        foreach (var (tableName, tableOwner) in filteredPairs)
         {
             var table = GetTable(provider, database, tableName, tableOwner);
             database.Tables.Add(table);
         }
 
+        allPairs = provider.GetTypeNames();
+        filteredPairs = string.IsNullOrWhiteSpace(schema) ? allPairs : Array.FindAll(allPairs, IsInSchema);
+
+        foreach (var (typeName, typeOwner) in filteredPairs)
+        {
+            var dataType = GetDataType(provider, database, typeName, typeOwner);
+            database.DataTypes.Add(dataType);
+        }
+
         return database;
+        
+        bool IsInSchema((string name, string owner) pair) =>
+            schema.Equals(pair.owner, StringComparison.OrdinalIgnoreCase);
     }
 
     public static Database GetDatabase(string providerName, string connectionString, string schema) =>
@@ -118,5 +128,17 @@ public static class SchemaProvider
                                 (ForeignKeyRule)metadata["deleteRule"]);
 
         return fk;
+    }
+
+    private static DataType GetDataType(ISchemaProvider provider, Database database, string typeName, string typeOwner)
+    {
+        var metadata = provider.GetTypeMeta(typeName, typeOwner);
+        var dataType = new DataType(database, typeName, typeOwner, (ColumnType)metadata["type"],
+                                    (string)metadata["nativeType"], (short)metadata["size"],
+                                    (byte)metadata["precision"], (byte)metadata["scale"],
+                                    (bool)metadata["nullable"], (bool)metadata["enumerated"],
+                                    metadata["defaultValue"], (IEnumerable<object>)metadata["possibleValues"]);
+        
+        return dataType;
     }
 }

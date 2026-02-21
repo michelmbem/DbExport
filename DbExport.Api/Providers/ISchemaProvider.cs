@@ -25,4 +25,8 @@ public interface ISchemaProvider
     Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName);
 
     Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName);
+
+    (string, string)[] GetTypeNames() => [];
+
+    Dictionary<string, object> GetTypeMeta(string typeName, string typeOwner) => [];
 }

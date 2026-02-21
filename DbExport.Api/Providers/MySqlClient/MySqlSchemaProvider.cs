@@ -342,6 +342,8 @@ public class MySqlSchemaProvider : ISchemaProvider
     {
         if (Utility.IsEmpty(value) || value.Equals("NULL", StringComparison.CurrentCultureIgnoreCase))
             return DBNull.Value;
+        
+        var ci = CultureInfo.InvariantCulture;
 
         return columnType switch
         {
@@ -351,23 +353,23 @@ public class MySqlSchemaProvider : ISchemaProvider
                 "1" or "true" => true,
                 _ => DBNull.Value
             },
-            ColumnType.TinyInt => Utility.IsNumeric(value) ? Convert.ToSByte(value) : DBNull.Value,
+            ColumnType.TinyInt => Utility.IsNumeric(value) ? Convert.ToSByte(value, ci) : DBNull.Value,
             ColumnType.UnsignedTinyInt => Utility.IsNumeric(value) ? Convert.ToByte(value) : DBNull.Value,
-            ColumnType.SmallInt => Utility.IsNumeric(value) ? Convert.ToInt16(value) : DBNull.Value,
-            ColumnType.UnsignedSmallInt => Utility.IsNumeric(value) ? Convert.ToUInt16(value) : DBNull.Value,
-            ColumnType.Integer => Utility.IsNumeric(value) ? Convert.ToInt32(value) : DBNull.Value,
-            ColumnType.UnsignedInt => Utility.IsNumeric(value) ? Convert.ToUInt32(value) : DBNull.Value,
-            ColumnType.BigInt => Utility.IsNumeric(value) ? Convert.ToInt64(value) : DBNull.Value,
-            ColumnType.UnsignedBigInt => Utility.IsNumeric(value) ? Convert.ToUInt64(value) : DBNull.Value,
-            ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value) : DBNull.Value,
-            ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value) : DBNull.Value,
+            ColumnType.SmallInt => Utility.IsNumeric(value) ? Convert.ToInt16(value, ci) : DBNull.Value,
+            ColumnType.UnsignedSmallInt => Utility.IsNumeric(value) ? Convert.ToUInt16(value, ci) : DBNull.Value,
+            ColumnType.Integer => Utility.IsNumeric(value) ? Convert.ToInt32(value, ci) : DBNull.Value,
+            ColumnType.UnsignedInt => Utility.IsNumeric(value) ? Convert.ToUInt32(value, ci) : DBNull.Value,
+            ColumnType.BigInt => Utility.IsNumeric(value) ? Convert.ToInt64(value, ci) : DBNull.Value,
+            ColumnType.UnsignedBigInt => Utility.IsNumeric(value) ? Convert.ToUInt64(value, ci) : DBNull.Value,
+            ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value, ci) : DBNull.Value,
+            ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value, ci) : DBNull.Value,
             ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value)
-                ? Convert.ToDecimal(value, CultureInfo.InvariantCulture)
+                ? Convert.ToDecimal(value, ci)
                 : DBNull.Value,
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => Utility.IsDate(value)
-                ? Convert.ToDateTime(value, CultureInfo.InvariantCulture)
+                ? Convert.ToDateTime(value, ci)
                 : DBNull.Value,
-            ColumnType.Char or ColumnType.VarChar or ColumnType.Text => value,
+            ColumnType.Char or ColumnType.VarChar or ColumnType.Text => Utility.UnquotedStr(value),
             ColumnType.Bit => Utility.FromBitString(value),
             _ => DBNull.Value
         };
