@@ -46,11 +46,7 @@ public partial class ConnectionViewModel : ViewModelBase
             Log.Warning(e, "Failed to test connection");
         }
         
-        await MessageBoxManager
-              .GetMessageBoxStandard("Connection Test",
-                                     message,
-                                     ButtonEnum.Ok,
-                                     icon)
-              .ShowAsync();
+        await MessageBoxManager.GetMessageBoxStandard("Connection Test", message, ButtonEnum.Ok, icon)
+                               .ShowAsync();
     }
 }

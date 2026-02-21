@@ -44,7 +44,6 @@ public partial class FileConnectionViewModel : ConnectionViewModel
 
         var parts = pattern.Split('|', splitOptions);
         var limit = parts.Length - 2;
-
         List<FilePickerFileType> fileTypes = [];
         
         for (var i = 0; i <= limit; i += 2)

@@ -57,10 +57,12 @@ public class NpgsqlCodeGenerator : CodeGenerator
             ColumnType.Interval => "interval",
             ColumnType.Char or ColumnType.NChar => $"char({column.Size})",
             ColumnType.VarChar or ColumnType.NVarChar => $"character varying({column.Size})",
-            ColumnType.Text or ColumnType.NText or ColumnType.Xml => "text",
+            ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.HierarchyId => "text",
             ColumnType.Bit => $"bit varying({column.Size})",
             ColumnType.Blob or ColumnType.RowVersion => "bytea",
             ColumnType.Guid => "uuid",
+            ColumnType.Geometry => "geometry",
+            ColumnType.Geography => "geography",
             _ => column.NativeType
         };
     }

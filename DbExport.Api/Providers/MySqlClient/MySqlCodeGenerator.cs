@@ -68,6 +68,8 @@ public class MySqlCodeGenerator : CodeGenerator
             ColumnType.Blob => "longblob",
             ColumnType.Guid => "char(36)",
             ColumnType.RowVersion => "tinyblob",
+            ColumnType.Geometry or ColumnType.Geography => "geometry",
+            ColumnType.HierarchyId => "text",
             _ => column.NativeType
         };
 

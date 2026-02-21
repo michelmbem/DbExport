@@ -220,7 +220,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "datetime",
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar =>
                 0 < column.Size && column.Size <= 255 ? $"text({column.Size})" : "text",
-            ColumnType.Text or ColumnType.NText or ColumnType.Xml => "text",
+            ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.HierarchyId => "text",
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "oleobject",
             ColumnType.Guid => "uniqueidentifier",
             _ => column.NativeType,

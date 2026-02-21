@@ -294,7 +294,8 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         switch (columnType)
         {
             case ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or
-                ColumnType.Text or ColumnType.NText or ColumnType.Guid or ColumnType.Xml:
+                ColumnType.Text or ColumnType.NText or ColumnType.Guid or ColumnType.Xml or
+                ColumnType.Geometry or ColumnType.Geography or ColumnType.HierarchyId:
                 return Utility.QuotedStr(value);
             case ColumnType.Date or ColumnType.Time or ColumnType.DateTime:
                 return "'" + ((DateTime) value).ToString("yyyy-MM-dd HH:mm:ss") + "'";

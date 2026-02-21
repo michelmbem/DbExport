@@ -68,6 +68,9 @@ public class SqlCodeGenerator : CodeGenerator
             ColumnType.Guid => "uniqueidentifier",
             ColumnType.RowVersion => "timestamp",
             ColumnType.Xml => "xml",
+            ColumnType.Geometry => "geometry",
+            ColumnType.Geography => "geography",
+            ColumnType.HierarchyId => "hierarchyid",
             _ => column.NativeType
         };
 

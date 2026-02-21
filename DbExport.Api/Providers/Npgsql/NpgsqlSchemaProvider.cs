@@ -328,8 +328,8 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
 
     #region Utility
 
-    private static ColumnType GetColumnType(string mysqlType) =>
-        mysqlType switch
+    private static ColumnType GetColumnType(string npgsqlType) =>
+        npgsqlType switch
         {
             "bool" or "boolean" => ColumnType.Boolean,
             "int2" or "smallint" => ColumnType.SmallInt,
@@ -350,7 +350,11 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
             "bytea" => ColumnType.Blob,
             "uuid" => ColumnType.Guid,
             "xml" => ColumnType.Xml,
-            _ => mysqlType.StartsWith("timestamp") ? ColumnType.DateTime : ColumnType.Unknown
+            "geometry" => ColumnType.Geometry,
+            "geography" => ColumnType.Geography,
+            "user-defined" => ColumnType.UserDefined,
+            _ when npgsqlType.StartsWith("timestamp") => ColumnType.DateTime,
+            _ => ColumnType.Unknown
         };
 
     private static object Parse(string value, ColumnType columnType)

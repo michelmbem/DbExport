@@ -330,6 +330,10 @@ public partial class SqlSchemaProvider : ISchemaProvider
             "uniqueidentifier" => ColumnType.Guid,
             "rowversion" or "timestamp" => ColumnType.RowVersion,
             "xml" => ColumnType.Xml,
+            "geometry" => ColumnType.Geometry,
+            "geography" => ColumnType.Geography,
+            "hierarchyid" => ColumnType.HierarchyId,
+            "udt" => ColumnType.UserDefined,
             _ => ColumnType.Unknown
         };
 

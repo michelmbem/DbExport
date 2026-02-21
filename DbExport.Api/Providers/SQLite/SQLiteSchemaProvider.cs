@@ -195,6 +195,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
             "ntext" => ColumnType.NText,
             "blob" or "image" => ColumnType.Blob,
             "guid" => ColumnType.Guid,
+            "geometry" => ColumnType.Geometry,
             _ => ColumnType.Unknown
         };
 

@@ -31,5 +31,9 @@ public enum ColumnType
     File,
     Xml,
     Guid,
-    RowVersion
+    RowVersion,
+    Geometry,
+    Geography,
+    HierarchyId,
+    UserDefined
 }

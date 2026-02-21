@@ -333,6 +333,7 @@ public class MySqlSchemaProvider : ISchemaProvider
             "text" or "tinytext" or "mediumtext" or "longtext" => ColumnType.Text,
             "bit" => ColumnType.Bit,
             "blob" or "tinyblob" or "mediumblob" or "longblob" => ColumnType.Blob,
+            "geometry" => ColumnType.Geometry,
             _ => ColumnType.Unknown
         };
 

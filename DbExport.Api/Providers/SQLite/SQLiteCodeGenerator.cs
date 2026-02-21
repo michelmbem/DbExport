@@ -99,6 +99,8 @@ public class SQLiteCodeGenerator : CodeGenerator
             ColumnType.Text or ColumnType.NText => column.ColumnType.ToString().ToLower(),
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "image",
             ColumnType.Guid => "guid",
+            ColumnType.Geometry or ColumnType.Geography => "geometry",
+            ColumnType.HierarchyId => "text",
             _ => column.NativeType
         };
 

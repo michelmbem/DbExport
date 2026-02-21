@@ -330,7 +330,7 @@ public class OracleSchemaProvider : ISchemaProvider
                 0 when precision < 3 => ColumnType.TinyInt,
                 0 when precision < 5 => ColumnType.SmallInt,
                 0 when precision < 10 => ColumnType.Integer,
-                0 when precision < 19 => ColumnType.BigInt,
+                0 when precision < 20 => ColumnType.BigInt,
                 _ => ColumnType.Decimal
             },
             "DATE" => ColumnType.DateTime,
@@ -343,7 +343,9 @@ public class OracleSchemaProvider : ISchemaProvider
             "BLOB" or "RAW" or "LONG RAW" => ColumnType.Blob,
             "BFILE" => ColumnType.File,
             "XMLType" => ColumnType.Xml,
-            _ => oracleType.StartsWith("TIMESTAMP") ? ColumnType.DateTime : ColumnType.Unknown
+            "SDO_GEOMETRY" => ColumnType.Geometry,
+            _ when oracleType.StartsWith("TIMESTAMP") => ColumnType.DateTime,
+            _ => ColumnType.Unknown
         };
     }
 
