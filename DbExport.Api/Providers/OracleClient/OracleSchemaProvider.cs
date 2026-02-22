@@ -315,62 +315,6 @@ public class OracleSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public (string, string)[] GetTypeNames()
-    {
-        const string sql = """
-                           SELECT
-                              OWNER,
-                              TYPE_NAME
-                           FROM
-                              ALL_TYPES
-                           WHERE
-                              OWNER NOT IN (
-                                   'SYS', 'SYSTEM', 'XDB', 'CTXSYS', 'MDSYS', 'ORDSYS', 'OLAPSYS',
-                                   'WMSYS', 'LBACSYS', 'OUTLN', 'DBSNMP', 'APPQOSSYS', 'AUDSYS',
-                                   'DBSFWUSER', 'GSMADMIN_INTERNAL'
-                              )
-                           ORDER BY
-                              OWNER,
-                              TYPE_NAME
-                           """;
-
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
-    }
-
-    public Dictionary<string, object> GetTypeMeta(string typeName, string typeOwner)
-    {
-        const string sql = """
-                           SELECT *
-                           FROM ALL_TYPE_ATTRS
-                           WHERE OWNER = '{1}' AND TYPE_NAME = '{0}'
-                           """;
-
-        Dictionary<string, object> metadata = new()
-        {
-            ["name"] = typeName,
-            ["owner"] = typeOwner,
-            ["nullable"] = false,
-            ["enumerated"] = false,
-            ["defaultValue"] = null,
-            ["possibleValues"] = Array.Empty<object>()
-        };
-
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        string nativeType;
-        byte precision, scale;
-        var values = helper.Query(string.Format(sql, typeName, typeOwner), SqlHelper.ToDictionary);
-                
-        metadata["size"] = Utility.ToInt16(values["LENGTH"]);
-        metadata["precision"] = precision = Utility.ToByte(values["PRECISION"]);
-        metadata["scale"] = scale = Utility.ToByte(values["SCALE"]);
-        metadata["nativeType"] = nativeType = values["ATTR_TYPE_NAME"].ToString();
-        metadata["type"] = GetColumnType(nativeType, precision, scale);
-
-        return metadata;
-    }
-
     #endregion
 
     #region Utility

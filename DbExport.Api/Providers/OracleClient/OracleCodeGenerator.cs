@@ -66,8 +66,6 @@ public class OracleCodeGenerator : CodeGenerator
             _ => item.NativeType
         };
 
-    protected override string GetTypeReference(DataType dataType) => dataType.Name;
-
     protected override string GetKeyName(Key key)
     {
         switch (key)

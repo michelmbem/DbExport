@@ -44,6 +44,12 @@ public class SqlCodeGenerator : CodeGenerator
             Write(" IDENTITY({0}, {1})", column.IdentitySeed, column.IdentityIncrement);
     }
 
+    public override void VisitDataType(DataType dataType)
+    {
+        WriteLine($"CREATE TYPE dbo.{dataType.Name} FROM {GetTypeName(dataType)};");
+        WriteLine();
+    }
+
     protected override string GetTypeName(IDataItem item) =>
         item.ColumnType switch
         {
@@ -70,7 +76,7 @@ public class SqlCodeGenerator : CodeGenerator
             _ => item.NativeType
         };
 
-    protected override string GetTypeReference(DataType dataType) => dataType.Name;
+    protected override string GetTypeReference(DataType dataType) => $"dbo.{dataType.Name}";
 
     protected override string Format(object value, ColumnType columnType)
     {
