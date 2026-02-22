@@ -149,7 +149,7 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
     {
         if (!dataReader.Read()) return null;
         
-        var result = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+        var result = Utility.EmptyDictionary<object>();
         for (var i = 0; i < dataReader.FieldCount; ++i)
             result[dataReader.GetName(i)] = dataReader.GetValue(i);
         return result;
@@ -175,7 +175,7 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
 
         while (dataReader.Read())
         {
-            var values = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var values = Utility.EmptyDictionary<object>();
             for (var i = 0; i < dataReader.FieldCount; ++i)
                 values[dataReader.GetName(i)] = dataReader.GetValue(i);
             result.Add(values);

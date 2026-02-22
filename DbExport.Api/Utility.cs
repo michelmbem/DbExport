@@ -1,48 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SQLite;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using DbExport.Providers;
 using DbExport.Schema;
+using Microsoft.Data.SqlClient;
+using MySql.Data.MySqlClient;
+using Npgsql;
+using Oracle.ManagedDataAccess.Client;
+using SQLitePCL;
 
 namespace DbExport;
 
 public static partial class Utility
 {
+    private static readonly CultureInfo CI = CultureInfo.InvariantCulture;
+    
     public static Encoding Encoding { get; set; } = Encoding.UTF8;
     
     public static void RegisterDbProviderFactories()
     {
-        SQLitePCL.Batteries.Init();
+        Batteries.Init();
 
 #if WINDOWS
 #pragma warning disable CA1416 // Verify platform compatibility
         DbProviderFactories.RegisterFactory(ProviderNames.ACCESS, System.Data.OleDb.OleDbFactory.Instance);
 #pragma warning restore CA1416 // Verify platform compatibility
 #endif
-        DbProviderFactories.RegisterFactory(ProviderNames.SQLSERVER, Microsoft.Data.SqlClient.SqlClientFactory.Instance);
-        DbProviderFactories.RegisterFactory(ProviderNames.ORACLE, Oracle.ManagedDataAccess.Client.OracleClientFactory.Instance);
-        DbProviderFactories.RegisterFactory(ProviderNames.MYSQL, MySql.Data.MySqlClient.MySqlClientFactory.Instance);
-        DbProviderFactories.RegisterFactory(ProviderNames.POSTGRESQL, Npgsql.NpgsqlFactory.Instance);
-        DbProviderFactories.RegisterFactory(ProviderNames.SQLITE, System.Data.SQLite.SQLiteFactory.Instance);
+        DbProviderFactories.RegisterFactory(ProviderNames.SQLSERVER, SqlClientFactory.Instance);
+        DbProviderFactories.RegisterFactory(ProviderNames.ORACLE, OracleClientFactory.Instance);
+        DbProviderFactories.RegisterFactory(ProviderNames.MYSQL, MySqlClientFactory.Instance);
+        DbProviderFactories.RegisterFactory(ProviderNames.POSTGRESQL, NpgsqlFactory.Instance);
+        DbProviderFactories.RegisterFactory(ProviderNames.SQLITE, SQLiteFactory.Instance);
     }
 
     public static Dictionary<string, string> ParseConnectionString(string connectionString)
     {
-        const StringSplitOptions splitOptions = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
-        
-        Dictionary<string, string> properties = [];
+        var properties = EmptyDictionary<string>();
 
-        foreach (var setting in connectionString.Split(';', splitOptions))
+        foreach (var setting in Split(connectionString, ';'))
         {
-            var members = setting.Split('=', splitOptions);
+            var members = Split(setting, '=');
             var (key, value) = (members[0], members.Length > 1 ? members[1] : string.Empty);
             if (key.Length == 0) continue;
-            if (value.StartsWith('"')) value = value[1..^1].Replace("\"\"", "\"");
-            properties[key.ToLower()] = value;
+            if (value.StartsWith('"')) value = UnquotedStr(value, '"');
+            properties[key] = value;
         }
 
         return properties;
@@ -50,20 +56,15 @@ public static partial class Utility
 
     public static string SanitizeConnectionString(string connectionString)
     {
-        const StringSplitOptions splitOptions = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
-        
         StringBuilder sb = new();
 
-        foreach (var setting in connectionString.Split(';', splitOptions))
+        foreach (var setting in Split(connectionString, ';'))
         {
-            var members = setting.Split('=', splitOptions);
+            var members = Split(setting, '=');
             var (key, value) = (members[0], members.Length > 1 ? members[1] : string.Empty);
             if (key.Length == 0) continue;
-            if (key.Equals("password", StringComparison.OrdinalIgnoreCase) ||
-                key.Equals("pwd", StringComparison.OrdinalIgnoreCase))
-                sb.Append($"{key}={new string('*', value.Length)};");
-            else
-                sb.Append($"{key}={value};");
+            if (PasswordRegex().IsMatch(key)) value = new string('*', value.Length);
+            sb.Append($"{key}={value};");
         }
 
         return sb.ToString();
@@ -81,6 +82,11 @@ public static partial class Utility
 
     public static DbConnection GetConnection(Database database) =>
         GetConnection(database.ProviderName, database.ConnectionString);
+    
+    public static Dictionary<string, TValue> EmptyDictionary<TValue>() => new(StringComparer.OrdinalIgnoreCase);
+    
+    public static string[] Split(string input, char separator) =>
+        input.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
     public static string Escape(string name, string providerName) =>
         providerName switch
@@ -96,22 +102,23 @@ public static partial class Utility
             null or DBNull => true,
             string s => string.IsNullOrWhiteSpace(s),
             Array a => a.Length == 0,
-            _ => value.Equals(0)
+            _ => false
         };
 
-    public static bool IsBoolean(object value) => Convert.ToString(value)?.ToLower() is "false" or "true";
+    public static bool IsBoolean(object value) =>
+        Convert.ToString(value, CI)?.ToLower() is "false" or "true";
 
     public static bool IsNumeric(object value) =>
-        decimal.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out _);
+        decimal.TryParse(Convert.ToString(value, CI), NumberStyles.Any, CI, out _);
 
     public static bool IsDate(object value) =>
-        DateTime.TryParse(value?.ToString(), CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+        DateTime.TryParse(Convert.ToString(value, CI), CI, DateTimeStyles.None, out _);
 
     public static byte ToByte(object value) =>
-        byte.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var res) ? res : (byte)0;
+        (byte)int.Parse("0" + Convert.ToString(value, CI), NumberStyles.Any, CI);
 
     public static short ToInt16(object value) =>
-        short.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var res) ? res : (short)0;
+        (short)int.Parse("0" + Convert.ToString(value, CI), NumberStyles.Any, CI);
 
     public static string QuotedStr(object value, char quote = '\'') =>
         $"{quote}{value.ToString()?.Replace(quote.ToString(), new string(quote, 2))}{quote}";
@@ -119,15 +126,10 @@ public static partial class Utility
     public static string UnquotedStr(object value, char quote = '\'') =>
         value.ToString()?[1..^1].Replace(new string(quote, 2), quote.ToString());
 
-    public static string BinToHex(byte[] bytes)
-    {
-        StringBuilder sb = new();
-
-        foreach (var b in bytes)
-            sb.Append(b.ToString("x2"));
-
-        return sb.ToString();
-    }
+    public static string BinToHex(byte[] bytes) =>
+        bytes.Select(b => b.ToString("x2"))
+             .Aggregate(new StringBuilder(), (a, b) => a.Append(b))
+             .ToString();
 
     public static byte[] Hex2Bin(string value)
     {
@@ -260,15 +262,10 @@ public static partial class Utility
         return [..bytes];
     }
 
-    public static string ToBitString(byte[] bytes)
-    {
-        StringBuilder sb = new();
-
-        foreach (var b in bytes)
-            sb.Append(ToBaseN(b, 2));
-
-        return sb.ToString();
-    }
+    public static string ToBitString(byte[] bytes) =>
+        bytes.Select(b => ToBaseN(b, 2))
+             .Aggregate(new StringBuilder(), (a, b) => a.Append(b))
+             .ToString();
 
     public static byte[] FromBitString(string value)
     {
@@ -313,4 +310,7 @@ public static partial class Utility
     
     [GeneratedRegex(@"\d{3}", RegexOptions.Compiled)]
     private static partial Regex ThreeDigitsRegex();
+
+    [GeneratedRegex(@"\b(password|pwd)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    private static partial Regex PasswordRegex();
 }

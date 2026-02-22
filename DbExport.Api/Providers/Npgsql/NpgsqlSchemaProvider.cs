@@ -504,7 +504,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
     [GeneratedRegex(@"\s*\,\s*", RegexOptions.Compiled)]
     private static partial Regex CommaRegex();
     
-    [GeneratedRegex("utf8", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+    [GeneratedRegex(@"\butf8\b", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex Utf8Regex();
 
     #endregion
