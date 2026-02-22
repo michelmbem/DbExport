@@ -33,7 +33,7 @@ public partial class MySqlOptionsViewModel : ProviderOptionsViewModel
 
     public ObservableCollection<string> Collations { get; }
 
-    public override string Title => "MySQL Options";
+    public override string Title => "MySQL options";
 
     public override object Options => new MySqlOptions
     {
