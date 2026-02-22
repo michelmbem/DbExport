@@ -38,14 +38,14 @@ public class SqlCodeGenerator : CodeGenerator
     {
         base.VisitColumn(column);
 
-        var visitIdentities = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
+        var visitIdentities = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
 
         if (visitIdentities && column.IsIdentity)
-            Write(" Identity({0}, {1})", column.IdentitySeed, column.IdentityIncrement);
+            Write(" IDENTITY({0}, {1})", column.IdentitySeed, column.IdentityIncrement);
     }
 
-    protected override string GetTypeName(ColumnType type, string nativeType, short size, byte precision, byte scale) =>
-        type switch
+    protected override string GetTypeName(IDataItem item) =>
+        item.ColumnType switch
         {
             ColumnType.Boolean => "bit",
             ColumnType.UnsignedTinyInt => "tinyint",
@@ -54,22 +54,20 @@ public class SqlCodeGenerator : CodeGenerator
             ColumnType.UnsignedInt or ColumnType.BigInt => "bigint",
             ColumnType.UnsignedBigInt => "decimal(20)",
             ColumnType.Currency => "money",
-            ColumnType.Decimal when precision == 0 => "decimal",
-            ColumnType.Decimal when scale == 0 => $"decimal({precision})",
-            ColumnType.Decimal => $"decimal({precision}, {scale})",
             ColumnType.SinglePrecision => "real",
             ColumnType.DoublePrecision or ColumnType.Interval => "float",
-            ColumnType.Char or ColumnType.NChar => $"{type.ToString().ToLower()}({size})",
-            ColumnType.VarChar or ColumnType.NVarChar =>
-                size > 0 ? $"{type.ToString().ToLower()}({size})" : $"{type.ToString().ToLower()}(max)",
-            ColumnType.DateTime or ColumnType.Date or ColumnType.Time or ColumnType.Text or
-                ColumnType.NText or ColumnType.Xml or ColumnType.Geometry => type.ToString().ToLower(),
-            ColumnType.Bit => size > 0 ? $"varbinary ({(size + 7) / 8})" : "varbinary(max)",
+            ColumnType.VarChar or ColumnType.NVarChar => item.Size > 0
+                ? $"{item.ColumnType.ToString().ToLower()}({item.Size})"
+                : $"{item.ColumnType.ToString().ToLower()}(max)",
+            ColumnType.Bit => item.Size > 0 ? $"varbinary ({(item.Size + 7) / 8})" : "varbinary(max)",
             ColumnType.Blob => "image",
             ColumnType.Guid => "uniqueidentifier",
             ColumnType.RowVersion => "timestamp",
             ColumnType.Json => "nvarchar(max)",
-            _ => nativeType
+            ColumnType.Decimal or ColumnType.DateTime or ColumnType.Date or ColumnType.Time or
+                ColumnType.Char or ColumnType.NChar or ColumnType.Text or ColumnType.NText or
+                ColumnType.Xml or ColumnType.Geometry => base.GetTypeName(item),
+            _ => item.NativeType
         };
 
     protected override string GetTypeReference(DataType dataType) => dataType.Name;

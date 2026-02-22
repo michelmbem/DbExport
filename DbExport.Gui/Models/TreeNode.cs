@@ -54,7 +54,8 @@ public partial class TreeNode : ObservableObject
     }
 
     public TreeNode(TreeNode? parent, Column column) :
-        this(parent, column.Name, column.IsPKColumn ? TreeNodeType.PrimaryKey : TreeNodeType.Column)
+        this(parent, $"{column.Name} : {IDataItem.GetFullTypeName(column)}",
+             column.IsPKColumn ? TreeNodeType.PrimaryKey : TreeNodeType.Column)
     {
         checkable = column;
     }
@@ -71,7 +72,7 @@ public partial class TreeNode : ObservableObject
     }
 
     public TreeNode(TreeNode? parent, DataType dataType) :
-        this(parent, dataType.Name, TreeNodeType.DataType)
+        this(parent, $"{dataType.Name} : {IDataItem.GetFullTypeName(dataType)}", TreeNodeType.DataType)
     {
         checkable = dataType;
     }
@@ -103,7 +104,7 @@ public partial class TreeNode : ObservableObject
 
         foreach (var schema in schemas)
         {
-            var schemaName = string.IsNullOrEmpty(schema.Key) ? "Default schema" : schema.Key;
+            var schemaName = string.IsNullOrEmpty(schema.Key) ? database.Name : schema.Key;
             var schemaNode = new TreeNode(null, schemaName, TreeNodeType.Schema);
             
             var tablesNode = new TreeNode(schemaNode, "Tables", TreeNodeType.Group);

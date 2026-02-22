@@ -30,14 +30,14 @@ public class OracleCodeGenerator : CodeGenerator
     {
         base.VisitColumn(column);
 
-        var visitIdentities = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
+        var visitIdentities = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
         
         if (visitIdentities && column.IsIdentity)
             Write($" GENERATED ALWAYS AS IDENTITY (START WITH {column.IdentitySeed}, INCREMENT BY {column.IdentityIncrement})");
     }
 
-    protected override string GetTypeName(ColumnType type, string nativeType, short size, byte precision, byte scale) =>
-        type switch
+    protected override string GetTypeName(IDataItem item) =>
+        item.ColumnType switch
         {
             ColumnType.Boolean => "NUMBER(1)",
             ColumnType.TinyInt or ColumnType.UnsignedTinyInt => "NUMBER(3)",
@@ -45,16 +45,16 @@ public class OracleCodeGenerator : CodeGenerator
             ColumnType.Integer or ColumnType.UnsignedInt => "NUMBER(10)",
             ColumnType.BigInt or ColumnType.UnsignedBigInt => "NUMBER(20)",
             ColumnType.Currency => "NUMBER(19, 4)",
-            ColumnType.Decimal when precision == 0 => "NUMBER",
-            ColumnType.Decimal when scale == 0 => $"NUMBER({precision})",
-            ColumnType.Decimal => $"NUMBER({precision}, {scale})",
+            ColumnType.Decimal when item.Precision == 0 => "NUMBER",
+            ColumnType.Decimal when item.Scale == 0 => $"NUMBER({item.Precision})",
+            ColumnType.Decimal => $"NUMBER({item.Precision}, {item.Scale})",
             ColumnType.SinglePrecision => "NUMBER(9, 7)",
             ColumnType.DoublePrecision => "NUMBER(17, 15)",
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "DATE",
-            ColumnType.Char => $"CHAR({size})",
-            ColumnType.NChar => $"NCHAR({size})",
-            ColumnType.VarChar => size > 0 ? $"VARCHAR2({size})" : "CLOB",
-            ColumnType.NVarChar => size > 0 ? $"NVARCHAR2({size})" : "NCLOB",
+            ColumnType.Char => $"CHAR({item.Size})",
+            ColumnType.NChar => $"NCHAR({item.Size})",
+            ColumnType.VarChar => item.Size > 0 ? $"VARCHAR2({item.Size})" : "CLOB",
+            ColumnType.NVarChar => item.Size > 0 ? $"NVARCHAR2({item.Size})" : "NCLOB",
             ColumnType.Text => "CLOB",
             ColumnType.NText => "NCLOB",
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "BLOB",
@@ -63,7 +63,7 @@ public class OracleCodeGenerator : CodeGenerator
             ColumnType.Xml => "XMLType",
             ColumnType.Json => "JSON",
             ColumnType.Geometry => "SDO_GEOMETRY",
-            _ => nativeType
+            _ => item.NativeType
         };
 
     protected override string GetTypeReference(DataType dataType) => dataType.Name;

@@ -16,7 +16,7 @@ public class DataType(
     bool enumerated,
     object defaultValue,
     IEnumerable<object> possibleValues)
-    : SchemaItem(database, name), ICheckable
+    : SchemaItem(database, name), IDataItem, ICheckable
 {
     public string Owner { get; } = owner;
     
@@ -29,7 +29,7 @@ public class DataType(
     public byte Precision { get; } = precision;
 
     public byte Scale { get; } = scale;
-    
+
     public bool IsNullable { get; } = nullable;
     
     public bool IsEnumerated { get; } = enumerated;
@@ -39,6 +39,8 @@ public class DataType(
     public ImmutableHashSet<object> PossibleValues { get; } = ImmutableHashSet.CreateRange(possibleValues);
 
     public Database Database => (Database)Parent;
+    
+    public bool IsRequired => !IsNullable;
 
     public bool IsChecked { get; set; }
     

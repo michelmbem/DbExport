@@ -84,8 +84,8 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     {
         var visitSchema = ExportOptions == null || ExportOptions.ExportSchema;
         var visitData = ExportOptions == null || ExportOptions.ExportData;
-        var visitFKs = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportForeignKeys);
-        var visitIdent = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
+        var visitFKs = true == ExportOptions?.HasFlag(ExportFlags.ExportForeignKeys);
+        var visitIdent = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
 
         WriteComment("Database: {0}", database.Name);
         WriteComment("Generated on: {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -151,9 +151,9 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     public virtual void VisitTable(Table table)
     {
-        var visitPKs = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportPrimaryKeys);
-        var visitIndexes = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIndexes);
-        var visitFKs = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportForeignKeys);
+        var visitPKs = true == ExportOptions?.HasFlag(ExportFlags.ExportPrimaryKeys);
+        var visitIndexes = true == ExportOptions?.HasFlag(ExportFlags.ExportIndexes);
+        var visitFKs = true == ExportOptions?.HasFlag(ExportFlags.ExportForeignKeys);
 
         WriteLine("CREATE TABLE {0} (", Escape(table.Name));
         Indent();
@@ -198,7 +198,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     public virtual void VisitColumn(Column column)
     {
-        var visitDefaults = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportDefaults);
+        var visitDefaults = true == ExportOptions?.HasFlag(ExportFlags.ExportDefaults);
 
         Write("{0} {1}", Escape(column.Name), GetTypeName(column));
             
@@ -280,19 +280,11 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     protected virtual string GetTypeName(Column column) => column.ColumnType == ColumnType.UserDefined
         ? GetTypeReference(column.DataType)
-        : GetTypeName(column.ColumnType, column.NativeType, column.Size, column.Precision, column.Scale);
+        : GetTypeName((IDataItem)column);
 
-    protected virtual string GetTypeName(ColumnType type, string nativeType, short size, byte precision, byte scale)
-    {
-        var typeName = type.ToString().ToLower();
-        if (typeName.StartsWith("unsigned")) return $"{typeName[8..]} unsigned";
-        if (type == ColumnType.Bit || typeName.EndsWith("char")) return $"{typeName}({size})";
-        if (type != ColumnType.Decimal || precision == 0) return typeName;
-        return scale == 0 ? $"{typeName}({precision})" : $"{typeName}({precision}, {scale})";
-    }
+    protected virtual string GetTypeName(IDataItem item) => IDataItem.GetFullTypeName(item, false);
 
-    protected virtual string GetTypeReference(DataType dataType) =>
-        GetTypeName(dataType.ColumnType, dataType.NativeType, dataType.Size, dataType.Precision, dataType.Scale);
+    protected virtual string GetTypeReference(DataType dataType) => GetTypeName(dataType);
 
     protected virtual string GetKeyName(Key key) => Escape(key.Name);
 
@@ -372,7 +364,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     protected virtual void WriteInsertDirective(Table table, DbDataReader dr)
     {
-        var skipIdentity = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
+        var skipIdentity = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
         var insertableColumns = table.Columns.Where(IsSelected).ToImmutableList();
         
         Write("INSERT INTO {0} (", Escape(table.Name));

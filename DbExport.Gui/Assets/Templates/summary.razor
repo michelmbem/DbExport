@@ -11,26 +11,6 @@
     {
         return column.IsPKColumn ? $"{column.Name} \u26BF" : column.Name;
     }
-    
-    string FullTypeName(dynamic item)
-    {
-        switch (item.ColumnType)
-        {
-            case ColumnType.Char:
-            case ColumnType.NChar:
-            case ColumnType.VarChar:
-            case ColumnType.NVarChar:
-                return $"{item.NativeType}({item.Size})";
-            case ColumnType.Decimal when item.Precision == 0:
-                return $"{item.NativeType}";
-            case ColumnType.Decimal when item.Scale == 0:
-                return $"{item.NativeType}({item.Precision})";
-            case ColumnType.Decimal:
-                return $"{item.NativeType}({item.Precision}, {item.Scale})";
-            default:
-                return item.NativeType;
-        }
-    }
 }
 
 ## Source database
@@ -76,8 +56,9 @@
     
     @foreach (var dataType in Model.Database.DataTypes.Where(t => t.IsChecked))
     {
-        @("| " + dataType.FullName + " | " + FullTypeName(dataType) + " | " + Bool2Str(dataType.IsNullable) +
-        " | " + Bool2Str(dataType.IsEnumerated) + " | " + dataType.DefaultValue + " |" + Environment.NewLine)
+        @("| " + dataType.FullName + " | " + IDataItem.GetFullTypeName(dataType) + " | " +
+        Bool2Str(dataType.IsNullable) + " | " + Bool2Str(dataType.IsEnumerated) + " | " +
+        dataType.DefaultValue + " |" + Environment.NewLine)
     }
     
     @(Environment.NewLine)
@@ -94,8 +75,8 @@
     
     foreach (var column in table.Columns.Where(c => c.IsChecked))
     {
-        @("| " + FullColumnName(column) + " | " + FullTypeName(column) + " | " + Bool2Str(!column.IsRequired) +
-        " | " + column.DefaultValue + " |" + Environment.NewLine)
+        @("| " + FullColumnName(column) + " | " + IDataItem.GetFullTypeName(column) + " | " +
+        Bool2Str(!column.IsRequired) + " | " + column.DefaultValue + " |" + Environment.NewLine)
     }
     
     @(Environment.NewLine + "**Indexes**" + Environment.NewLine + Environment.NewLine)

@@ -37,13 +37,11 @@ public class NpgsqlCodeGenerator : CodeGenerator
     {
         if (dataType.PossibleValues.IsEmpty)
         {
-            var baseName = GetTypeName(dataType.ColumnType, dataType.NativeType, dataType.Size,
-                                       dataType.Precision, dataType.Scale);
-            Write($"CREATE DOMAIN {dataType.Name} AS {baseName}");
+            Write($"CREATE DOMAIN {dataType.Name} AS {GetTypeName(dataType)}");
             
             if (!dataType.IsNullable) Write(" NOT NULL");
             
-            var visitDefaults = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportDefaults);
+            var visitDefaults = true == ExportOptions?.HasFlag(ExportFlags.ExportDefaults);
             if (visitDefaults && !Utility.IsEmpty(dataType.DefaultValue))
                 Write(" DEFAULT {0}", Format(dataType.DefaultValue, dataType.ColumnType));
             
@@ -60,12 +58,12 @@ public class NpgsqlCodeGenerator : CodeGenerator
 
     protected override string GetTypeName(Column column)
     {
-        var visitIdentities = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
+        var visitIdentities = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
         return visitIdentities && column.IsIdentity ? "serial" : base.GetTypeName(column);
     }
 
-    protected override string GetTypeName(ColumnType type, string nativeType, short size, byte precision, byte scale) =>
-        type switch
+    protected override string GetTypeName(IDataItem item) =>
+        item.ColumnType switch
         {
             ColumnType.Boolean => "boolean",
             ColumnType.TinyInt or ColumnType.UnsignedTinyInt or ColumnType.SmallInt => "smallint",
@@ -73,25 +71,25 @@ public class NpgsqlCodeGenerator : CodeGenerator
             ColumnType.UnsignedInt or ColumnType.BigInt => "bigint",
             ColumnType.UnsignedBigInt => "numeric(20)",
             ColumnType.Currency => "numeric(19, 4)",
-            ColumnType.Decimal when precision == 0 => "numeric",
-            ColumnType.Decimal when scale == 0 => $"numeric({precision})",
-            ColumnType.Decimal => $"numeric({precision}, {scale})",
+            ColumnType.Decimal when item.Precision == 0 => "numeric",
+            ColumnType.Decimal when item.Scale == 0 => $"numeric({item.Precision})",
+            ColumnType.Decimal => $"numeric({item.Precision}, {item.Scale})",
             ColumnType.SinglePrecision => "real",
             ColumnType.DoublePrecision => "double precision",
             ColumnType.Date => "date",
             ColumnType.Time => "time",
             ColumnType.DateTime => "timestamp",
             ColumnType.Interval => "interval",
-            ColumnType.Char or ColumnType.NChar => $"char({size})",
-            ColumnType.VarChar or ColumnType.NVarChar => size > 0 ? $"character varying({size})" : "text",
+            ColumnType.Char or ColumnType.NChar => $"char({item.Size})",
+            ColumnType.VarChar or ColumnType.NVarChar => item.Size > 0 ? $"character varying({item.Size})" : "text",
             ColumnType.Text or ColumnType.NText => "text",
-            ColumnType.Bit => size > 0 ? $"bit varying({size})" : "bytea",
+            ColumnType.Bit => item.Size > 0 ? $"bit varying({item.Size})" : "bytea",
             ColumnType.Blob or ColumnType.RowVersion => "bytea",
             ColumnType.Guid => "uuid",
             ColumnType.Xml => "xml",
             ColumnType.Json => "jsonb",
             ColumnType.Geometry => "geometry",
-            _ => nativeType
+            _ => item.NativeType
         };
 
     protected override string GetTypeReference(DataType dataType) =>

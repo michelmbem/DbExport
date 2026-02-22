@@ -11,7 +11,7 @@ public class Column(
     ColumnAttributes attributes,
     object defaultValue,
     string description)
-    : SchemaItem(table, name), ICheckable
+    : SchemaItem(table, name), IDataItem, ICheckable
 {
     public ColumnType ColumnType { get; } = type;
 
