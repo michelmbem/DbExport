@@ -198,11 +198,19 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     private static string GetTypeName(Column column, ExportOptions options)
     {
-        var visitIdentities = options == null || options.HasFlag(ExportFlags.ExportIdentities);
+        if (column.ColumnType == ColumnType.UserDefined)
+        {
+            var udt = column.DataType;
+            return GetTypeName(udt.ColumnType, udt.NativeType, udt.Size, udt.Precision, udt.Scale);
+        }
 
-        if (visitIdentities && column.IsIdentity) return "counter";
+        return ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true && column.IsIdentity
+             ? "counter"
+             : GetTypeName(column.ColumnType, column.NativeType, column.Size, column.Precision, column.Scale);
+    }
 
-        return column.ColumnType switch
+    private string GetTypeName(ColumnType type, string nativeType, short size, byte precision, byte scale) =>
+        type switch
         {
             ColumnType.Boolean => "bit",
             ColumnType.UnsignedTinyInt => "byte",
@@ -213,19 +221,18 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
             ColumnType.SinglePrecision => "single",
             ColumnType.DoublePrecision or ColumnType.Interval => "double",
             ColumnType.Currency => "currency",
-            ColumnType.Decimal when column.Precision == 0 => "decimal",
-            ColumnType.Decimal when column.Precision > 28 => $"decimal(28, {column.Scale})",
-            ColumnType.Decimal when column.Scale == 0 => $"decimal({column.Precision})",
-            ColumnType.Decimal => $"decimal({column.Precision}, {column.Scale})",
+            ColumnType.Decimal when precision == 0 => "decimal",
+            ColumnType.Decimal when precision > 28 => $"decimal(28, {scale})",
+            ColumnType.Decimal when scale == 0 => $"decimal({precision})",
+            ColumnType.Decimal => $"decimal({precision}, {scale})",
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "datetime",
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar =>
-                0 < column.Size && column.Size <= 255 ? $"text({column.Size})" : "text",
+                0 < size && size <= 255 ? $"text({size})" : "text",
             ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Json or ColumnType.Geometry => "text",
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "oleobject",
             ColumnType.Guid => "uniqueidentifier",
             _ => column.NativeType,
         };
-    }
 
     private static string Format(object value, ColumnType columnType)
     {

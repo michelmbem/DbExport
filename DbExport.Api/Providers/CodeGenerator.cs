@@ -4,6 +4,11 @@ using System.Data.Common;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using DbExport.Providers.MySqlClient;
+using DbExport.Providers.Npgsql;
+using DbExport.Providers.OracleClient;
+using DbExport.Providers.SqlClient;
+using DbExport.Providers.SQLite;
 using DbExport.Schema;
 
 namespace DbExport.Providers;
@@ -36,11 +41,11 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     public static CodeGenerator Get(string providerName, TextWriter output) =>
         providerName switch
         {
-            ProviderNames.SQLSERVER => new SqlClient.SqlCodeGenerator(output),
-            ProviderNames.ORACLE => new OracleClient.OracleCodeGenerator(output),
-            ProviderNames.MYSQL => new MySqlClient.MySqlCodeGenerator(output),
-            ProviderNames.POSTGRESQL => new Npgsql.NpgsqlCodeGenerator(output),
-            ProviderNames.SQLITE => new SQLite.SQLiteCodeGenerator(output),
+            ProviderNames.SQLSERVER => new SqlCodeGenerator(output),
+            ProviderNames.ORACLE => new OracleCodeGenerator(output),
+            ProviderNames.MYSQL => new MySqlCodeGenerator(output),
+            ProviderNames.POSTGRESQL => new NpgsqlCodeGenerator(output),
+            ProviderNames.SQLITE => new SQLiteCodeGenerator(output),
             _ => throw new ArgumentException(null, nameof(providerName))
         };
 
@@ -91,6 +96,11 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         {
             if (SupportsDbCreation)
                 WriteDbCreationDirective(database);
+
+            foreach (var dataType in database.DataTypes.Where(dataType => dataType.IsChecked))
+            {
+                dataType.AcceptVisitor(this);
+            }
 
             foreach (var table in database.Tables.Where(table => table.IsChecked))
             {
@@ -260,30 +270,29 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         WriteDelimiter();
     }
 
+    public virtual void VisitDataType(DataType dataType) { }
+
     #endregion
 
     #region Virtual Methods
 
     protected virtual string Escape(string name) => Utility.Escape(name, ProviderName);
 
-    protected virtual string GetTypeName(Column column)
+    protected virtual string GetTypeName(Column column) => column.ColumnType == ColumnType.UserDefined
+        ? GetTypeReference(column.DataType)
+        : GetTypeName(column.ColumnType, column.NativeType, column.Size, column.Precision, column.Scale);
+
+    protected virtual string GetTypeName(ColumnType type, string nativeType, short size, byte precision, byte scale)
     {
-        var typeName = column.ColumnType.ToString().ToLower();
-
-        if (typeName.StartsWith("unsigned"))
-            return $"{typeName[8..]} unsigned";
-
-        if (column.ColumnType == ColumnType.Bit || typeName.EndsWith("char"))
-            return $"{typeName}({column.Size})";
-
-        if (column.ColumnType != ColumnType.Decimal || column.Precision == 0)
-            return typeName;
-        
-        return column.Scale == 0
-             ? $"{typeName}({column.Precision})"
-             : $"{typeName}({column.Precision}, {column.Scale})";
-
+        var typeName = type.ToString().ToLower();
+        if (typeName.StartsWith("unsigned")) return $"{typeName[8..]} unsigned";
+        if (type == ColumnType.Bit || typeName.EndsWith("char")) return $"{typeName}({size})";
+        if (type != ColumnType.Decimal || precision == 0) return typeName;
+        return scale == 0 ? $"{typeName}({precision})" : $"{typeName}({precision}, {scale})";
     }
+
+    protected virtual string GetTypeReference(DataType dataType) =>
+        GetTypeName(dataType.ColumnType, dataType.NativeType, dataType.Size, dataType.Precision, dataType.Scale);
 
     protected virtual string GetKeyName(Key key) => Escape(key.Name);
 

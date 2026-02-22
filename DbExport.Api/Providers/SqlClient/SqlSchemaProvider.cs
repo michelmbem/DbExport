@@ -65,6 +65,8 @@ public partial class SqlSchemaProvider : ISchemaProvider
                            WHERE
                            	    TABLE_NAME = '{0}'
                            	    AND TABLE_SCHEMA = '{1}'
+                           ORDER BY
+                               ORDINAL_POSITION
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
@@ -151,7 +153,9 @@ public partial class SqlSchemaProvider : ISchemaProvider
                             	COLUMN_DEFAULT,
                             	IS_NULLABLE,
                                 COLUMNPROPERTY(OBJECT_ID(TABLE_NAME), COLUMN_NAME, 'IsIdentity') IS_IDENTITY,
-                                COLUMNPROPERTY(OBJECT_ID(TABLE_NAME), COLUMN_NAME, 'IsComputed') IS_COMPUTED
+                                COLUMNPROPERTY(OBJECT_ID(TABLE_NAME), COLUMN_NAME, 'IsComputed') IS_COMPUTED,
+                                DOMAIN_NAME,
+                                DOMAIN_SCHEMA
                             FROM
                             	INFORMATION_SCHEMA.COLUMNS
                             WHERE
@@ -163,16 +167,16 @@ public partial class SqlSchemaProvider : ISchemaProvider
         const string sql2 = """
                             SELECT
                                 ex.value
-                            FROM
-                                sys.columns c
-                                LEFT OUTER JOIN sys.extended_properties ex
+                            FROM sys.columns c
+                            LEFT JOIN sys.extended_properties ex
                                 ON ex.major_id = c.object_id
                                 AND ex.minor_id = c.column_id
                                 AND ex.name = 'MS_Description'
+                                AND ex.class = 1
                             WHERE
-                                OBJECT_NAME(c.object_id) = '{0}'
-                                AND c.name = '{1}'
-                            """; // TODO: Check this!
+                                c.object_id = OBJECT_ID('{1}.{0}')
+                                AND c.name = '{2}'
+                            """;
 
         Dictionary<string, object> metadata = new()
         {
@@ -182,22 +186,32 @@ public partial class SqlSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var values = helper.Query(string.Format(sql1, tableName, tableOwner, columnName), SqlHelper.ToArray);
-        var attributes = ColumnAttributes.None;
-        ColumnType columnType;
-                
-        metadata["type"] = columnType = GetColumnType(values[0].ToString());
-        metadata["nativeType"] = values[0].ToString();
+        
+        if (Utility.IsEmpty(values[8]))
+        {
+            var nativeType = values[0].ToString();
+            metadata["nativeType"] = nativeType;
+            metadata["type"] = GetColumnType(nativeType);
+        }
+        else
+        {
+            metadata["type"] = ColumnType.UserDefined;
+            metadata["nativeType"] = $"{values[9]}.{values[8]}";
+        }
+
         metadata["size"] = Utility.ToInt16(values[1]);
         metadata["precision"] = Utility.ToByte(values[2]);
         metadata["scale"] = Utility.ToByte(values[3]);
 
         if (values[4] != DBNull.Value)
         {
-            var defaultValue = values[5].ToString()!;
-            metadata["defaultValue"] = Parse(defaultValue[2..], columnType);
+            var defaultValue = values[4].ToString()!;
+            metadata["defaultValue"] = Parse(defaultValue[2..^2], (ColumnType)metadata["type"]);
         }
 
-        if (values[5].Equals("NO"))
+        var attributes = ColumnAttributes.None;
+        
+        if ("NO".Equals(values[5].ToString(), StringComparison.OrdinalIgnoreCase))
             attributes |= ColumnAttributes.Required;
 
         if (values[6].Equals(1))
@@ -207,7 +221,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
             attributes |= ColumnAttributes.Computed;
 
         metadata["attributes"] = attributes;
-        metadata["description"] = Convert.ToString(helper.QueryScalar(string.Format(sql2, tableName, columnName)));
+        metadata["description"] = Convert.ToString(helper.QueryScalar(string.Format(sql2, tableName, tableOwner, columnName)));
 
         if (attributes.HasFlag(ColumnAttributes.Identity))
         {

@@ -79,8 +79,8 @@ public class SQLiteCodeGenerator : CodeGenerator
         WriteLine("PRAGMA foreign_keys = ON;");
     }
 
-    protected override string GetTypeName(Column column) =>
-        column.ColumnType switch
+    protected override string GetTypeName(ColumnType type, string nativeType, short size, byte precision, byte scale) =>
+        type switch
         {
             ColumnType.Boolean => "bit",
             ColumnType.TinyInt or ColumnType.UnsignedTinyInt => "tinyint",
@@ -88,19 +88,19 @@ public class SQLiteCodeGenerator : CodeGenerator
             ColumnType.Integer or ColumnType.UnsignedInt => "integer",
             ColumnType.BigInt or ColumnType.UnsignedBigInt => "bigint",
             ColumnType.Currency => "money",
-            ColumnType.Decimal when column.Precision == 0 => "decimal",
-            ColumnType.Decimal when column.Scale == 0 => $"numeric({column.Precision})",
-            ColumnType.Decimal => $"numeric({column.Precision}, {column.Scale})",
+            ColumnType.Decimal when precision == 0 => "decimal",
+            ColumnType.Decimal when scale == 0 => $"numeric({precision})",
+            ColumnType.Decimal => $"numeric({precision}, {scale})",
             ColumnType.SinglePrecision => "float",
             ColumnType.DoublePrecision or ColumnType.Interval => "real",
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "datetime",
-            ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar =>
-                $"{column.ColumnType.ToString().ToLower()}({column.Size})",
-            ColumnType.Text or ColumnType.NText or ColumnType.Guid => column.ColumnType.ToString().ToLower(),
+            ColumnType.Char or ColumnType.NChar => $"{type.ToString().ToLower()}({size})",
+            ColumnType.VarChar or ColumnType.NVarChar =>
+                size > 0 ? $"{type.ToString().ToLower()}({size})" : $"{type.ToString().ToLower()}(max)",
+            ColumnType.Text or ColumnType.NText or ColumnType.Guid or ColumnType.Geometry => type.ToString().ToLower(),
             ColumnType.Xml or ColumnType.Json => "ntext",
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "image",
-            ColumnType.Geometry => "geometry",
-            _ => column.NativeType
+            _ => nativeType
         };
 
     protected override string Format(object value, ColumnType columnType)

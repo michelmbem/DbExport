@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using DbExport.Schema;
 
 namespace DbExport.Providers.MySqlClient;
@@ -40,37 +41,51 @@ public class MySqlCodeGenerator : CodeGenerator
         if (visitIdentities && column.IsIdentity) Write(" AUTO_INCREMENT");
     }
 
-    protected override string GetTypeName(Column column) =>
-        column.ColumnType switch
+    protected override string GetTypeName(ColumnType type, string nativeType, short size, byte precision, byte scale)
+    {
+        return type switch
         {
-            ColumnType.Boolean => "tinyint(1)",
-            ColumnType.TinyInt => "tinyint",
-            ColumnType.UnsignedTinyInt => "tinyint unsigned",
-            ColumnType.SmallInt => "smallint",
-            ColumnType.UnsignedSmallInt => "smallint unsigned",
-            ColumnType.Integer => "int",
-            ColumnType.UnsignedInt => "int unsigned",
-            ColumnType.BigInt => "bigint",
-            ColumnType.UnsignedBigInt => "bigint unsigned",
-            ColumnType.Currency => "decimal(19, 4)",
-            ColumnType.Decimal when column.Precision == 0 => "decimal",
-            ColumnType.Decimal when column.Scale == 0 => $"decimal({column.Precision})",
-            ColumnType.Decimal => $"decimal({column.Precision}, {column.Scale})",
-            ColumnType.SinglePrecision => "float",
-            ColumnType.DoublePrecision or ColumnType.Interval => "double",
-            ColumnType.Date => "date",
-            ColumnType.Time => "time",
-            ColumnType.DateTime => "datetime",
-            ColumnType.Char or ColumnType.NChar => $"char({column.Size})",
-            ColumnType.VarChar or ColumnType.NVarChar => $"varchar({column.Size})",
-            ColumnType.Text or ColumnType.NText or ColumnType.Xml => "longtext",
-            ColumnType.Bit => $"bit({column.Size})",
-            ColumnType.Blob => "longblob",
-            ColumnType.Guid => "char(36)",
-            ColumnType.RowVersion => "tinyblob",
-            ColumnType.Geometry => "geometry",
-            _ => column.NativeType
+           ColumnType.Boolean => "tinyint(1)",
+           ColumnType.TinyInt => "tinyint",
+           ColumnType.UnsignedTinyInt => "tinyint unsigned",
+           ColumnType.SmallInt => "smallint",
+           ColumnType.UnsignedSmallInt => "smallint unsigned",
+           ColumnType.Integer => "int",
+           ColumnType.UnsignedInt => "int unsigned",
+           ColumnType.BigInt => "bigint",
+           ColumnType.UnsignedBigInt => "bigint unsigned",
+           ColumnType.Currency => "decimal(19, 4)",
+           ColumnType.Decimal when precision == 0 => "decimal",
+           ColumnType.Decimal when scale == 0 => $"decimal({precision})",
+           ColumnType.Decimal => $"decimal({precision}, {scale})",
+           ColumnType.SinglePrecision => "float",
+           ColumnType.DoublePrecision or ColumnType.Interval => "double",
+           ColumnType.Date => "date",
+           ColumnType.Time => "time",
+           ColumnType.DateTime => "datetime",
+           ColumnType.Char or ColumnType.NChar => $"char({size})",
+           ColumnType.VarChar or ColumnType.NVarChar => size > 0 ? $"varchar({size})" : "longtext",
+           ColumnType.Text or ColumnType.NText or ColumnType.Xml => "longtext",
+           ColumnType.Bit => size > 0 ? $"bit({size})" : "longblob",
+           ColumnType.Blob => "longblob",
+           ColumnType.Guid => "char(36)",
+           ColumnType.RowVersion => "tinyblob",
+           ColumnType.Geometry => "geometry",
+           _ => nativeType
         };
+    }
+
+    protected override string GetTypeReference(DataType dataType)
+    {
+        if (dataType.PossibleValues.IsEmpty)
+            return base.GetTypeReference(dataType);
+        
+        var members = string.Join(", ", dataType.PossibleValues.Select(v => Format(v, ColumnType.VarChar)));
+        
+        return dataType.IsEnumerated
+             ? $"enum({string.Join(", ", members)})"
+             : $"set({string.Join(", ", members)})";
+    }
 
     protected override void WriteTableCreationSuffix(Table table)
     {

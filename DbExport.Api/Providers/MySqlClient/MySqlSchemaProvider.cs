@@ -58,6 +58,8 @@ public partial class MySqlSchemaProvider : ISchemaProvider
                            WHERE
                                TABLE_SCHEMA = '{0}' AND
                                TABLE_NAME = '{1}'
+                           ORDER BY
+                               ORDINAL_POSITION
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
@@ -181,8 +183,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         var values = helper.Query(string.Format(sql, DatabaseName, tableName, columnName), SqlHelper.ToArray);
         var nativeType = values[0].ToString()!;
 
-        if (nativeType.StartsWith("enum(", StringComparison.OrdinalIgnoreCase) ||
-            nativeType.StartsWith("set(", StringComparison.OrdinalIgnoreCase))
+        if (UserTypeRegex().IsMatch(nativeType))
         {
             metadata["type"] = ColumnType.UserDefined;
             metadata["nativeType"] = $"{tableName}_{columnName}";
@@ -359,8 +360,8 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         var nativeType = values["COLUMN_TYPE"].ToString();
         var isEnum = nativeType!.StartsWith("enum(", StringComparison.OrdinalIgnoreCase);
                 
-        metadata["type"] = ColumnType.UserDefined;
         metadata["nativeType"] = "varchar";
+        metadata["type"] = ColumnType.VarChar;
         metadata["size"] = Utility.ToInt16(values["character_maximum_length"]);
         metadata["precision"] = Utility.ToByte(values["numeric_precision"]);
         metadata["scale"] = Utility.ToByte(values["numeric_scale"]);
@@ -452,6 +453,9 @@ public partial class MySqlSchemaProvider : ISchemaProvider
             "SET NULL" => ForeignKeyRule.SetNull,
             _ => ForeignKeyRule.None
         };
+    
+    [GeneratedRegex("(enum|set)", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+    private static partial Regex UserTypeRegex();
     
     [GeneratedRegex("utf8", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex Utf8Regex();

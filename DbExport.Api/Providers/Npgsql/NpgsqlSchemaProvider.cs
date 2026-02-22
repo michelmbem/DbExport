@@ -162,7 +162,8 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                            	    IDENTITY_INCREMENT,
                            	    IS_GENERATED,
                            	    GENERATION_EXPRESSION,
-                           	    UDT_NAME
+                           	    UDT_NAME,
+                           	    UDT_SCHEMA
                            FROM
                            	    INFORMATION_SCHEMA.COLUMNS
                            WHERE
@@ -184,7 +185,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         if ("USER-DEFINED".Equals(nativeType, StringComparison.OrdinalIgnoreCase))
         {
             metadata["type"] = ColumnType.UserDefined;
-            metadata["nativeType"] = values[12].ToString();
+            metadata["nativeType"] = $"{values[13]}.{values[12]}";
         }
         else
         {
