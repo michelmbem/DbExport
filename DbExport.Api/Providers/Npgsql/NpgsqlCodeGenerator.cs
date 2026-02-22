@@ -17,12 +17,6 @@ public class NpgsqlCodeGenerator : CodeGenerator
 
     #endregion
 
-    #region New Properties
-
-    public string DbOwner { get; set; }
-
-    #endregion
-
     #region Overriden Properties
 
     public override string ProviderName => ProviderNames.POSTGRESQL;
@@ -59,7 +53,15 @@ public class NpgsqlCodeGenerator : CodeGenerator
     protected override string GetTypeName(Column column)
     {
         var visitIdentities = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
-        return visitIdentities && column.IsIdentity ? "serial" : base.GetTypeName(column);
+        
+        if (visitIdentities && column.IsIdentity)
+            return column.ColumnType switch
+            {
+                ColumnType.BigInt or ColumnType.UnsignedBigInt => "bigserial",
+                _ => "serial"
+            };
+        
+        return base.GetTypeName(column);
     }
 
     protected override string GetTypeName(IDataItem item) =>
@@ -126,20 +128,6 @@ public class NpgsqlCodeGenerator : CodeGenerator
                 "E'" + Utility.GetString((byte[])value) + "'::bytea",
             _ => base.Format(value, columnType)
         };
-    }
-
-    protected override void WriteTableCreationSuffix(Table table)
-    {
-        WriteLine(" WITH (");
-        Indent();
-        WriteLine("OIDS = FALSE");
-        Unindent();
-        Write(")");
-
-        if (string.IsNullOrEmpty(DbOwner)) return;
-        
-        WriteDelimiter();
-        Write("ALTER TABLE {0} OWNER TO {1}", Escape(table.Name), DbOwner);
     }
 
     #endregion
