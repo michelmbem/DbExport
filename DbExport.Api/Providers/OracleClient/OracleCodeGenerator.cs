@@ -30,7 +30,7 @@ public class OracleCodeGenerator : CodeGenerator
     {
         base.VisitColumn(column);
 
-        var visitIdentities = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
+        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
         
         if (visitIdentities && column.IsIdentity)
             Write($" GENERATED ALWAYS AS IDENTITY (START WITH {column.IdentitySeed}, INCREMENT BY {column.IdentityIncrement})");

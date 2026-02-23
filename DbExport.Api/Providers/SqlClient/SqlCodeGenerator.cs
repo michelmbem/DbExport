@@ -38,7 +38,7 @@ public class SqlCodeGenerator : CodeGenerator
     {
         base.VisitColumn(column);
 
-        var visitIdentities = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
+        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
 
         if (visitIdentities && column.IsIdentity)
             Write(" IDENTITY({0}, {1})", column.IdentitySeed, column.IdentityIncrement);

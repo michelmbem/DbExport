@@ -87,10 +87,10 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     public virtual void VisitDatabase(Database database)
     {
-        var visitSchema = ExportOptions == null || ExportOptions.ExportSchema;
-        var visitData = ExportOptions == null || ExportOptions.ExportData;
-        var visitFKs = true == ExportOptions?.HasFlag(ExportFlags.ExportForeignKeys);
-        var visitIdent = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
+        var visitSchema = ExportOptions?.ExportSchema == true;
+        var visitData = ExportOptions?.ExportData == true;
+        var visitFKs = ExportOptions?.HasFlag(ExportFlags.ExportForeignKeys) == true;
+        var visitIdent = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
 
         WriteComment("Database: {0}", database.Name);
         WriteComment("Generated on: {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -156,9 +156,9 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     public virtual void VisitTable(Table table)
     {
-        var visitPKs = true == ExportOptions?.HasFlag(ExportFlags.ExportPrimaryKeys);
-        var visitIndexes = true == ExportOptions?.HasFlag(ExportFlags.ExportIndexes);
-        var visitFKs = true == ExportOptions?.HasFlag(ExportFlags.ExportForeignKeys);
+        var visitPKs = ExportOptions?.HasFlag(ExportFlags.ExportPrimaryKeys) == true;
+        var visitIndexes = ExportOptions?.HasFlag(ExportFlags.ExportIndexes) == true;
+        var visitFKs = ExportOptions?.HasFlag(ExportFlags.ExportForeignKeys) == true;
 
         WriteLine("CREATE TABLE {0} (", Escape(table.Name));
         Indent();
@@ -203,7 +203,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     public virtual void VisitColumn(Column column)
     {
-        var visitDefaults = true == ExportOptions?.HasFlag(ExportFlags.ExportDefaults);
+        var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
 
         Write("{0} {1}", Escape(column.Name), GetTypeName(column));
             
@@ -376,7 +376,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     protected virtual void WriteInsertDirective(Table table, DbDataReader dr)
     {
-        var skipIdentity = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
+        var skipIdentity = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
         var insertableColumns = table.Columns.Where(IsSelected).ToImmutableList();
         
         Write("INSERT INTO {0} (", Escape(table.Name));

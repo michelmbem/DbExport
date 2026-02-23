@@ -30,7 +30,7 @@ public class SQLiteCodeGenerator : CodeGenerator
 
     public override void VisitColumn(Column column)
     {
-        var visitIdentities = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
+        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
 
         if (visitIdentities && column.IsIdentity)
             Write("{0} integer NOT NULL UNIQUE", Escape(column.Name));

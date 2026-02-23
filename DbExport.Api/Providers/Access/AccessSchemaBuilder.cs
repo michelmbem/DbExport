@@ -18,10 +18,10 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     public void VisitDatabase(Database database)
     {
-        var visitSchema = ExportOptions == null || ExportOptions.ExportSchema;
-        var visitData = ExportOptions == null || ExportOptions.ExportData;
-        var visitFKs = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportForeignKeys);
-        var visitIdent = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
+        var visitSchema = ExportOptions?.ExportSchema == true;
+        var visitData = ExportOptions?.ExportData == true;
+        var visitFKs = ExportOptions?.HasFlag(ExportFlags.ExportForeignKeys) == true;
+        var visitIdent = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
 
         var catalog = new ADOX.Catalog();
 
@@ -61,8 +61,8 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     public void VisitTable(Table table)
     {
-        var visitPKs = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportPrimaryKeys);
-        var visitIndexes = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIndexes);
+        var visitPKs = ExportOptions?.HasFlag(ExportFlags.ExportPrimaryKeys) == true;
+        var visitIndexes = ExportOptions?.HasFlag(ExportFlags.ExportIndexes) == true;
 
         Write("CREATE TABLE {0} (", Escape(table.Name));
 
@@ -94,7 +94,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     public void VisitColumn(Column column)
     {
-        var visitDefaults = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportDefaults);
+        var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
 
         Write("{0} {1}", Escape(column.Name), GetTypeName(column, ExportOptions));
         
@@ -198,14 +198,18 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     private static string GetTypeName(Column column, ExportOptions options)
     {
-        if (column.ColumnType == ColumnType.UserDefined) return GetTypeName(column.DataType);
+        if (column.ColumnType == ColumnType.UserDefined)
+        {
+            var dataType = column.DataType;
+            if (dataType != null) return GetTypeName(dataType);
+        }
         
-        return true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities) && column.IsIdentity
+        return options?.HasFlag(ExportFlags.ExportIdentities) == true && column.IsIdentity
              ? "counter"
              : GetTypeName((IDataItem)column);
     }
 
-    private string GetTypeName(IDataItem item) =>
+    private static string GetTypeName(IDataItem item) =>
         item.ColumnType switch
         {
             ColumnType.Boolean => "bit",
@@ -287,7 +291,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     private void ImportRecord(Table table, DbDataReader dr)
     {
-        var skipIdentity = ExportOptions == null || ExportOptions.HasFlag(ExportFlags.ExportIdentities);
+        var skipIdentity = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
         var comma = false;
 
         Write("INSERT INTO {0} (", Escape(table.Name));

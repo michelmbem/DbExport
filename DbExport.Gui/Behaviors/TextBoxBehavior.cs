@@ -31,7 +31,7 @@ public class TextBoxBehavior : AvaloniaObject
 
         static void OnTextInput(object? sender, TextInputEventArgs e)
         {
-            if (false == e.Text?.All(char.IsDigit))
+            if (e.Text?.All(char.IsDigit) == false)
                 e.Handled = true;
         }
     }

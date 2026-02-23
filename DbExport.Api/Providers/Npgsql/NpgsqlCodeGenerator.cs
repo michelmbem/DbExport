@@ -35,7 +35,7 @@ public class NpgsqlCodeGenerator : CodeGenerator
             
             if (!dataType.IsNullable) Write(" NOT NULL");
             
-            var visitDefaults = true == ExportOptions?.HasFlag(ExportFlags.ExportDefaults);
+            var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
             if (visitDefaults && !Utility.IsEmpty(dataType.DefaultValue))
                 Write(" DEFAULT {0}", Format(dataType.DefaultValue, dataType.ColumnType));
             
@@ -52,7 +52,7 @@ public class NpgsqlCodeGenerator : CodeGenerator
 
     protected override string GetTypeName(Column column)
     {
-        var visitIdentities = true == ExportOptions?.HasFlag(ExportFlags.ExportIdentities);
+        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
         
         if (visitIdentities && column.IsIdentity)
             return column.ColumnType switch

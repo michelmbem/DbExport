@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DbExport.Schema;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using DbExport.Schema;
 
 namespace DbExport.Providers.Access;
 
@@ -81,11 +81,12 @@ public class AccessSchemaProvider : ISchemaProvider
 
     public Dictionary<string, object> GetTableMeta(string tableName, string tableOwner)
     {
-        Dictionary<string, object> metadata = [];
         var table = catalog.Tables[tableName];
-
-        metadata["name"] = tableName;
-        metadata["owner"] = "Admin";
+        Dictionary<string, object> metadata = new()
+        {
+            ["name"] = tableName,
+            ["owner"] = "Admin"
+        };
         
         foreach (ADOX.Index index in table.Indexes)
         {
@@ -105,25 +106,27 @@ public class AccessSchemaProvider : ISchemaProvider
 
     public Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
-        Dictionary<string, object> metadata = [];
         var table = catalog.Tables[tableName];
         var column = table.Columns[columnName];
-        ColumnType columnType;
+        Dictionary<string, object> metadata = new()
+        {
+            ["name"] = column.Name,
+            ["type"] = GetColumnType(column.Type),
+            ["nativeType"] = column.Type.ToString(),
+            ["size"] = (short)column.DefinedSize,
+            ["precision"] = (byte)column.Precision,
+            ["scale"] = column.NumericScale,
+            ["defaultValue"] = DBNull.Value,
+            ["description"] = string.Empty
+        };
 
-        metadata["name"] = column.Name;
-        metadata["type"] = columnType = GetColumnType(column.Type);
-        metadata["nativeType"] = column.Type.ToString();
-        metadata["size"] = (short)column.DefinedSize;
-        metadata["precision"] = (byte)column.Precision;
-        metadata["scale"] = column.NumericScale;
-        metadata["defaultValue"] = DBNull.Value;
-        metadata["description"] = string.Empty;
+        var defaultValue = column.Properties["Default"].Value;
+        if (!Utility.IsEmpty(defaultValue))
+            metadata["defaultValue"] = Parse(defaultValue.ToString(), (ColumnType)metadata["type"]);
 
-        if (!Utility.IsEmpty(column.Properties["Default"].Value))
-            metadata["defaultValue"] = Parse(column.Properties["Default"].Value.ToString(), columnType);
-
-        if (!Utility.IsEmpty(column.Properties["Description"].Value))
-            metadata["description"] = column.Properties["Description"].Value.ToString();
+        var description = column.Properties["Description"].Value;
+        if (!Utility.IsEmpty(description))
+            metadata["description"] = description.ToString();
 
         var attributes = ColumnAttributes.None;
 
@@ -147,7 +150,6 @@ public class AccessSchemaProvider : ISchemaProvider
 
     public Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
-        var metadata = new Dictionary<string, object>();
         var table = catalog.Tables[tableName];
         var index = table.Indexes[indexName];
 
@@ -155,17 +157,17 @@ public class AccessSchemaProvider : ISchemaProvider
         for (int i = 0; i < columns.Length; ++i)
             columns[i] = index.Columns[i].Name;
 
-        metadata["name"] = indexName;
-        metadata["unique"] = index.Unique;
-        metadata["primaryKey"] = index.PrimaryKey;
-        metadata["columns"] = columns;
-
-        return metadata;
+        return new Dictionary<string, object>
+        {
+            ["name"] = indexName,
+            ["unique"] = index.Unique,
+            ["primaryKey"] = index.PrimaryKey,
+            ["columns"] = columns
+        };
     }
 
     public Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
-        var metadata = new Dictionary<string, object>();
         var table = catalog.Tables[tableName];
         var key = table.Keys[fkName];
 
@@ -178,15 +180,16 @@ public class AccessSchemaProvider : ISchemaProvider
             relatedColumns[i] = key.Columns[i].RelatedColumn;
         }
 
-        metadata["name"] = fkName;
-        metadata["columns"] = columns;
-        metadata["relatedName"] = key.RelatedTable;
-        metadata["relatedOwner"] = string.Empty;
-        metadata["relatedColumns"] = relatedColumns;
-        metadata["updateRule"] = GetFKRule(key.UpdateRule);
-        metadata["deleteRule"] = GetFKRule(key.DeleteRule);
-
-        return metadata;
+        return new Dictionary<string, object>
+        {
+            ["name"] = fkName,
+            ["columns"] = columns,
+            ["relatedName"] = key.RelatedTable,
+            ["relatedOwner"] = string.Empty,
+            ["relatedColumns"] = relatedColumns,
+            ["updateRule"] = GetFKRule(key.UpdateRule),
+            ["deleteRule"] = GetFKRule(key.DeleteRule)
+        };
     }
 
     #endregion
@@ -218,7 +221,7 @@ public class AccessSchemaProvider : ISchemaProvider
 
     private static object Parse(string value, ColumnType columnType)
     {
-        if (Utility.IsEmpty(value) || value.Equals("NULL", StringComparison.OrdinalIgnoreCase))
+        if (Utility.IsEmpty(value) || "NULL".Equals(value, StringComparison.OrdinalIgnoreCase))
             return DBNull.Value;
         
         var ci = CultureInfo.InvariantCulture;
