@@ -91,7 +91,7 @@
                   IsEditable="True"
                   ItemsSource="{Binding AllCatalogs}"
                   Text="{Binding Catalog}"
-                  DropDownOpened="OnCatalogComboBoxDropDownOpened"/>
+                  b:ComboBoxBehavior.DropDown="{Binding ReloadCatalogsCommand}"/>
         <Label Grid.Row="3"
                Grid.Column="2"
                Content="Schema :"
@@ -104,7 +104,7 @@
                   ItemsSource="{Binding AvailableSchemas}"
                   Text="{Binding Schema}"
                   IsVisible="{Binding !IsDestination}"
-                  DropDownOpened="OnSchemaComboBoxDropDownOpened"/>
+                  b:ComboBoxBehavior.DropDown="{Binding ReloadSchemasCommand}"/>
         <Button Grid.Row="4"
                 Grid.Column="0"
                 Grid.ColumnSpan="4"

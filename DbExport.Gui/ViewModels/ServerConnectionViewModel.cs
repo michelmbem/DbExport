@@ -3,9 +3,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
-
+using CommunityToolkit.Mvvm.Input;
 using DbExport.Providers;
-
 using Serilog;
 
 namespace DbExport.Gui.ViewModels;
@@ -42,7 +41,8 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
 
     public override string SelectedSchema => Schema ?? string.Empty;
 
-    public void ReloadCatalogs()
+    [RelayCommand]
+    private void ReloadCatalogs()
     {
         AllCatalogs.Clear();
 
@@ -60,7 +60,8 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
         }
     }
 
-    public void ReloadSchemas()
+    [RelayCommand]
+    private void ReloadSchemas()
     {
         AvailableSchemas.Clear();
 
