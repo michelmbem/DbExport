@@ -71,9 +71,14 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     public void Dispose()
     {
-        if (!closeOutput) return;
-        Output.Close();
+        Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing && closeOutput)
+            Output.Dispose();
     }
 
     #endregion
@@ -278,9 +283,16 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     protected virtual string Escape(string name) => Utility.Escape(name, ProviderName);
 
-    protected virtual string GetTypeName(Column column) => column.ColumnType == ColumnType.UserDefined
-        ? GetTypeReference(column.DataType)
-        : GetTypeName((IDataItem)column);
+    protected virtual string GetTypeName(Column column)
+    {
+        if (column.ColumnType == ColumnType.UserDefined)
+        {
+            var dataType = column.DataType;
+            if (dataType != null) return GetTypeReference(dataType);
+        }
+
+        return GetTypeName((IDataItem)column);
+    }
 
     protected virtual string GetTypeName(IDataItem item) => IDataItem.GetFullTypeName(item, false);
 

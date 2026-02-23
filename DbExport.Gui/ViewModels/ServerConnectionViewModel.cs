@@ -60,7 +60,6 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
         }
     }
 
-    [RelayCommand]
     private void ReloadSchemas()
     {
         AvailableSchemas.Clear();
@@ -86,5 +85,10 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
     partial void OnTrustedConnectionChanged(bool value)
     {
         if (value) Username = Password = null;
+    }
+    
+    partial void OnCatalogChanged(string? value)
+    {
+        ReloadSchemas();
     }
 }

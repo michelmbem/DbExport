@@ -103,8 +103,7 @@
                   IsEditable="True"
                   ItemsSource="{Binding AvailableSchemas}"
                   Text="{Binding Schema}"
-                  IsVisible="{Binding !IsDestination}"
-                  b:ComboBoxBehavior.DropDown="{Binding ReloadSchemasCommand}"/>
+                  IsVisible="{Binding !IsDestination}"/>
         <Button Grid.Row="4"
                 Grid.Column="0"
                 Grid.ColumnSpan="4"
