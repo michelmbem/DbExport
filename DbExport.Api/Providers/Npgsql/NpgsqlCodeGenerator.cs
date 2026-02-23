@@ -21,8 +21,6 @@ public class NpgsqlCodeGenerator : CodeGenerator
 
     public override string ProviderName => ProviderNames.POSTGRESQL;
 
-    protected override bool SupportsDbCreation => false;
-
     #endregion
 
     #region Overriden Methods
@@ -82,7 +80,7 @@ public class NpgsqlCodeGenerator : CodeGenerator
             ColumnType.Time => "time",
             ColumnType.DateTime => "timestamp",
             ColumnType.Interval => "interval",
-            ColumnType.Char or ColumnType.NChar => $"char({item.Size})",
+            ColumnType.Char or ColumnType.NChar => $"character({item.Size})",
             ColumnType.VarChar or ColumnType.NVarChar => item.Size > 0 ? $"character varying({item.Size})" : "text",
             ColumnType.Text or ColumnType.NText => "text",
             ColumnType.Bit => item.Size > 0 ? $"bit varying({item.Size})" : "bytea",
@@ -95,7 +93,9 @@ public class NpgsqlCodeGenerator : CodeGenerator
         };
 
     protected override string GetTypeReference(DataType dataType) =>
-        dataType.PossibleValues.IsEmpty || dataType.IsEnumerated ? dataType.Name : $"{dataType.Name}[]";
+        dataType.PossibleValues.IsEmpty || dataType.IsEnumerated
+            ? $"public.{dataType.Name}"
+            : $"public.{dataType.Name}[]";
 
     protected override string GetKeyName(Key key)
     {
@@ -128,6 +128,13 @@ public class NpgsqlCodeGenerator : CodeGenerator
                 "E'" + Utility.GetString((byte[])value) + "'::bytea",
             _ => base.Format(value, columnType)
         };
+    }
+
+    protected override void WriteDbCreationDirective(Database database)
+    {
+        Write("CREATE DATABASE {0}", database.Name);
+        WriteDelimiter();
+        WriteLine();
     }
 
     #endregion

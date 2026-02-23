@@ -40,6 +40,12 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         Dispose(true);
     }
 
+    private void Dispose(bool disposing)
+    {
+        if (disposing && disposeConnection)
+            connection.Dispose();
+    }
+
     public TResult Query<TResult>(string sql, Func<DbDataReader, TResult> extractor)
     {
         TResult result;
@@ -102,12 +108,81 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         return result;
     }
 
-    public void ExecuteScript(string script)
+    public static void ExecuteScript(string providerName, string connectionString, string script)
     {
-        if (ProviderName == ProviderNames.SQLSERVER)
-            ExecuteSqlScript(script);
-        else
-            Execute(script);
+        switch (providerName)
+        {
+            case ProviderNames.SQLSERVER:
+                ExecuteSqlScript(connectionString, script);
+                break;
+            case ProviderNames.POSTGRESQL:
+                ExecutePgScript(connectionString, script);
+                break;
+            case ProviderNames.ORACLE:
+                ExecuteBatch(providerName, connectionString, script);
+                break;
+            default:
+            {
+                using var helper = new SqlHelper(providerName, connectionString);
+                helper.Execute(script);
+                break;
+            }
+        }
+    }
+
+    private static void ExecuteSqlScript(string connectionString, string script)
+    {
+        using var helper = new SqlHelper(ProviderNames.SQLSERVER, connectionString);
+        var match = SqlCreateDbRegex().Match(script);
+        
+        if (match.Success)
+        {
+            var sqlCreateDb = match.Value[..^2].TrimEnd();
+            helper.Execute(sqlCreateDb);
+            script = script[(match.Index + match.Length)..];
+        }
+
+        script = SqlDelimiterRegex().Replace(script, ";\n");
+        helper.Execute(script);
+    }
+
+    private static void ExecutePgScript(string connectionString, string script)
+    {
+        var match = CreateDbRegex().Match(script);
+        
+        if (match.Success)
+        {
+            var createDb = match.Value[..^1];
+            var dbName = match.Groups[1].Value;
+            
+            using (var helper1 = new SqlHelper(ProviderNames.POSTGRESQL, connectionString))
+                helper1.Execute(createDb);
+            
+            var builder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString) { Database = dbName };
+            connectionString = builder.ToString();
+            
+            script = script[(match.Index + match.Length)..];
+        }
+        
+        ExecuteBatch(ProviderNames.POSTGRESQL, connectionString, script);
+    }
+
+    private static void ExecuteBatch(string providerName, string connectionString, string script)
+    {
+        using var conn = Utility.GetConnection(providerName, connectionString);
+        var batch = conn.CreateBatch();
+
+        foreach (var statement in DelimiterRegex().Split(script))
+        {
+            if (string.IsNullOrWhiteSpace(statement)) continue;
+            
+            var command = batch.CreateBatchCommand();
+            command.CommandText = statement.Trim();
+            batch.BatchCommands.Add(command);
+        }
+
+        conn.Open();
+        batch.ExecuteNonQuery();
     }
 
     public static (DbDataReader, DbConnection) OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
@@ -194,26 +269,11 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         return result;
     }
 
-    private void Dispose(bool disposing)
-    {
-        if (disposing && disposeConnection)
-            connection.Dispose();
-    }
-
-    private void ExecuteSqlScript(string script)
-    {
-        var match = SqlCreateDbRegex().Match(script);
-        
-        if (match.Success)
-        {
-            var sqlCreateDb = match.Value[..^2].TrimEnd();
-            Execute(sqlCreateDb);
-            script = script[(match.Index + match.Length)..];
-        }
-
-        script = SqlDelimiterRegex().Replace(script, ";\n");
-        Execute(script);
-    }
+    [GeneratedRegex(@"CREATE DATABASE (.+)\s*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    private static partial Regex CreateDbRegex();
+    
+    [GeneratedRegex(@";(?=(?:[^']*'[^']*')*[^']*$)", RegexOptions.Compiled)]
+    private static partial Regex DelimiterRegex();
 
     [GeneratedRegex(@"CREATE DATABASE (.+)\s+GO", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex SqlCreateDbRegex();

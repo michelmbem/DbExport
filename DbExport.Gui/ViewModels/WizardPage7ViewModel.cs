@@ -233,8 +233,7 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
                     return;
             }
 #endif
-           using var helper = new SqlHelper(Summary?.TargetProvider.Name, Summary?.TargetConnectionString);
-           helper.ExecuteScript(SqlScript);
+           SqlHelper.ExecuteScript(Summary?.TargetProvider.Name, Summary?.TargetConnectionString, SqlScript);
        }
        catch (Exception e)
        {
@@ -244,14 +243,10 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     }
 
     private bool CanExecuteScript() =>
-        Summary != null &&
-        Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsScriptExecution) &&
-        (ScriptIsReady() || !Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsDDL));
+        Summary != null && (ScriptIsReady() || !Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsDDL));
 
     private bool CanSaveScript() =>
-        Summary != null &&
-        Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsDDL) &&
-        ScriptIsReady();
+        Summary != null && Summary.TargetProvider.HasFeature(ProviderFeatures.SupportsDDL) && ScriptIsReady();
 
     private bool ScriptIsReady() => !(IsBusy || string.IsNullOrWhiteSpace(SqlScript));
     

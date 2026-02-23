@@ -11,15 +11,14 @@ public enum ProviderFeatures
     SupportsTrustedConnection = 2,
     SupportsDatabaseCreation = 4,
     SupportsDDL = 8,
-    SupportsScriptExecution = 16,
     
-    Access = IsFileBased | SupportsScriptExecution,
-    LocalDB = Access | SupportsTrustedConnection ,
-    SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation | SupportsDDL| SupportsScriptExecution,
+    Access = IsFileBased,
+    LocalDB = Access | SupportsTrustedConnection,
+    SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation | SupportsDDL,
     Oracle = SupportsTrustedConnection | SupportsDDL,
-    MySql = SupportsDatabaseCreation | SupportsDDL| SupportsScriptExecution,
-    PostgreSql = SupportsDDL | SupportsScriptExecution,
-    SQLite = Access | SupportsDDL ,
+    MySql = SupportsDatabaseCreation | SupportsDDL,
+    PostgreSql = MySql,
+    SQLite = Access | SupportsDDL
 }
 
 public sealed class DataProvider(

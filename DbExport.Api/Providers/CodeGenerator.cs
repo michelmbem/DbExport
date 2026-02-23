@@ -310,11 +310,17 @@ public abstract class CodeGenerator : IVisitor, IDisposable
                 ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Json or
                 ColumnType.Guid or ColumnType.Geometry:
                 return Utility.QuotedStr(value);
-            case ColumnType.Date or ColumnType.Time or ColumnType.DateTime:
-                return $"'{(Convert.ToString(value, CultureInfo.InvariantCulture))}'";
+            case ColumnType.DateTime:
+            case ColumnType.RowVersion when value is DateTime:
+                return $"'{value:yyyy-MM-dd HH:mm:ss}'";
+            case ColumnType.Date:
+                return $"'{value:yyyy-MM-dd}'";
+            case ColumnType.Time:
+                return $"'{value:HH:mm:ss}'";
             case ColumnType.Bit:
                 return $"B'{Utility.ToBitString((byte[])value)}'";
             case ColumnType.Blob:
+            case ColumnType.RowVersion when value is byte[]:
             {
                 var bytes = (byte[])value;
                 return bytes.Length <= 0 ? "''" : $"0x{Utility.BinToHex(bytes)}";
@@ -394,8 +400,12 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         comma = false;
         foreach (var column in insertableColumns)
         {
+            var columnType = column.ColumnType == ColumnType.UserDefined
+                ? column.DataType?.ColumnType ?? ColumnType.VarChar
+                : column.ColumnType;
+            
             if (comma) Write(", ");
-            Write(Format(dr[column.Name], column.ColumnType));
+            Write(Format(dr[column.Name], columnType));
             comma = true;
         }
 

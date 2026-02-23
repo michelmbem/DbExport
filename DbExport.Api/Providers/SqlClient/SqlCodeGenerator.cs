@@ -84,9 +84,12 @@ public class SqlCodeGenerator : CodeGenerator
 
         return columnType switch
         {
-            ColumnType.Date or ColumnType.Time or ColumnType.DateTime =>
-                $"CONVERT(datetime, {base.Format(value, columnType)}, 20)",
+            ColumnType.DateTime => $"CONVERT(datetime, {base.Format(value, columnType)}, 20)",
+            ColumnType.Date  => $"CONVERT(datetime, {base.Format(value, columnType)}, 23)",
+            ColumnType.Time => $"CONVERT(datetime, {base.Format(value, columnType)}, 24)",
             ColumnType.Bit => base.Format(value, ColumnType.Blob),
+            ColumnType.RowVersion when value is DateTime =>
+                $"CONVERT(datetime, {base.Format(value, ColumnType.DateTime)}, 20)",
             _ => base.Format(value, columnType)
         };
     }

@@ -91,10 +91,11 @@ public class OracleCodeGenerator : CodeGenerator
 
         return columnType switch
         {
-            ColumnType.Date or ColumnType.Time or ColumnType.DateTime =>
-                $"TO_DATE({base.Format(value, columnType)}, 'YYYY-MM-DD HH24:MI:SS')",
+            ColumnType.DateTime => $"TO_DATE({base.Format(value, columnType)}, 'YYYY-MM-DD HH24:MI:SS')",
+            ColumnType.Date => $"TO_DATE({base.Format(value, columnType)}, 'YYYY-MM-DD')",
+            ColumnType.Time => $"TO_DATE({base.Format(value, columnType)}, 'HH24:MI:SS')",
             ColumnType.RowVersion when value is DateTime =>
-                $"TO_DATE({base.Format(value, columnType)}, 'YYYY-MM-DD HH24:MI:SS')",
+                $"TO_DATE({base.Format(value, ColumnType.DateTime)}, 'YYYY-MM-DD HH24:MI:SS')",
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "EMPTY_BLOB()",
             _ => base.Format(value, columnType)
         };

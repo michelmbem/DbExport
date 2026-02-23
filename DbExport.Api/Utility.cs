@@ -54,21 +54,15 @@ public static partial class Utility
         return properties;
     }
 
-    public static string SanitizeConnectionString(string connectionString)
+    public static string TransformConnectionString(string connectionString, Func<string, string, string> transformer)
     {
-        StringBuilder sb = new();
-
-        foreach (var setting in Split(connectionString, ';'))
-        {
-            var members = Split(setting, '=');
-            var (key, value) = (members[0], members.Length > 1 ? members[1] : string.Empty);
-            if (key.Length == 0) continue;
-            if (PasswordRegex().IsMatch(key)) value = new string('*', value.Length);
-            sb.Append($"{key}={value};");
-        }
-
-        return sb.ToString();
+        var properties = ParseConnectionString(connectionString);
+        return string.Join(";", properties.Select(p => $"{p.Key}={transformer(p.Key, p.Value)}"));
     }
+
+    public static string SanitizeConnectionString(string connectionString) =>
+        TransformConnectionString(connectionString, (key, value) =>
+            PasswordRegex().IsMatch(key) ? new string('*', value.Length) : value);
 
     public static DbConnection GetConnection(string providerName, string connectionString)
     {

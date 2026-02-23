@@ -247,9 +247,13 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
                  ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Json or
                  ColumnType.Guid or ColumnType.Geometry:
                 return Utility.QuotedStr(value);
-            case ColumnType.Date or ColumnType.Time or ColumnType.DateTime:
+            case ColumnType.DateTime:
             case ColumnType.RowVersion when value is DateTime:
-                return $"#{(DateTime)value:yyyy-MM-dd HH:mm:ss}#";
+                return $"#{value:yyyy-MM-dd HH:mm:ss}#";
+            case ColumnType.Date:
+                return $"#{value:yyyy-MM-dd}#";
+            case ColumnType.Time:
+                return $"#{value:HH:mm:ss}#";
             case ColumnType.Bit or ColumnType.Blob:
             case ColumnType.RowVersion when value is byte[]:
             {
@@ -310,8 +314,13 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         foreach (Column column in table.Columns)
         {
             if (skipIdentity && column.IsIdentity) continue;
+            
+            var columnType = column.ColumnType == ColumnType.UserDefined
+                ? column.DataType?.ColumnType ?? ColumnType.VarChar
+                : column.ColumnType;
+            
             if (comma) Write(", ");
-            Write(Format(dr[column.Name], column.ColumnType));
+            Write(Format(dr[column.Name], columnType));
             comma = true;
         }
 
