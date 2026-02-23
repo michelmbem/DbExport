@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Data;
 using AvaloniaEdit;
@@ -10,6 +12,9 @@ public class TextEditorBehavior : AvaloniaObject
         AvaloniaProperty.RegisterAttached<TextEditorBehavior, TextEditor, string?>(
             "Text", string.Empty, false, BindingMode.TwoWay);
 
+    private static readonly HashSet<TextEditor> AttachedEditors = [];
+    private static bool isUpdating;
+
     static TextEditorBehavior()
     {
         TextProperty.Changed.AddClassHandler<TextEditor>(OnTextChanged);
@@ -21,6 +26,20 @@ public class TextEditorBehavior : AvaloniaObject
 
     private static void OnTextChanged(TextEditor editor, AvaloniaPropertyChangedEventArgs e)
     {
-        editor.Text = (string?)e.NewValue ?? string.Empty;
+        if (isUpdating) return;
+
+        if (AttachedEditors.Add(editor))
+            editor.TextChanged += OnEditorTextChanged;
+
+        editor.Text = (string?)e.NewValue;
+
+        static void OnEditorTextChanged(object? sender, EventArgs e)
+        {
+            var editor = (TextEditor)sender!;
+
+            isUpdating = true;
+            SetText(editor, editor.Text);
+            isUpdating = false;
+        }
     }
 }
