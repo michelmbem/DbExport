@@ -3,13 +3,12 @@
              xmlns:i="https://github.com/projektanker/icons.avalonia"
              xmlns:ae="https://github.com/avaloniaui/avaloniaedit"
              xmlns:vm="using:DbExport.Gui.ViewModels"
+             xmlns:b="using:DbExport.Gui.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DbExport.Gui.Views.WizardPage7View"
-             x:DataType="vm:WizardPage7ViewModel"
-             AttachedToVisualTree="OnAttachedToVisualTree"
-             DetachedFromVisualTree="OnDetachedFromVisualTree">
+             x:DataType="vm:WizardPage7ViewModel">
 
     <Design.DataContext>
         <vm:WizardPage7ViewModel
@@ -55,7 +54,7 @@
                            ShowLineNumbers="True"
                            FontFamily="{StaticResource RobotoMono}"
                            FontSize="13"
-                           TextChanged="OnSqlEditorTextChanged">
+                           b:TextEditorBehavior.Text="{Binding SqlScript}">
                 <ae:TextEditor.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Undo"

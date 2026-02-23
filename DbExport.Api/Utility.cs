@@ -115,10 +115,10 @@ public static partial class Utility
         DateTime.TryParse(Convert.ToString(value, CI), CI, DateTimeStyles.None, out _);
 
     public static byte ToByte(object value) =>
-        (byte)int.Parse("0" + Convert.ToString(value, CI), NumberStyles.Any, CI);
+        byte.TryParse(Convert.ToString(value, CI), NumberStyles.Any, CI, out var result) ? result : default;
 
     public static short ToInt16(object value) =>
-        (short)int.Parse("0" + Convert.ToString(value, CI), NumberStyles.Any, CI);
+        short.TryParse(Convert.ToString(value, CI), NumberStyles.Any, CI, out var result) ? result : default;
 
     public static string QuotedStr(object value, char quote = '\'') =>
         $"{quote}{value.ToString()?.Replace(quote.ToString(), new string(quote, 2))}{quote}";

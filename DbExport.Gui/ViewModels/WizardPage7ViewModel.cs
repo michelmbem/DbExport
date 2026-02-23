@@ -24,6 +24,9 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     [ObservableProperty]
     private MigrationSummary? summary;
 
+    [ObservableProperty]
+    private string? sqlScript;
+
     public WizardPage7ViewModel()
     {
         Header.Title = "Proceed with migration";
@@ -31,8 +34,6 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
                              "Depending on the target database, you can run it directly from this wizard, " +
                              "or save it to a file and load it in a dedicated tool.";
     }
-
-    public string SqlScript { get; set; } = string.Empty;
 
     public override bool CanMoveForward => false;
 
@@ -123,12 +124,8 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         var codegen = CodeGenerator.Get(summary.TargetProvider.Name, sqlWriter);
         codegen.ExportOptions = summary.ExportOptions;
 
-        switch (codegen)
-        {
-            case SqlCodeGenerator sqlCodeGen:
-                sqlCodeGen.IsLocalDb = summary.TargetProvider.HasFeature(ProviderFeatures.IsFileBased);
-                break;
-        }
+        if (codegen is SqlCodeGenerator sqlCodeGen)
+            sqlCodeGen.IsLocalDb = summary.TargetProvider.HasFeature(ProviderFeatures.IsFileBased);
 
         try
         {
