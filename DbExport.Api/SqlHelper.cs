@@ -108,24 +108,6 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         return result;
     }
 
-    public static void ExecuteBatch(string providerName, string connectionString, string script)
-    {
-        using var conn = Utility.GetConnection(providerName, connectionString);
-        var batch = conn.CreateBatch();
-
-        foreach (var statement in DelimiterRegex().Split(script))
-        {
-            if (string.IsNullOrWhiteSpace(statement)) continue;
-
-            var command = batch.CreateBatchCommand();
-            command.CommandText = statement.Trim();
-            batch.BatchCommands.Add(command);
-        }
-
-        conn.Open();
-        batch.ExecuteNonQuery();
-    }
-
     public static void ExecuteScript(string providerName, string connectionString, string script)
     {
         switch (providerName)
@@ -183,6 +165,36 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         }
         
         ExecuteBatch(ProviderNames.POSTGRESQL, connectionString, script);
+    }
+
+    public static void ExecuteBatch(string providerName, string connectionString, string script)
+    {
+        using var conn = Utility.GetConnection(providerName, connectionString);
+        var statements = DelimiterRegex().Split(script)
+                                         .Select(s => s.Trim())
+                                         .Where(s => s.Length > 0);
+
+        if (conn.CanCreateBatch)
+        {
+            var batch = conn.CreateBatch();
+
+            foreach (var statement in statements)
+            {
+                var command = batch.CreateBatchCommand();
+                command.CommandText = statement;
+                batch.BatchCommands.Add(command);
+            }
+
+            conn.Open();
+            batch.ExecuteNonQuery();
+        }
+        else
+        {
+            using var helper = new SqlHelper(conn);
+
+            foreach (var statement in statements)
+                helper.Execute(statement);
+        }
     }
 
     public static (DbDataReader, DbConnection) OpenTable(Table table, bool skipIdentity, bool skipRowVersion)

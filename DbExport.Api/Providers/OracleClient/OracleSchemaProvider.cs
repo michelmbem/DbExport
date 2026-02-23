@@ -40,11 +40,13 @@ public class OracleSchemaProvider : ISchemaProvider
                            WHERE
                                TEMPORARY = 'N'
                                AND SECONDARY = 'N'
-                               AND OWNER NOT IN (
-                                    'SYS', 'SYSTEM', 'XDB', 'CTXSYS', 'MDSYS', 'ORDSYS', 'OLAPSYS',
-                                    'WMSYS', 'LBACSYS', 'OUTLN', 'DBSNMP', 'APPQOSSYS', 'AUDSYS',
-                                    'DBSFWUSER', 'GSMADMIN_INTERNAL'
-                               )
+                               AND OWNER IN (
+                                   SELECT USERNAME
+                                   FROM ALL_USERS
+                                   WHERE ORACLE_MAINTAINED = 'N' OR CREATED > (
+                                       SELECT CREATED
+                                       FROM ALL_USERS
+                                       WHERE USERNAME = 'OPS$ORACLE'))
                            ORDER BY
                                OWNER,
                                TABLE_NAME
