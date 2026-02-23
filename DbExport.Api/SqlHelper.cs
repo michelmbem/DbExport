@@ -108,6 +108,24 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         return result;
     }
 
+    public static void ExecuteBatch(string providerName, string connectionString, string script)
+    {
+        using var conn = Utility.GetConnection(providerName, connectionString);
+        var batch = conn.CreateBatch();
+
+        foreach (var statement in DelimiterRegex().Split(script))
+        {
+            if (string.IsNullOrWhiteSpace(statement)) continue;
+
+            var command = batch.CreateBatchCommand();
+            command.CommandText = statement.Trim();
+            batch.BatchCommands.Add(command);
+        }
+
+        conn.Open();
+        batch.ExecuteNonQuery();
+    }
+
     public static void ExecuteScript(string providerName, string connectionString, string script)
     {
         switch (providerName)
@@ -130,7 +148,7 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         }
     }
 
-    private static void ExecuteSqlScript(string connectionString, string script)
+    public static void ExecuteSqlScript(string connectionString, string script)
     {
         using var helper = new SqlHelper(ProviderNames.SQLSERVER, connectionString);
         var match = SqlCreateDbRegex().Match(script);
@@ -146,7 +164,7 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         helper.Execute(script);
     }
 
-    private static void ExecutePgScript(string connectionString, string script)
+    public static void ExecutePgScript(string connectionString, string script)
     {
         var match = CreateDbRegex().Match(script);
         
@@ -165,24 +183,6 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         }
         
         ExecuteBatch(ProviderNames.POSTGRESQL, connectionString, script);
-    }
-
-    private static void ExecuteBatch(string providerName, string connectionString, string script)
-    {
-        using var conn = Utility.GetConnection(providerName, connectionString);
-        var batch = conn.CreateBatch();
-
-        foreach (var statement in DelimiterRegex().Split(script))
-        {
-            if (string.IsNullOrWhiteSpace(statement)) continue;
-            
-            var command = batch.CreateBatchCommand();
-            command.CommandText = statement.Trim();
-            batch.BatchCommands.Add(command);
-        }
-
-        conn.Open();
-        batch.ExecuteNonQuery();
     }
 
     public static (DbDataReader, DbConnection) OpenTable(Table table, bool skipIdentity, bool skipRowVersion)

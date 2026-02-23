@@ -263,10 +263,10 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         var def = helper.QueryScalar(string.Format(sql1, tableName, tableOwner, indexName)).ToString();
         var lparen = def!.IndexOf('(');
         var rparen = def.LastIndexOf(')');
-        var columnNames = def.Substring(lparen + 1, rparen - lparen - 1);
+        var columnNames = def[(lparen + 1)..rparen];
 
         metadata["unique"] = def.StartsWith("CREATE UNIQUE INDEX");
-        metadata["columns"] = CommaRegex().Split(columnNames);
+        metadata["columns"] = CommaRegex().Split(columnNames).Select(s => s.StartsWith('"') ? s[1..^1] : s);
         metadata["primaryKey"] = helper.QueryScalar(string.Format(sql2, tableName, tableOwner, indexName)).Equals(1);
 
         return metadata;
