@@ -125,15 +125,17 @@ public class NpgsqlCodeGenerator : CodeGenerator
             ColumnType.Boolean => (bool)value ? "true" : "false",
             ColumnType.RowVersion when value is DateTime => base.Format(value, ColumnType.DateTime),
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion =>
-                "E'" + Utility.GetString((byte[])value) + "'::bytea",
+                $"E'{Utility.GetString((byte[])value)}'::bytea",
             _ => base.Format(value, columnType)
         };
     }
 
     protected override void WriteDbCreationDirective(Database database)
     {
-        Write("CREATE DATABASE {0}", database.Name);
-        WriteDelimiter();
+        WriteLine($"CREATE DATABASE {database.Name};");
+        WriteLine();
+        
+        WriteLine($@"\c {database.Name};");
         WriteLine();
     }
 

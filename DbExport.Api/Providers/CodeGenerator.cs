@@ -315,6 +315,8 @@ public abstract class CodeGenerator : IVisitor, IDisposable
                 return $"'{value:yyyy-MM-dd HH:mm:ss}'";
             case ColumnType.Date:
                 return $"'{value:yyyy-MM-dd}'";
+            case ColumnType.Time when value is TimeSpan:
+                return $"'{value:c}'";
             case ColumnType.Time:
                 return $"'{value:HH:mm:ss}'";
             case ColumnType.Bit:

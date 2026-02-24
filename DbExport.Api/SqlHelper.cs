@@ -137,8 +137,8 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         
         if (match.Success)
         {
-            var sqlCreateDb = match.Value[..^2].TrimEnd();
-            helper.Execute(sqlCreateDb);
+            var createDb = match.Value[..^2].TrimEnd();
+            helper.Execute(createDb);
             script = script[(match.Index + match.Length)..];
         }
 
@@ -162,6 +162,10 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
             connectionString = builder.ToString();
             
             script = script[(match.Index + match.Length)..];
+            match = new Regex($@"\\[Cc]\s+({dbName})\s*;").Match(script);
+            
+            if (match.Success)
+                script = script[(match.Index + match.Length)..];
         }
         
         ExecuteBatch(ProviderNames.POSTGRESQL, connectionString, script);
