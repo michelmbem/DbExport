@@ -420,7 +420,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
             ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value)
                 ? Convert.ToDecimal(value, ci)
                 : DBNull.Value,
-            ColumnType.DateTime => Utility.IsDate(value) ? DateTime.Parse(value.ToString(ci), ci) : DBNull.Value,
+            ColumnType.DateTime => Utility.IsDate(value) ? Utility.ToDate(value) : DBNull.Value,
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or ColumnType.Text
                 or ColumnType.NText => value,
             _ => DBNull.Value

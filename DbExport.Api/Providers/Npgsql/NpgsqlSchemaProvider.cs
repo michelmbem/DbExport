@@ -483,7 +483,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                 ? Convert.ToDecimal(value, ci)
                 : DBNull.Value,
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => Utility.IsDate(value)
-                ? DateTime.Parse(value.ToString(ci), ci)
+                ? Utility.ToDate(value)
                 : DBNull.Value,
             ColumnType.Char or ColumnType.VarChar or ColumnType.Text => value,
             ColumnType.Bit => Utility.FromBitString(value),

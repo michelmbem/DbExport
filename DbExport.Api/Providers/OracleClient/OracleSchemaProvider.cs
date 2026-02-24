@@ -369,7 +369,7 @@ public class OracleSchemaProvider : ISchemaProvider
             ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value, ci) : DBNull.Value,
             ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value, ci) : DBNull.Value,
             ColumnType.Decimal => Utility.IsNumeric(value) ? Convert.ToDecimal(value, ci) : DBNull.Value,
-            ColumnType.DateTime => Utility.IsDate(value) ? DateTime.Parse(value.ToString(ci), ci) : DBNull.Value,
+            ColumnType.DateTime => Utility.IsDate(value) ? Utility.ToDate(value) : DBNull.Value,
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or ColumnType.Text
                 or ColumnType.NText => value,
             _ => DBNull.Value

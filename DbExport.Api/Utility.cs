@@ -6,12 +6,20 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+
 using DbExport.Providers;
 using DbExport.Schema;
+
 using Microsoft.Data.SqlClient;
+
 using MySql.Data.MySqlClient;
+
+using MySqlX.XDevAPI.Common;
+
 using Npgsql;
+
 using Oracle.ManagedDataAccess.Client;
+
 using SQLitePCL;
 
 namespace DbExport;
@@ -113,6 +121,9 @@ public static partial class Utility
 
     public static short ToInt16(object value) =>
         short.TryParse(Convert.ToString(value, CI), NumberStyles.Any, CI, out var result) ? result : default;
+
+    public static DateTime ToDate(object value) =>
+        DateTime.TryParse(Convert.ToString(value, CI), CI, DateTimeStyles.None, out var result) ? result : default;
 
     public static string QuotedStr(object value, char quote = '\'') =>
         $"{quote}{value.ToString()?.Replace(quote.ToString(), new string(quote, 2))}{quote}";
