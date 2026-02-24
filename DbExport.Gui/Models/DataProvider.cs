@@ -17,7 +17,6 @@ public enum ProviderFeatures
     SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation | SupportsDDL,
     Oracle = SupportsTrustedConnection | SupportsDDL,
     MySql = SupportsDatabaseCreation | SupportsDDL,
-    PostgreSql = MySql,
     SQLite = Access | SupportsDDL
 }
 
@@ -25,7 +24,7 @@ public sealed class DataProvider(
     string name,
     string description,
     ProviderFeatures features,
-    IConnectionStringBuilder connectionStringBuilder,
+    IConnectionStringFactory connectionStringFactory,
     string? databaseListQuery = null)
 {
 #if WINDOWS
@@ -41,14 +40,15 @@ public sealed class DataProvider(
     public static DataProvider[] All { get; } =
     [
 #if WINDOWS
-        new(ProviderNames.ACCESS, "Microsoft Access", ProviderFeatures.Access, new OleDbConnectionStringBuilder(), ACCESS_DATABASE_FILE_PATTERN),
-        new(ProviderNames.SQLSERVER, "Microsoft SQL Server LocalDB", ProviderFeatures.LocalDB, new LocalDBConnectionStringBuilder(), LOCALDB_DATABASE_FILE_PATTERN),
+        new(ProviderNames.ACCESS, "Microsoft Access", ProviderFeatures.Access, new OleDbConnectionStringFactory(), ACCESS_DATABASE_FILE_PATTERN),
+        new(ProviderNames.SQLSERVER, "Microsoft SQL Server LocalDB", ProviderFeatures.LocalDB, new LocalDBConnectionStringFactory(), LOCALDB_DATABASE_FILE_PATTERN),
 #endif
-        new(ProviderNames.SQLSERVER, "Microsoft SQL Server", ProviderFeatures.SqlServer, new SqlConnectionStringBuilder(), SQLSERVER_DATABASE_LIST_QUERY),
-        new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.Oracle, new OracleConnectionStringBuilder(), ORACLE_DATABASE_LIST_QUERY),
-        new(ProviderNames.MYSQL, "MySQL", ProviderFeatures.MySql, new MySqlConnectionStringBuilder(), MYSQL_DATABASE_LIST_QUERY),
-        new(ProviderNames.POSTGRESQL, "PostgreSQL", ProviderFeatures.PostgreSql, new NpgsqlConnectionStringBuilder(), POSTGRESQL_DATABASE_LIST_QUERY),
-        new(ProviderNames.SQLITE, "SQLite 3", ProviderFeatures.SQLite, new SQLiteConnectionStringBuilder(), SQLITE_DATABASE_FILE_PATTERN)
+        new(ProviderNames.SQLSERVER, "Microsoft SQL Server", ProviderFeatures.SqlServer, new SqlConnectionStringFactory(), SQLSERVER_DATABASE_LIST_QUERY),
+        new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.Oracle, new OracleConnectionStringFactory(), ORACLE_DATABASE_LIST_QUERY),
+        new(ProviderNames.MYSQL, "MySQL", ProviderFeatures.MySql, new MySqlConnectionStringFactory(), MYSQL_DATABASE_LIST_QUERY),
+        new(ProviderNames.POSTGRESQL, "PostgreSQL", ProviderFeatures.MySql, new NpgsqlConnectionStringFactory(), POSTGRESQL_DATABASE_LIST_QUERY),
+        new(ProviderNames.FIREBIRD, "Firebird", ProviderFeatures.MySql, new FirebirdConnectionStringFactory()),
+        new(ProviderNames.SQLITE, "SQLite 3", ProviderFeatures.SQLite, new SQLiteConnectionStringFactory(), SQLITE_DATABASE_FILE_PATTERN)
     ];
 
     public string Name { get; } = name;
@@ -57,7 +57,7 @@ public sealed class DataProvider(
     
     public ProviderFeatures Features { get; } = features;
     
-    public IConnectionStringBuilder ConnectionStringBuilder { get; } = connectionStringBuilder;
+    public IConnectionStringFactory ConnectionStringFactory { get; } = connectionStringFactory;
     
     public string? DatabaseListQuery { get; } = databaseListQuery;
     

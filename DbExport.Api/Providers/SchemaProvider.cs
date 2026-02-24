@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DbExport.Providers.Firebird;
 using DbExport.Providers.MySqlClient;
 using DbExport.Providers.Npgsql;
 using DbExport.Providers.OracleClient;
@@ -27,6 +28,8 @@ public static class SchemaProvider
                 return new MySqlSchemaProvider(connectionString);
             case ProviderNames.POSTGRESQL:
                 return new NpgsqlSchemaProvider(connectionString);
+            case ProviderNames.FIREBIRD:
+                return new FirebirdSchemaProvider(connectionString);
             case ProviderNames.SQLITE:
                 return new SQLiteSchemaProvider(connectionString);
             default:

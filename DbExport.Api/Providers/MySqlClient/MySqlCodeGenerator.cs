@@ -67,7 +67,7 @@ public class MySqlCodeGenerator : CodeGenerator
             ColumnType.Text or ColumnType.NText or ColumnType.Xml => "longtext",
             ColumnType.Bit => item.Size > 0 ? $"bit({item.Size})" : "longblob",
             ColumnType.Blob => "longblob",
-            ColumnType.Guid => "char(36)",
+            ColumnType.Guid => "binary(16)",
             ColumnType.RowVersion => "tinyblob",
             ColumnType.Geometry => "geometry",
             _ => item.NativeType

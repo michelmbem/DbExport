@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using DbExport.Providers.Firebird;
 using DbExport.Providers.MySqlClient;
 using DbExport.Providers.Npgsql;
 using DbExport.Providers.OracleClient;
@@ -45,6 +46,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
             ProviderNames.ORACLE => new OracleCodeGenerator(output),
             ProviderNames.MYSQL => new MySqlCodeGenerator(output),
             ProviderNames.POSTGRESQL => new NpgsqlCodeGenerator(output),
+            ProviderNames.FIREBIRD => new FirebirdCodeGenerator(output),
             ProviderNames.SQLITE => new SQLiteCodeGenerator(output),
             _ => throw new ArgumentException(null, nameof(providerName))
         };

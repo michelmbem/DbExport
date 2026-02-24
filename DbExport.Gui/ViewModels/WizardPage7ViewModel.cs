@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DbExport.Gui.Models;
 using DbExport.Providers;
+using DbExport.Providers.Firebird;
 using DbExport.Providers.SqlClient;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -124,8 +125,20 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         var codegen = CodeGenerator.Get(summary.TargetProvider.Name, sqlWriter);
         codegen.ExportOptions = summary.ExportOptions;
 
-        if (codegen is SqlCodeGenerator sqlCodeGen)
-            sqlCodeGen.IsLocalDb = summary.TargetProvider.HasFeature(ProviderFeatures.IsFileBased);
+        switch (codegen)
+        {
+            case SqlCodeGenerator sqlCodeGen:
+                sqlCodeGen.IsLocalDb = summary.TargetProvider.HasFeature(ProviderFeatures.IsFileBased);
+                break;
+            case FirebirdCodeGenerator fbCodeGen:
+            {
+                var settings = Utility.ParseConnectionString(summary.TargetConnectionString);
+                fbCodeGen.DbName = settings["initial catalog"];
+                fbCodeGen.DbUser = settings["user id"];
+                fbCodeGen.DbPassword = settings["password"];
+                break;
+            }
+        }
 
         try
         {

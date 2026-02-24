@@ -6,20 +6,13 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-
 using DbExport.Providers;
 using DbExport.Schema;
-
+using FirebirdSql.Data.FirebirdClient;
 using Microsoft.Data.SqlClient;
-
 using MySql.Data.MySqlClient;
-
-using MySqlX.XDevAPI.Common;
-
 using Npgsql;
-
 using Oracle.ManagedDataAccess.Client;
-
 using SQLitePCL;
 
 namespace DbExport;
@@ -43,6 +36,7 @@ public static partial class Utility
         DbProviderFactories.RegisterFactory(ProviderNames.ORACLE, OracleClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.MYSQL, MySqlClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.POSTGRESQL, NpgsqlFactory.Instance);
+        DbProviderFactories.RegisterFactory(ProviderNames.FIREBIRD, FirebirdClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.SQLITE, SQLiteFactory.Instance);
     }
 

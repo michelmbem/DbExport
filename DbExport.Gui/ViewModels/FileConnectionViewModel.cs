@@ -21,7 +21,7 @@ public partial class FileConnectionViewModel : ConnectionViewModel
     private string? password;
 
     public override string ConnectionString =>
-        DataProvider?.ConnectionStringBuilder.Build(Utility.QuotedStr(FilePath, '"'), null, null, false, Username, Password) ?? string.Empty;
+        DataProvider?.ConnectionStringFactory.Build(FilePath, null, null, false, Username, Password) ?? string.Empty;
 
     [RelayCommand]
     private async Task ChooseFile(Window window)

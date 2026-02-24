@@ -37,7 +37,7 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
     public ObservableCollection<string> AvailableSchemas { get; } = [];
 
     public override string ConnectionString =>
-        DataProvider?.ConnectionStringBuilder.Build(Host, Port, Catalog, TrustedConnection, Username, Password) ?? string.Empty;
+        DataProvider?.ConnectionStringFactory.Build(Host, Port, Catalog, TrustedConnection, Username, Password) ?? string.Empty;
 
     public override string SelectedSchema => Schema ?? string.Empty;
 
