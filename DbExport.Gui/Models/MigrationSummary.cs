@@ -1,24 +1,37 @@
+using DbExport.Providers;
 using DbExport.Schema;
 
 namespace DbExport.Gui.Models;
 
-public sealed class MigrationSummary(
-    DataProvider sourceProvider,
-    string sourceConnectionString,
-    DataProvider targetProvider,
-    string targetConnectionString,
-    ExportOptions exportOptions,
-    Database database)
+public sealed class MigrationSummary
 {
-    public DataProvider SourceProvider => sourceProvider;
+    public MigrationSummary(DataProvider sourceProvider,
+                            string sourceConnectionString,
+                            DataProvider targetProvider,
+                            string targetConnectionString,
+                            ExportOptions exportOptions,
+                            Database database)
+    {
+        SourceProvider = sourceProvider;
+        SourceConnectionString = sourceConnectionString;
+        TargetProvider = targetProvider;
+        TargetConnectionString = targetConnectionString;
+        ExportOptions = exportOptions;
+        Database = database;
+        
+        if (TargetProvider.Name == ProviderNames.SQLSERVER)
+            ExportOptions.ProviderSpecific = TargetProvider.HasFeature(ProviderFeatures.IsFileBased);
+    }
 
-    public string SourceConnectionString => sourceConnectionString;
+    public DataProvider SourceProvider { get; }
 
-    public DataProvider TargetProvider => targetProvider;
+    public string SourceConnectionString { get; }
 
-    public string TargetConnectionString => targetConnectionString;
-    
-    public ExportOptions ExportOptions => exportOptions;
+    public DataProvider TargetProvider { get; }
 
-    public Database Database => database;
+    public string TargetConnectionString { get; }
+
+    public ExportOptions ExportOptions { get; }
+
+    public Database Database { get; }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using DbExport.Schema;
 
 namespace DbExport.Providers.Firebird;
@@ -18,7 +19,7 @@ public class FirebirdCodeGenerator : CodeGenerator
 
     #region New Properties
 
-    public string DbName { get; set; }
+    public FirebirdOptions FirebirdOptions => (FirebirdOptions)ExportOptions?.ProviderSpecific;
 
     #endregion
 
@@ -114,13 +115,16 @@ public class FirebirdCodeGenerator : CodeGenerator
             ColumnType.Time => $"TIME {base.Format(value, columnType)}",
             ColumnType.Blob or ColumnType.RowVersion =>
                 $"X'{Utility.BinToHex((byte[])value)}'",
+            ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Json =>
+                FormatText(value.ToString()),
             _ => base.Format(value, columnType)
         };
     }
 
     protected override void WriteDbCreationDirective(Database database)
     {
-        WriteLine($"CREATE DATABASE '{DbName}' DEFAULT CHARACTER SET UTF8;");
+        var dbName = Path.Combine(FirebirdOptions.DataDirectory, database.Name) + ".fdb";
+        WriteLine($"CREATE DATABASE '{dbName}' DEFAULT CHARACTER SET {FirebirdOptions.CharacterSet};");
         WriteLine();
     }
 
@@ -136,5 +140,43 @@ public class FirebirdCodeGenerator : CodeGenerator
             Write($" ON DELETE {GetForeignKeyRuleText(deleteRule)}");
     }
 
+    #endregion
+    
+    #region Utility
+
+    private static string FormatText(string input)
+    {
+        if (input.Length == 0) return "_UTF8 ''";
+
+        var utf8 = Encoding.UTF8;
+        var buffer = new StringBuilder();
+        var chunk = new StringBuilder();
+        var chunkSize = 0;
+
+        foreach (var ch in input)
+        {
+            var s = ch == '\'' ? "''" : ch.ToString();
+            var byteCount = utf8.GetByteCount(s);
+
+            if (chunkSize + byteCount > 16000) FlushChunk();
+
+            chunk.Append(s);
+            chunkSize += byteCount;
+        }
+
+        FlushChunk();
+
+        return buffer.ToString();
+
+        void FlushChunk()
+        {
+            if (chunk.Length == 0) return;
+            if (buffer.Length > 0) buffer.Append(" || ");
+            buffer.Append("_UTF8 '") .Append(chunk).Append('\'');
+            chunk.Clear();
+            chunkSize = 0;
+        }
+    }
+    
     #endregion
 }

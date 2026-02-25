@@ -6,6 +6,7 @@ namespace DbExport.Gui.ViewModels;
 public partial class WizardPage4ViewModel : WizardPageViewModel
 {
     private readonly MySqlOptionsViewModel mysqlOptions = new();
+    private readonly FirebirdOptionsViewModel firebirdOptions = new();
     
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ProviderOptions))]
@@ -44,6 +45,7 @@ public partial class WizardPage4ViewModel : WizardPageViewModel
     public ProviderOptionsViewModel? ProviderOptions => ProviderName switch
     {
         ProviderNames.MYSQL => mysqlOptions,
+        ProviderNames.FIREBIRD => firebirdOptions,
         _ => null
     };
     

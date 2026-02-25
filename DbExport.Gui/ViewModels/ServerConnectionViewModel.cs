@@ -89,6 +89,6 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
     
     partial void OnCatalogChanged(string? value)
     {
-        ReloadSchemas();
+        if (!IsDestination) ReloadSchemas();
     }
 }

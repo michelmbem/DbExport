@@ -18,7 +18,7 @@ public class SqlCodeGenerator : CodeGenerator
 
     #region New Properties
 
-    public bool IsLocalDb { get; set; }
+    public bool IsFileBased => ExportOptions?.ProviderSpecific ?? false;
 
     #endregion
 
@@ -26,7 +26,7 @@ public class SqlCodeGenerator : CodeGenerator
 
     public override string ProviderName => ProviderNames.SQLSERVER;
 
-    protected override bool SupportsDbCreation => !IsLocalDb;
+    protected override bool SupportsDbCreation => !IsFileBased;
 
     protected override bool GeneratesRowVersion => true;
 

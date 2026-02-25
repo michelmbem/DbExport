@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using DbExport.Providers;
+using DbExport.Providers.Firebird;
 using DbExport.Schema;
 using FirebirdSql.Data.FirebirdClient;
 using FirebirdSql.Data.Isql;
@@ -187,7 +188,8 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
             var builder = new FbConnectionStringBuilder(connectionString) { Database = dbName };
             
             connectionString = builder.ToString();
-            FbConnection.CreateDatabase(connectionString);
+            FbConnection.CreateDatabase(connectionString, FirebirdOptions.PageSize,
+                                        FirebirdOptions.ForcesWrites, FirebirdOptions.Overwrite);
             
             script = script[(match.Index + match.Length)..];
         }
