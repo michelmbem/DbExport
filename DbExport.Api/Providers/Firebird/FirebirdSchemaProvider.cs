@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
 using DbExport.Schema;
 
 namespace DbExport.Providers.Firebird;

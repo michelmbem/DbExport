@@ -133,9 +133,8 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
             case FirebirdCodeGenerator fbCodeGen:
             {
                 var settings = Utility.ParseConnectionString(summary.TargetConnectionString);
-                fbCodeGen.DbName = settings["initial catalog"];
-                fbCodeGen.DbUser = settings["user id"];
-                fbCodeGen.DbPassword = settings["password"];
+                fbCodeGen.DbName = Path.Combine(Path.GetDirectoryName(settings["initial catalog"])!,
+                                                summary.Database.Name + ".fdb");
                 break;
             }
         }

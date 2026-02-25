@@ -7,6 +7,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using DbExport.Providers;
 using DbExport.Schema;
+using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Isql;
+using Npgsql;
 
 namespace DbExport;
 
@@ -118,6 +121,9 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
             case ProviderNames.POSTGRESQL:
                 ExecutePgScript(connectionString, script);
                 break;
+            case ProviderNames.FIREBIRD:
+                ExecuteFbScript(connectionString, script);
+                break;
             case ProviderNames.ORACLE:
                 ExecuteBatch(providerName, connectionString, script);
                 break;
@@ -158,7 +164,7 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
             using (var helper1 = new SqlHelper(ProviderNames.POSTGRESQL, connectionString))
                 helper1.Execute(createDb);
             
-            var builder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString) { Database = dbName };
+            var builder = new NpgsqlConnectionStringBuilder(connectionString) { Database = dbName };
             connectionString = builder.ToString();
             
             script = script[(match.Index + match.Length)..];
@@ -169,6 +175,36 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         }
         
         ExecuteBatch(ProviderNames.POSTGRESQL, connectionString, script);
+    }
+
+    public static void ExecuteFbScript(string connectionString, string script)
+    {
+        var match = FbCreateDbRegex().Match(script);
+        
+        if (match.Success)
+        {
+            var dbName = match.Groups[1].Value;
+            var builder = new FbConnectionStringBuilder(connectionString) { Database = dbName };
+            
+            connectionString = builder.ToString();
+            FbConnection.CreateDatabase(connectionString);
+            
+            script = script[(match.Index + match.Length)..];
+        }
+        
+        using var conn = Utility.GetConnection(ProviderNames.FIREBIRD, connectionString);
+        using var cmd = conn.CreateCommand();
+
+        var fbScript = new FbScript(script);
+        fbScript.Parse();
+        
+        conn.Open();
+
+        foreach (var statement in fbScript.Results)
+        {
+            cmd.CommandText = statement.Text;
+            cmd.ExecuteNonQuery();
+        }
     }
 
     public static void ExecuteBatch(string providerName, string connectionString, string script)
@@ -194,10 +230,13 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         }
         else
         {
-            using var helper = new SqlHelper(conn);
-
+            using var cmd = conn.CreateCommand();
+        
             foreach (var statement in statements)
-                helper.Execute(statement);
+            {
+                cmd.CommandText = statement;
+                cmd.ExecuteNonQuery();
+            }
         }
     }
 
@@ -217,7 +256,7 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         var connection = Utility.GetConnection(table.Database);
         connection.Open();
 
-        using var command = connection.CreateCommand();
+        var command = connection.CreateCommand();
         command.CommandText = sb.ToString();
         
         var dataReader = command.ExecuteReader(CommandBehavior.CloseConnection);
@@ -285,15 +324,18 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         return result;
     }
 
-    [GeneratedRegex(@"CREATE DATABASE (.+)\s*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"CREATE\s+DATABASE\s+(\w[\w\d]*)[^;]*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex CreateDbRegex();
     
     [GeneratedRegex(@";(?=(?:[^']*'[^']*')*[^']*$)", RegexOptions.Compiled)]
     private static partial Regex DelimiterRegex();
 
-    [GeneratedRegex(@"CREATE DATABASE (.+)\s+GO", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"CREATE\s+DATABASE\s+(.+)\s+GO", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex SqlCreateDbRegex();
     
     [GeneratedRegex(@"[\r\n]GO[\r\n]", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex SqlDelimiterRegex();
+
+    [GeneratedRegex(@"CREATE\s+DATABASE\s+'([^']+)'[^;]*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    private static partial Regex FbCreateDbRegex();
 }

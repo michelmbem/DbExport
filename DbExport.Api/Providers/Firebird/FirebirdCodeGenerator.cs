@@ -20,10 +20,6 @@ public class FirebirdCodeGenerator : CodeGenerator
 
     public string DbName { get; set; }
 
-    public string DbUser { get; set; }
-
-    public string DbPassword { get; set; }
-
     #endregion
 
     #region Overriden Properties
@@ -124,9 +120,7 @@ public class FirebirdCodeGenerator : CodeGenerator
 
     protected override void WriteDbCreationDirective(Database database)
     {
-        WriteLine($"CREATE DATABASE '{DbName}'");
-        WriteLine($"USER '{DbUser}' PASSWORD '{DbPassword}'");
-        WriteLine("DEFAULT CHARACTER SET UTF8;");
+        WriteLine($"CREATE DATABASE '{DbName}' DEFAULT CHARACTER SET UTF8;");
         WriteLine();
     }
 
