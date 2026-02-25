@@ -123,8 +123,9 @@ public class FirebirdCodeGenerator : CodeGenerator
 
     protected override void WriteDbCreationDirective(Database database)
     {
-        var dbName = Path.Combine(FirebirdOptions.DataDirectory, database.Name) + ".fdb";
-        WriteLine($"CREATE DATABASE '{dbName}' DEFAULT CHARACTER SET {FirebirdOptions.CharacterSet};");
+        var dbName = Path.Combine(FirebirdOptions.DataDirectory, database.Name);
+        WriteLine($"CREATE DATABASE '{dbName}.fdb'");
+        WriteLine($"DEFAULT CHARACTER SET {FirebirdOptions.DefaultCharSet};");
         WriteLine();
     }
 

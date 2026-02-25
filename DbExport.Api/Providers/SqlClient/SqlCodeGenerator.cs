@@ -18,7 +18,7 @@ public class SqlCodeGenerator : CodeGenerator
 
     #region New Properties
 
-    public bool IsFileBased => ExportOptions?.ProviderSpecific ?? false;
+    public bool IsFileBased { get; set; }
 
     #endregion
 
@@ -70,9 +70,10 @@ public class SqlCodeGenerator : CodeGenerator
             ColumnType.Guid => "uniqueidentifier",
             ColumnType.RowVersion => "timestamp",
             ColumnType.Json => "nvarchar(max)",
-            ColumnType.Decimal or ColumnType.DateTime or ColumnType.Date or ColumnType.Time or
-                ColumnType.Char or ColumnType.NChar or ColumnType.Text or ColumnType.NText or
-                ColumnType.Xml or ColumnType.Geometry => base.GetTypeName(item),
+            ColumnType.DateTime => "datetime2",
+            ColumnType.Date or ColumnType.Time or ColumnType.Char or ColumnType.NChar or
+                ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Geometry or
+                ColumnType.Decimal => base.GetTypeName(item),
             _ => item.NativeType
         };
 
@@ -84,9 +85,9 @@ public class SqlCodeGenerator : CodeGenerator
 
         return columnType switch
         {
-            ColumnType.DateTime => $"CONVERT(datetime, {base.Format(value, columnType)}, 20)",
-            ColumnType.Date  => $"CONVERT(datetime, {base.Format(value, columnType)}, 23)",
-            ColumnType.Time => $"CONVERT(datetime, {base.Format(value, columnType)}, 24)",
+            ColumnType.DateTime => $"CONVERT(datetime2, {base.Format(value, columnType)})",
+            ColumnType.Date  => $"CONVERT(date, {base.Format(value, columnType)})",
+            ColumnType.Time => $"CONVERT(time, {base.Format(value, columnType)})",
             ColumnType.Bit => base.Format(value, ColumnType.Blob),
             ColumnType.RowVersion when value is DateTime =>
                 $"CONVERT(datetime, {base.Format(value, ColumnType.DateTime)}, 20)",

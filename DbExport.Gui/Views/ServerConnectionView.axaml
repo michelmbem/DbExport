@@ -47,8 +47,7 @@
                  Grid.Column="1"
                  Name="PortTextBox"
                  b:TextBoxBehavior.NumericOnly="True"
-                 Text="{Binding Port,
-                        Converter={x:Static c:NullableConverters.Int32}}"/>
+                 Text="{Binding Port, Converter={x:Static c:NullableConverters.Int32}}"/>
         <CheckBox Grid.Row="1"
                   Grid.Column="3"
                   Content="Use trusted connection"
@@ -90,7 +89,7 @@
                   Grid.Column="1"
                   IsEditable="True"
                   ItemsSource="{Binding AllCatalogs}"
-                  Text="{Binding Catalog}"
+                  Text="{Binding Catalog, UpdateSourceTrigger=LostFocus}"
                   b:ComboBoxBehavior.DropDown="{Binding ReloadCatalogsCommand}"/>
         <Label Grid.Row="3"
                Grid.Column="2"

@@ -24,6 +24,9 @@
             <Style Selector="ComboBox">
                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
             </Style>
+            <Style Selector="WrapPanel">
+                <Setter Property="ItemWidth" Value="185"/>
+            </Style>
         </Grid.Styles>
         <Label Grid.Row="0"
                Grid.Column="0"
@@ -33,16 +36,17 @@
                  Grid.Row="0"
                  Grid.Column="1"
                  Grid.ColumnSpan="3"
+                 Watermark="Path to the directory where to store the generated .fdb file"
                  Text="{Binding DataDirectory}"/>
         <Label Grid.Row="1"
                Grid.Column="0"
-               Content="Character set :"
+               Content="Default character set :"
                Target="CharacterSetComboBox"/>
         <ComboBox Name="CharacterSetComboBox"
                   Grid.Row="1"
                   Grid.Column="1"
                   ItemsSource="{Binding CharacterSets}"
-                  SelectedItem="{Binding CharacterSet}"/>
+                  SelectedItem="{Binding DefaultCharSet}"/>
         <Label Grid.Row="1"
                Grid.Column="2"
                Content="Page size :"
@@ -51,15 +55,18 @@
                  Grid.Row="1"
                  Grid.Column="3"
                  b:TextBoxBehavior.NumericOnly="True"
-                 Text="{Binding PageSize,
-                        Converter={x:Static c:NullableConverters.Int32}}"/>
-        <CheckBox Grid.Row="2"
-               Grid.Column="1"
-               Content="Force writes"
-               IsChecked="{Binding ForcesWrites}"/>
-        <CheckBox Grid.Row="2"
-                  Grid.Column="3"
-                  Content="Overwrite file if it exists"
-                  IsChecked="{Binding Overwrite}"/>
+                 Text="{Binding PageSize, Converter={x:Static c:NullableConverters.Int32}}"
+                 Watermark="{Binding DefaultPageSize, StringFormat='g'}"/>
+        <Label Grid.Row="2"
+               Grid.Column="0"
+               Content="Other flags :"/>
+        <WrapPanel Grid.Row="2"
+                   Grid.Column="1"
+                   Grid.ColumnSpan="3">
+            <CheckBox Content="Forced writes"
+                      IsChecked="{Binding ForcedWrites}"/>
+            <CheckBox Content="Overwrite file if it exists"
+                      IsChecked="{Binding Overwrite}"/>
+        </WrapPanel>
     </Grid>
 </UserControl>

@@ -4,14 +4,14 @@ public class FirebirdOptions
 {
     public string DataDirectory { get; set; }
     
-    public static string CharacterSet { get; set; } = "UTF8";
+    public string DefaultCharSet { get; set; }
     
     public static int PageSize { get; set; } = 4096;
     
-    public static bool ForcesWrites { get; set; } = true;
-    
-    public static bool Overwrite { get; set; } = false;
-    
+    public static bool ForcedWrites { get; set; } = true;
+
+    public static bool Overwrite { get; set; }
+
     #region Collections
 
     public static string[] CharacterSets { get; } =
@@ -86,9 +86,9 @@ public class FirebirdOptions
                                    | Property | Value |
                                    |----------|-------|
                                    | Data directory | {DataDirectory} |
-                                   | Character set | {CharacterSet} |
-                                   | Page size | {PageSize}|
-                                   | Force writes | {(ForcesWrites ? "Yes" : "No")} |
-                                   | Overwrite file if it exists | {(Overwrite ? "Yes" : "No")}|
+                                   | Default character set | {DefaultCharSet} |
+                                   | Page size | {PageSize} |
+                                   | Forced writes | {(ForcedWrites ? "Yes" : "No")} |
+                                   | Overwrite file if it exists | {(Overwrite ? "Yes" : "No")} |
                                    """;
 }

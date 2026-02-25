@@ -10,16 +10,18 @@ public partial class FirebirdOptionsViewModel : ProviderOptionsViewModel
     private string dataDirectory = string.Empty;
     
     [ObservableProperty]
-    private string characterSet = FirebirdOptions.CharacterSet;
+    private string defaultCharSet = "UTF8";
     
     [ObservableProperty]
     private int? pageSize = FirebirdOptions.PageSize;
     
     [ObservableProperty]
-    private bool forcesWrites = FirebirdOptions.ForcesWrites;
+    private bool forcedWrites = FirebirdOptions.ForcedWrites;
     
     [ObservableProperty]
     private bool overwrite = FirebirdOptions.Overwrite;
+
+    public static int DefaultPageSize => FirebirdOptions.PageSize;
 
     public ObservableCollection<string> CharacterSets { get; } = [..FirebirdOptions.CharacterSets];
 
@@ -29,13 +31,16 @@ public partial class FirebirdOptionsViewModel : ProviderOptionsViewModel
     {
         get
         {
-            FirebirdOptions.CharacterSet = CharacterSet;
-            FirebirdOptions.ForcesWrites = ForcesWrites;
+            FirebirdOptions.ForcedWrites = ForcedWrites;
             FirebirdOptions.Overwrite = Overwrite;
             
             if (PageSize.HasValue) FirebirdOptions.PageSize = PageSize.Value;
             
-            return new FirebirdOptions { DataDirectory = DataDirectory };
+            return new FirebirdOptions
+            {
+                DataDirectory = DataDirectory,
+                DefaultCharSet = DefaultCharSet
+            };
         }
     }
 }

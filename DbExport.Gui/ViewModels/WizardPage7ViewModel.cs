@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DbExport.Gui.Models;
 using DbExport.Providers;
+using DbExport.Providers.SqlClient;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Serilog;
@@ -123,6 +124,9 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         var codegen = CodeGenerator.Get(summary.TargetProvider.Name, sqlWriter);
         codegen.ExportOptions = summary.ExportOptions;
 
+        if (codegen is SqlCodeGenerator sqlCodeGen)
+            sqlCodeGen.IsFileBased = summary.TargetProvider.HasFeature(ProviderFeatures.IsFileBased);
+
         try
         {
             summary.Database.AcceptVisitor(codegen);
@@ -160,7 +164,7 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         if (summary == null) return;
 
         var settings = Utility.ParseConnectionString(summary.TargetConnectionString);
-        var tmpConStr = $"Server={settings["server"]};Integrated Security=true";
+        var tmpConStr = $"Data Source={settings["data source"]};Integrated Security=true";
 
         using (var helper1 = new SqlHelper(summary.TargetProvider.Name, tmpConStr))
         {

@@ -186,11 +186,11 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         {
             var dbName = match.Groups[1].Value;
             var builder = new FbConnectionStringBuilder(connectionString) { Database = dbName };
-            
+
             connectionString = builder.ToString();
             FbConnection.CreateDatabase(connectionString, FirebirdOptions.PageSize,
-                                        FirebirdOptions.ForcesWrites, FirebirdOptions.Overwrite);
-            
+                                        FirebirdOptions.ForcedWrites, FirebirdOptions.Overwrite);
+
             script = script[(match.Index + match.Length)..];
         }
         

@@ -83,8 +83,11 @@ public class SqlConnectionStringFactory : IConnectionStringFactory
         }
         else
         {
-            builder.UserID = username;
-            builder.Password = password;
+            if (!string.IsNullOrWhiteSpace(username))
+                builder.UserID = username;
+
+            if (!string.IsNullOrWhiteSpace(password))
+                builder.Password = password;
         }
 
         return builder.ConnectionString;
@@ -108,10 +111,17 @@ public class OracleConnectionStringFactory : IConnectionStringFactory
             DataSource = dataSourceString
         };
 
-        if (!trustedConnection)
+        if (trustedConnection)
         {
-            builder.UserID = username;
-            builder.Password = password;
+            builder.UserID = "/";
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(username))
+                builder.UserID = username;
+
+            if (!string.IsNullOrWhiteSpace(password))
+                builder.Password = password;
         }
 
         return builder.ConnectionString;
