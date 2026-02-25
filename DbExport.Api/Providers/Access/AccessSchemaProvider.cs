@@ -1,7 +1,6 @@
 ﻿using DbExport.Schema;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 
 namespace DbExport.Providers.Access;
@@ -223,8 +222,6 @@ public class AccessSchemaProvider : ISchemaProvider
     {
         if (Utility.IsEmpty(value) || "NULL".Equals(value, StringComparison.OrdinalIgnoreCase))
             return DBNull.Value;
-        
-        var ci = CultureInfo.InvariantCulture;
 
         return columnType switch
         {
@@ -234,13 +231,13 @@ public class AccessSchemaProvider : ISchemaProvider
                 "1" or "true" => true,
                 _ => DBNull.Value,
             },
-            ColumnType.UnsignedTinyInt => Utility.IsNumeric(value) ? Convert.ToByte(value, ci) : DBNull.Value,
-            ColumnType.SmallInt => Utility.IsNumeric(value) ? Convert.ToInt16(value, ci) : DBNull.Value,
-            ColumnType.Integer => Utility.IsNumeric(value) ? Convert.ToInt32(value, ci) : DBNull.Value,
-            ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value, ci) : DBNull.Value,
-            ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value, ci) : DBNull.Value,
-            ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value) ? Convert.ToDecimal(value, ci) : DBNull.Value,
-            ColumnType.DateTime => Utility.IsDate(value) ? Convert.ToDateTime(value, ci) : DBNull.Value,
+            ColumnType.UnsignedTinyInt => Utility.IsNumeric(value, out var number) ? (byte)number : DBNull.Value,
+            ColumnType.SmallInt => Utility.IsNumeric(value, out var number) ? (short)number : DBNull.Value,
+            ColumnType.Integer => Utility.IsNumeric(value, out var number) ? (int)number : DBNull.Value,
+            ColumnType.SinglePrecision => Utility.IsNumeric(value, out var number) ? (float)number : DBNull.Value,
+            ColumnType.DoublePrecision => Utility.IsNumeric(value, out var number) ? (double)number : DBNull.Value,
+            ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value, out var number) ? number : DBNull.Value,
+            ColumnType.DateTime => Utility.IsDate(value, out var date) ? date : DBNull.Value,
             ColumnType.NVarChar or ColumnType.NText => value,
             _ => DBNull.Value,
         };

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using DbExport.Schema;
 
@@ -355,21 +354,19 @@ public class OracleSchemaProvider : ISchemaProvider
 
     private static object Parse(string value, ColumnType columnType)
     {
-        if (Utility.IsEmpty(value) || value.ToUpper() == "NULL")
+        if (Utility.IsEmpty(value) || "NULL".Equals(value, StringComparison.OrdinalIgnoreCase))
             return DBNull.Value;
-        
-        var ci = CultureInfo.InvariantCulture;
 
         return columnType switch
         {
-            ColumnType.TinyInt => Utility.IsNumeric(value) ? Convert.ToSByte(value, ci) : DBNull.Value,
-            ColumnType.SmallInt => Utility.IsNumeric(value) ? Convert.ToInt16(value, ci) : DBNull.Value,
-            ColumnType.Integer => Utility.IsNumeric(value) ? Convert.ToInt32(value, ci) : DBNull.Value,
-            ColumnType.BigInt => Utility.IsNumeric(value) ? Convert.ToInt64(value, ci) : DBNull.Value,
-            ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value, ci) : DBNull.Value,
-            ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value, ci) : DBNull.Value,
-            ColumnType.Decimal => Utility.IsNumeric(value) ? Convert.ToDecimal(value, ci) : DBNull.Value,
-            ColumnType.DateTime => Utility.IsDate(value) ? Utility.ToDate(value) : DBNull.Value,
+            ColumnType.TinyInt => Utility.IsNumeric(value, out var number) ? (sbyte)number : DBNull.Value,
+            ColumnType.SmallInt => Utility.IsNumeric(value, out var number) ? (short)number : DBNull.Value,
+            ColumnType.Integer => Utility.IsNumeric(value, out var number) ? (int)number : DBNull.Value,
+            ColumnType.BigInt => Utility.IsNumeric(value, out var number) ? (long)number : DBNull.Value,
+            ColumnType.SinglePrecision => Utility.IsNumeric(value, out var number) ? (float)number : DBNull.Value,
+            ColumnType.DoublePrecision => Utility.IsNumeric(value, out var number) ? (double)number : DBNull.Value,
+            ColumnType.Decimal => Utility.IsNumeric(value, out var number) ? number : DBNull.Value,
+            ColumnType.DateTime => Utility.IsDate(value, out var date) ? date : DBNull.Value,
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or ColumnType.Text
                 or ColumnType.NText => value,
             _ => DBNull.Value

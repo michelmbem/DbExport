@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DbExport.Schema;
@@ -411,8 +410,6 @@ public partial class MySqlSchemaProvider : ISchemaProvider
     {
         if (Utility.IsEmpty(value) || value.Equals("NULL", StringComparison.CurrentCultureIgnoreCase))
             return DBNull.Value;
-        
-        var ci = CultureInfo.InvariantCulture;
 
         return columnType switch
         {
@@ -422,22 +419,18 @@ public partial class MySqlSchemaProvider : ISchemaProvider
                 "1" or "true" => true,
                 _ => DBNull.Value
             },
-            ColumnType.TinyInt => Utility.IsNumeric(value) ? Convert.ToSByte(value, ci) : DBNull.Value,
-            ColumnType.UnsignedTinyInt => Utility.IsNumeric(value) ? Convert.ToByte(value) : DBNull.Value,
-            ColumnType.SmallInt => Utility.IsNumeric(value) ? Convert.ToInt16(value, ci) : DBNull.Value,
-            ColumnType.UnsignedSmallInt => Utility.IsNumeric(value) ? Convert.ToUInt16(value, ci) : DBNull.Value,
-            ColumnType.Integer => Utility.IsNumeric(value) ? Convert.ToInt32(value, ci) : DBNull.Value,
-            ColumnType.UnsignedInt => Utility.IsNumeric(value) ? Convert.ToUInt32(value, ci) : DBNull.Value,
-            ColumnType.BigInt => Utility.IsNumeric(value) ? Convert.ToInt64(value, ci) : DBNull.Value,
-            ColumnType.UnsignedBigInt => Utility.IsNumeric(value) ? Convert.ToUInt64(value, ci) : DBNull.Value,
-            ColumnType.SinglePrecision => Utility.IsNumeric(value) ? Convert.ToSingle(value, ci) : DBNull.Value,
-            ColumnType.DoublePrecision => Utility.IsNumeric(value) ? Convert.ToDouble(value, ci) : DBNull.Value,
-            ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value)
-                ? Convert.ToDecimal(value, ci)
-                : DBNull.Value,
-            ColumnType.Date or ColumnType.Time or ColumnType.DateTime => Utility.IsDate(value)
-                ? Utility.ToDate(value)
-                : DBNull.Value,
+            ColumnType.TinyInt => Utility.IsNumeric(value, out var number) ? (sbyte)number : DBNull.Value,
+            ColumnType.UnsignedTinyInt => Utility.IsNumeric(value, out var number) ? (byte)number : DBNull.Value,
+            ColumnType.SmallInt => Utility.IsNumeric(value, out var number) ? (short)number : DBNull.Value,
+            ColumnType.UnsignedSmallInt => Utility.IsNumeric(value, out var number) ? (ushort)number : DBNull.Value,
+            ColumnType.Integer => Utility.IsNumeric(value, out var number) ? (int)number : DBNull.Value,
+            ColumnType.UnsignedInt => Utility.IsNumeric(value, out var number) ? (uint)number : DBNull.Value,
+            ColumnType.BigInt => Utility.IsNumeric(value, out var number) ? (long)number : DBNull.Value,
+            ColumnType.UnsignedBigInt => Utility.IsNumeric(value, out var number) ? (ulong)number : DBNull.Value,
+            ColumnType.SinglePrecision => Utility.IsNumeric(value, out var number) ? (float)number : DBNull.Value,
+            ColumnType.DoublePrecision => Utility.IsNumeric(value, out var number) ? (double)number : DBNull.Value,
+            ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value, out var number) ? number : DBNull.Value,
+            ColumnType.Date or ColumnType.Time or ColumnType.DateTime => Utility.IsDate(value, out var date) ? date : DBNull.Value,
             ColumnType.Char or ColumnType.VarChar or ColumnType.Text => Utility.UnquotedStr(value),
             ColumnType.Bit => Utility.FromBitString(value),
             _ => DBNull.Value

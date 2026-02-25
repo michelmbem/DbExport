@@ -104,11 +104,11 @@ public static partial class Utility
     public static bool IsBoolean(object value) =>
         Convert.ToString(value, CI)?.ToLower() is "false" or "true";
 
-    public static bool IsNumeric(object value) =>
-        decimal.TryParse(Convert.ToString(value, CI), NumberStyles.Any, CI, out _);
+    public static bool IsNumeric(object value, out decimal converted) =>
+        decimal.TryParse(Convert.ToString(value, CI), NumberStyles.Any, CI, out converted);
 
-    public static bool IsDate(object value) =>
-        DateTime.TryParse(Convert.ToString(value, CI), CI, DateTimeStyles.None, out _);
+    public static bool IsDate(object value, out DateTime converted) =>
+        DateTime.TryParse(Convert.ToString(value, CI), CI, DateTimeStyles.None, out converted);
 
     public static byte ToByte(object value) =>
         byte.TryParse(Convert.ToString(value, CI), NumberStyles.Any, CI, out var result) ? result : default;
