@@ -36,8 +36,8 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
 
     public ObservableCollection<string> AvailableSchemas { get; } = [];
 
-    public override string ConnectionString =>
-        DataProvider?.ConnectionStringFactory.Build(Host, Port, Catalog, TrustedConnection, Username, Password) ?? string.Empty;
+    public override string ConnectionString => DataProvider?.ConnectionStringFactory
+        .Build(Host, Port, Catalog, TrustedConnection, Username, Password) ?? string.Empty;
 
     public override string SelectedSchema => Schema ?? string.Empty;
 
@@ -89,6 +89,7 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
     
     partial void OnCatalogChanged(string? value)
     {
-        if (!IsDestination) ReloadSchemas();
+        if (SupportsSchemas && !IsDestination)
+            ReloadSchemas();
     }
 }

@@ -11,12 +11,16 @@ public enum ProviderFeatures
     SupportsTrustedConnection = 2,
     SupportsDatabaseCreation = 4,
     SupportsDDL = 8,
-    
+    SupportsSchemas = 16,
+    UsesPathAsDatabaseName = 32,
+
     Access = IsFileBased,
-    LocalDB = Access | SupportsTrustedConnection,
-    SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation | SupportsDDL,
-    Oracle = SupportsTrustedConnection | SupportsDDL,
+    LocalDB = Access | SupportsTrustedConnection | SupportsSchemas,
+    SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation | SupportsDDL | SupportsSchemas,
+    Oracle = SupportsTrustedConnection | SupportsDDL | SupportsSchemas,
     MySql = SupportsDatabaseCreation | SupportsDDL,
+    PostgreSQL = MySql | SupportsSchemas,
+    Firebird = MySql | UsesPathAsDatabaseName,
     SQLite = Access | SupportsDDL
 }
 
@@ -46,8 +50,8 @@ public sealed class DataProvider(
         new(ProviderNames.SQLSERVER, "Microsoft SQL Server", ProviderFeatures.SqlServer, new SqlConnectionStringFactory(), SQLSERVER_DATABASE_LIST_QUERY),
         new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.Oracle, new OracleConnectionStringFactory(), ORACLE_DATABASE_LIST_QUERY),
         new(ProviderNames.MYSQL, "MySQL", ProviderFeatures.MySql, new MySqlConnectionStringFactory(), MYSQL_DATABASE_LIST_QUERY),
-        new(ProviderNames.POSTGRESQL, "PostgreSQL", ProviderFeatures.MySql, new NpgsqlConnectionStringFactory(), POSTGRESQL_DATABASE_LIST_QUERY),
-        new(ProviderNames.FIREBIRD, "Firebird", ProviderFeatures.MySql, new FirebirdConnectionStringFactory()),
+        new(ProviderNames.POSTGRESQL, "PostgreSQL", ProviderFeatures.PostgreSQL, new NpgsqlConnectionStringFactory(), POSTGRESQL_DATABASE_LIST_QUERY),
+        new(ProviderNames.FIREBIRD, "Firebird", ProviderFeatures.Firebird, new FirebirdConnectionStringFactory()),
         new(ProviderNames.SQLITE, "SQLite 3", ProviderFeatures.SQLite, new SQLiteConnectionStringFactory(), SQLITE_DATABASE_FILE_PATTERN)
     ];
 

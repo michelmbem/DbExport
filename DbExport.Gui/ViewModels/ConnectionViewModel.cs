@@ -12,7 +12,8 @@ namespace DbExport.Gui.ViewModels;
 public partial class ConnectionViewModel : ViewModelBase
 {
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SupportsTrustedConnection))]
+    [NotifyPropertyChangedFor(nameof(SupportsTrustedConnection),
+        nameof(SupportsSchemas), nameof(UsesPathAsDatabaseName))]
     private DataProvider? dataProvider;
 
     [ObservableProperty]
@@ -24,6 +25,12 @@ public partial class ConnectionViewModel : ViewModelBase
 
     public bool SupportsTrustedConnection =>
         DataProvider?.HasFeature(ProviderFeatures.SupportsTrustedConnection) ?? false;
+
+    public bool SupportsSchemas =>
+        DataProvider?.HasFeature(ProviderFeatures.SupportsSchemas) ?? false;
+
+    public bool UsesPathAsDatabaseName =>
+        DataProvider?.HasFeature(ProviderFeatures.UsesPathAsDatabaseName) ?? false;
 
     [RelayCommand]
     private async Task TestConnection()

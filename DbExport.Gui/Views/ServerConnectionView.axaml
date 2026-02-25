@@ -90,19 +90,38 @@
                   IsEditable="True"
                   ItemsSource="{Binding AllCatalogs}"
                   Text="{Binding Catalog, UpdateSourceTrigger=LostFocus}"
-                  b:ComboBoxBehavior.DropDown="{Binding ReloadCatalogsCommand}"/>
+                  b:ComboBoxBehavior.DropDown="{Binding ReloadCatalogsCommand}"
+                  IsVisible="{Binding !UsesPathAsDatabaseName}"/>
+        <TextBox Grid.Row="3"
+                 Grid.Column="1"
+                 Grid.ColumnSpan="3"
+                 Text="{Binding Catalog}"
+                 IsVisible="{Binding UsesPathAsDatabaseName}"/>
         <Label Grid.Row="3"
                Grid.Column="2"
                Content="Schema :"
-               Target="SchemaComboBox"
-               IsVisible="{Binding !IsDestination}"/>
+               Target="SchemaComboBox">
+            <Label.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="!UsesPathAsDatabaseName"/>
+                    <Binding Path="!IsDestination"/>
+                </MultiBinding>
+            </Label.IsVisible>
+        </Label>
         <ComboBox Name="SchemaComboBox"
                   Grid.Row="3"
                   Grid.Column="3"
                   IsEditable="True"
                   ItemsSource="{Binding AvailableSchemas}"
                   Text="{Binding Schema}"
-                  IsVisible="{Binding !IsDestination}"/>
+                  IsEnabled="{Binding SupportsSchemas}">
+            <ComboBox.IsVisible>
+				<MultiBinding Converter="{x:Static BoolConverters.And}">
+                    <Binding Path="!UsesPathAsDatabaseName"/>
+                    <Binding Path="!IsDestination"/>
+                </MultiBinding>
+            </ComboBox.IsVisible>
+        </ComboBox>
         <Button Grid.Row="4"
                 Grid.Column="0"
                 Grid.ColumnSpan="4"
