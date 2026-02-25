@@ -13,7 +13,7 @@ public partial class FirebirdOptionsViewModel : ProviderOptionsViewModel
     private string characterSet = FirebirdOptions.CharacterSet;
     
     [ObservableProperty]
-    private int pageSize = FirebirdOptions.PageSize;
+    private int? pageSize = FirebirdOptions.PageSize;
     
     [ObservableProperty]
     private bool forcesWrites = FirebirdOptions.ForcesWrites;
@@ -30,9 +30,10 @@ public partial class FirebirdOptionsViewModel : ProviderOptionsViewModel
         get
         {
             FirebirdOptions.CharacterSet = CharacterSet;
-            FirebirdOptions.PageSize = PageSize;
             FirebirdOptions.ForcesWrites = ForcesWrites;
             FirebirdOptions.Overwrite = Overwrite;
+            
+            if (PageSize.HasValue) FirebirdOptions.PageSize = PageSize.Value;
             
             return new FirebirdOptions { DataDirectory = DataDirectory };
         }
