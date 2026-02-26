@@ -2,6 +2,9 @@ using System;
 
 namespace DbExport;
 
+/// <summary>
+/// Flags to specify what aspects of the database to export. These can be combined using bitwise operations.
+/// </summary>
 [Flags]
 public enum ExportFlags
 {
@@ -13,6 +16,9 @@ public enum ExportFlags
     ExportIdentities    = 16
 }
 
+/// <summary>
+/// Options for exporting a database, including what to export and any provider-specific settings.
+/// </summary>
 public class ExportOptions
 {
     public bool ExportSchema { get; set; }

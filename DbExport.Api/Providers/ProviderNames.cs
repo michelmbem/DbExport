@@ -1,5 +1,10 @@
 namespace DbExport.Providers;
 
+/// <summary>
+/// A static class that contains constant string values representing the names of supported database providers.
+/// These names are typically used to identify the specific database provider when configuring database connections
+/// or performing database operations.
+/// </summary>
 public static class ProviderNames
 {
     public const string ACCESS = "System.Data.OleDb";
