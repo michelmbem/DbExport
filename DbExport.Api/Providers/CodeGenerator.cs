@@ -634,6 +634,12 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         --indentation;
     }
 
+    /// <summary>
+    /// Writes a single character to the output, taking care of indentation and line breaks.
+    /// </summary>
+    /// <param name="c">The character to be written. This method will ensure that the character is properly formatted
+    /// and written to the output, taking into account the current indentation level and the presence
+    /// of line breaks in the input string.</param>   
     protected void Write(char c)
     {
         if (c == '\r') return;
@@ -646,27 +652,50 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         textColumn = c == '\n' ? 0 : textColumn + 1;
     }
 
+    /// <summary>
+    /// Writes a string to the output, taking care of indentation and line breaks.
+    /// </summary>
+    /// <param name="s">The string to be written. This method will ensure that the string is properly formatted
+    /// and written to the output, taking into account the current indentation level and the presence
+    /// of line breaks in the input string.</param>  
     protected void Write(string s)
     {
         foreach (var c in s)
             Write(c);
     }
 
+    /// <summary>
+    /// Writes a formatted string to the output, taking care of indentation and line breaks.
+    /// </summary>
+    /// <param name="format">The format string that describes the content to be written.</param>
+    /// <param name="values">The objects to be formatted and written to the output.</param> 
     protected void Write(string format, params object[] values)
     {
         Write(string.Format(format, values));
     }
 
+    /// <summary>
+    /// Writes a line break to the output, taking care of indentation.
+    /// </summary>
     protected void WriteLine()
     {
         Write(Environment.NewLine);
     }
 
+    /// <summary>
+    /// Writes a string followed by a line break to the output, taking care of indentation.
+    /// </summary>
+    /// <param name="s">The string to be written.</param> 
     protected void WriteLine(string s)
     {
         Write(s + Environment.NewLine);
     }
 
+    /// <summary>
+    /// Writes a formatted string followed by a line break to the output, taking care of indentation.
+    /// </summary>
+    /// <param name="format">The format string that describes the content to be written.</param>
+    /// <param name="values">The objects to be formatted and written to the output.</param>
     protected void WriteLine(string format, params object[] values)
     {
         Write(format + Environment.NewLine, values);

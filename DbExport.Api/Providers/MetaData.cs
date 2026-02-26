@@ -10,5 +10,8 @@ namespace DbExport.Providers;
 /// </summary>
 public class MetaData : Dictionary<string, object>
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MetaData"/> class.
+    /// </summary>
     public MetaData() : base(StringComparer.OrdinalIgnoreCase) { }
 }
