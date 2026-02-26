@@ -83,7 +83,8 @@
         <Label Grid.Row="3"
                Grid.Column="0"
                Content="Catalog :"
-               Target="CatalogComboBox"/>
+               Target="CatalogComboBox"
+               IsVisible="{Binding !UsesPathAsDatabaseName}"/>
         <ComboBox Name="CatalogComboBox"
                   Grid.Row="3"
                   Grid.Column="1"
@@ -92,9 +93,16 @@
                   Text="{Binding Catalog, UpdateSourceTrigger=LostFocus}"
                   b:ComboBoxBehavior.DropDown="{Binding ReloadCatalogsCommand}"
                   IsVisible="{Binding !UsesPathAsDatabaseName}"/>
-        <TextBox Grid.Row="3"
+        <Label Grid.Row="3"
+               Grid.Column="0"
+               Content="File path :"
+               Target="CatalogTextBox"
+               IsVisible="{Binding UsesPathAsDatabaseName}"/>
+        <TextBox Name="CatalogTextBox"
+                 Grid.Row="3"
                  Grid.Column="1"
                  Grid.ColumnSpan="3"
+                 Watermark="Full path to a .fdb file on the database server"
                  Text="{Binding Catalog}"
                  IsVisible="{Binding UsesPathAsDatabaseName}"/>
         <Label Grid.Row="3"
