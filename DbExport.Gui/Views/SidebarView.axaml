@@ -2,7 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Svg.Controls.Avalonia"
              xmlns:vm="using:DbExport.Gui.ViewModels"
-             xmlns:util="using:DbExport.Gui.Utilities"
+             xmlns:c="using:DbExport.Gui.Converters"
+             xmlns:u="using:DbExport.Gui.Utilities"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="250" d:DesignHeight="500"
@@ -32,16 +33,11 @@
             <StackPanel Orientation="Horizontal">
               <svg:Svg Width="32"
                        Height="32"
-                       Path="/Assets/Images/unselected-item.svg"
-                       IsVisible="{Binding !IsSelected}"/>
-              <svg:Svg Width="32"
-                       Height="32"
-                       Path="/Assets/Images/selected-item.svg"
-                       IsVisible="{Binding IsSelected}"/>
+                       Path="{Binding IsSelected, Converter={x:Static c:SidebarConverters.IconPath}}"/>
               <TextBlock Text="{Binding Title}"
-                         Foreground="{Binding Foreground}"
                          FontSize="16"
-                         VerticalAlignment="Center"/>
+                         VerticalAlignment="Center"
+                         Foreground="{Binding IsSelected, Converter={x:Static c:SidebarConverters.Foreground}}"/>
             </StackPanel>
           </DataTemplate>
         </ItemsControl.ItemTemplate>
@@ -51,7 +47,7 @@
              Stretch="Uniform"
              Opacity="0.8"/>
       <TextBlock Grid.Row="4"
-                 Text="{x:Static util:AssemblyInfo.Copyright}"
+                 Text="{x:Static u:AssemblyInfo.Copyright}"
                  Foreground="White"
                  FontSize="11"
                  Margin="0, 5, 0, 0"/>

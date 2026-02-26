@@ -14,9 +14,25 @@ using Npgsql;
 
 namespace DbExport;
 
-public sealed partial class SqlHelper(DbConnection connection) : IDisposable
+public sealed partial class SqlHelper : IDisposable
 {
+    #region Fields
+
     private readonly bool disposeConnection;
+    private readonly DbConnection connection;
+
+    #endregion
+
+    #region Constructors
+
+    public SqlHelper(DbConnection connection)
+    {
+        this.connection = connection;
+
+        var fullName = connection.GetType().FullName;
+        var lastDot = fullName.LastIndexOf('.');
+        ProviderName = fullName[..lastDot];
+    }
 
     public SqlHelper(string providerName, string connectionString) :
         this(Utility.GetConnection(providerName, connectionString))
@@ -29,15 +45,15 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         disposeConnection = true;
     }
 
-    public string ProviderName
-    {
-        get
-        {
-            var fullName = connection.GetType().FullName;
-            var lastDot = fullName!.LastIndexOf('.');
-            return fullName[..lastDot];
-        }
-    }
+    #endregion
+
+    #region Properties
+
+    public string ProviderName { get; }
+
+    #endregion
+
+    #region IDisposable interface
 
     public void Dispose()
     {
@@ -49,6 +65,10 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         if (disposing && disposeConnection)
             connection.Dispose();
     }
+
+    #endregion
+
+    #region Query and Execute methods
 
     public TResult Query<TResult>(string sql, Func<DbDataReader, TResult> extractor)
     {
@@ -112,6 +132,10 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         return result;
     }
 
+    #endregion
+
+    #region ExecuteScript methods
+
     public static void ExecuteScript(string providerName, string connectionString, string script)
     {
         switch (providerName)
@@ -162,8 +186,8 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
             var createDb = match.Value[..^1];
             var dbName = match.Groups[1].Value;
             
-            using (var helper1 = new SqlHelper(ProviderNames.POSTGRESQL, connectionString))
-                helper1.Execute(createDb);
+            using (var helper = new SqlHelper(ProviderNames.POSTGRESQL, connectionString))
+                helper.Execute(createDb);
             
             var builder = new NpgsqlConnectionStringBuilder(connectionString) { Database = dbName };
             connectionString = builder.ToString();
@@ -233,7 +257,9 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         else
         {
             using var cmd = conn.CreateCommand();
-        
+
+            conn.Open();
+
             foreach (var statement in statements)
             {
                 cmd.CommandText = statement;
@@ -242,7 +268,11 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         }
     }
 
-    public static (DbDataReader, DbConnection) OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
+    #endregion
+
+    #region OpenTable method
+
+    public static RowSet OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
     {
         StringBuilder sb = new("SELECT ");
 
@@ -262,11 +292,15 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         command.CommandText = sb.ToString();
         
         var dataReader = command.ExecuteReader(CommandBehavior.CloseConnection);
-        return (dataReader, connection);
+        return new RowSet(connection, command, dataReader);
         
         bool ShouldNotSkip(Column c) => !(skipIdentity && c.IsIdentity ||
                                           skipRowVersion && c.ColumnType == ColumnType.RowVersion);
     }
+
+    #endregion
+
+    #region DataReader extractors
 
     public static object[] ToArray(DbDataReader dataReader)
     {
@@ -326,6 +360,10 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
         return result;
     }
 
+    #endregion
+
+    #region Regular expressions
+
     [GeneratedRegex(@"CREATE\s+DATABASE\s+(\w[\w\d]*)[^;]*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex CreateDbRegex();
     
@@ -340,4 +378,6 @@ public sealed partial class SqlHelper(DbConnection connection) : IDisposable
 
     [GeneratedRegex(@"CREATE\s+DATABASE\s+'([^']+)'[^;]*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex FbCreateDbRegex();
+
+    #endregion
 }

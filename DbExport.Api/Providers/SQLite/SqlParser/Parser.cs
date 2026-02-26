@@ -78,13 +78,16 @@ public class Parser
         {
             typeName = tok.Data.ToString();
 
-            if (TryMatch(TokenId.LPAREN, out tok))
+            if (TryMatch(TokenId.LPAREN, out _))
             {
                 prec = Convert.ToInt32(Match(TokenId.LT_NUM).Data);
-                if (TryMatch(TokenId.COMMA, out tok))
+                
+                if (TryMatch(TokenId.COMMA, out _))
                     scale = Convert.ToInt32(Match(TokenId.LT_NUM).Data);
-                if (TryMatch(TokenId.COMMA, out tok))
+                
+                if (TryMatch(TokenId.COMMA, out _))
                     Match(TokenId.LT_NUM); // Appearently, SQLite allows that syntax
+
                 Match(TokenId.RPAREN);
             }
         }
@@ -116,7 +119,7 @@ public class Parser
                     Skip();
                     Match(TokenId.KW_KEY);
                     pk = true;
-                    if (TryMatch(TokenId.KW_AUTOINC, out tok))
+                    if (TryMatch(TokenId.KW_AUTOINC, out _))
                         autoinc = true;
                     break;
                 case TokenId.KW_DEFAULT:
@@ -131,7 +134,7 @@ public class Parser
             }
         }
 
-        Dictionary<string, object> attributes = new()
+        MetaData attributes = new()
         {
             ["COLUMN_NAME"] = colName,
             ["TYPE_NAME"] = typeName,
@@ -169,7 +172,7 @@ public class Parser
             TokenId.KW_UNIQUE => UniqueKeySpec(constraintName),
             TokenId.KW_FOREIGN => ForeignKeySpec(constraintName),
             TokenId.KW_CHECK => CheckSpec(constraintName),
-            _ => throw new FormatException("Invalid constraint specification " + token.Id)
+            _ => throw new SyntaxException($"Invalid constraint specification '{token.Id}'")
         };
     }
 
@@ -196,25 +199,24 @@ public class Parser
         var pkColNames = ColumnRefList();
         Match(TokenId.RPAREN);
 
-        Token tok;
         var updateRule = ForeignKeyRule.None;
         var deleteRule = ForeignKeyRule.None;
 
-        while (TryMatch(TokenId.KW_ON, out tok))
+        while (TryMatch(TokenId.KW_ON, out _))
         {
-            if (TryMatch(TokenId.KW_UPDATE, out tok))
+            if (TryMatch(TokenId.KW_UPDATE, out _))
             {
                 Match(TokenId.KW_CASCADE);
                 updateRule = ForeignKeyRule.Cascade;
             }
-            else if (TryMatch(TokenId.KW_DELETE, out tok))
+            else if (TryMatch(TokenId.KW_DELETE, out _))
             {
                 Match(TokenId.KW_CASCADE);
                 deleteRule = ForeignKeyRule.Cascade;
             }
         }
 
-        Dictionary<string, object> attributes = new()
+        MetaData attributes = new()
         {
             ["CONSTRAINT_NAME"] = fkName,
             ["TARGET_TABLE_NAME"] = targetTableName,
@@ -276,9 +278,8 @@ public class Parser
             return predicate;
 
         Skip();
-        var node = Expression();
-        if (node == null)
-            throw new FormatException("Syntax error after " + sign + ". An expression was expected");
+        var node = Expression() ??
+            throw new SyntaxException($"Syntax error after '{sign}'. An expression was expected");
 
         return sign switch
         {
@@ -304,9 +305,8 @@ public class Parser
             return relation;
 
         Skip();
-        var node = Predicate();
-        if (node == null)
-            throw new FormatException("Syntax error after " + sign + ". An expression was expected");
+        var node = Predicate() ??
+            throw new SyntaxException($"Syntax error after '{sign}'. An expression was expected");
 
         return sign switch
         {
@@ -324,8 +324,7 @@ public class Parser
     private AstNode Term()
     {
         var node = Factor();
-        if (node != null)
-            node = MoreFactors(node);
+        if (node != null) node = MoreFactors(node);
         return node;
     }
 
@@ -336,19 +335,15 @@ public class Parser
             return term;
 
         Skip();
-        var node = Relation();
-        if (node == null)
-            throw new FormatException("Syntax error after " + sign + ". An expression was expected");
+        var node = Relation() ??
+            throw new SyntaxException($"Syntax error after '{sign}'. An expression was expected");
 
-        switch (sign)
+        return sign switch
         {
-            case TokenId.PLUS:
-                return new AstNode(AstNodeKind.BINEXPR, BinaryOperator.ADD, term, node);
-            case TokenId.MINUS:
-                return new AstNode(AstNodeKind.BINEXPR, BinaryOperator.SUB, term, node);
-            default:
-                return new AstNode(AstNodeKind.BINEXPR, BinaryOperator.CONCAT, term, node);
-        }
+            TokenId.PLUS => new AstNode(AstNodeKind.BINEXPR, BinaryOperator.ADD, term, node),
+            TokenId.MINUS => new AstNode(AstNodeKind.BINEXPR, BinaryOperator.SUB, term, node),
+            _ => new AstNode(AstNodeKind.BINEXPR, BinaryOperator.CONCAT, term, node),
+        };
     }
 
     private AstNode Factor()
@@ -387,26 +382,23 @@ public class Parser
             case TokenId.PLUS:
                 tok = token;
                 Skip();
-                node = Factor();
-                if (node == null)
-                    throw new FormatException("Syntax error after " + tok.Id + ". An expression was expected");
+                node = Factor() ??
+                    throw new SyntaxException($"Syntax error after '{tok.Id}'. An expression was expected");
                 return new AstNode(AstNodeKind.UNEXPR, UnaryOperator.PLUS, node);
             case TokenId.MINUS:
                 tok = token;
                 Skip();
-                node = Factor();
-                if (node == null)
-                    throw new FormatException("Syntax error after " + tok.Id + ". An expression was expected");
+                node = Factor() ??
+                    throw new SyntaxException($"Syntax error after '{tok.Id}'. An expression was expected");
                 return new AstNode(AstNodeKind.UNEXPR, UnaryOperator.MINUS, node);
             case TokenId.KW_NOT:
                 tok = token;
                 Skip();
-                node = Factor();
-                if (node == null)
-                    throw new FormatException("Syntax error after " + tok.Id + ". An expression was expected");
+                node = Factor() ??
+                    throw new SyntaxException($"Syntax error after '{tok.Id}'. An expression was expected");
                 return new AstNode(AstNodeKind.UNEXPR, UnaryOperator.NOT, node);
             default:
-                throw new FormatException("Unexpected token: " + token.Id);
+                throw new SyntaxException("Unexpected token: " + token.Id);
         }
     }
 
@@ -417,9 +409,8 @@ public class Parser
             return factor;
 
         Skip();
-        var node = Term();
-        if (node == null)
-            throw new FormatException("Syntax error after " + sign + ". An expression was expected");
+        var node = Term() ??
+            throw new SyntaxException($"Syntax error after '{sign}'. An expression was expected");
 
         return sign switch
         {
@@ -455,10 +446,10 @@ public class Parser
     private Token Match(TokenId tokenId, Predicate<Token> cond)
     {
         if (token.Id != tokenId)
-            throw new FormatException("Encountered " + token.Id + " while expecting " + tokenId);
+            throw new SyntaxException($"Encountered '{token.Id}' while expecting '{tokenId}'");
 
         if (cond != null && !cond(token))
-            throw new FormatException("Encountered " + tokenId + " without satisfying " + cond);
+            throw new SyntaxException($"Encountered '{tokenId}' without satisfying '{cond}'");
 
         var prevTok = token;
         Skip();
@@ -473,7 +464,7 @@ public class Parser
         found = null;
 
         if (token.Id != tokenId) return false;
-        if (cond != null && !cond.Invoke(token)) return false;
+        if (cond?.Invoke(token) == false) return false;
             
         found = token;
         Skip();

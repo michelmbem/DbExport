@@ -2,7 +2,7 @@ using Avalonia.Data.Converters;
 
 namespace DbExport.Gui.Converters;
 
-public static class NullableConverters
+public static class ValueConverters
 {
     public static readonly IValueConverter Int32 = new FuncValueConverter<int?, string?>(
         i => i?.ToString(),

@@ -70,7 +70,7 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
         {
             var schemaProvider = SchemaProvider.GetProvider(DataProvider?.Name, ConnectionString);
             var schemas = schemaProvider.GetTableNames()
-                                        .Select(t => t.Item2)
+                                        .Select(t => t.Owner)
                                         .Where(s => !string.IsNullOrEmpty(s))
                                         .Distinct();
 

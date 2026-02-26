@@ -32,7 +32,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
 
     public string DatabaseName { get; }
 
-    public (string, string)[] GetTableNames()
+    public NameOwnerPair[] GetTableNames()
     {
         const string sql = """
                            SELECT
@@ -51,7 +51,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
+        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -98,7 +98,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName, string tableOwner)
+    public MetaData GetTableMeta(string tableName, string tableOwner)
     {
         const string sql = """
                             SELECT
@@ -116,19 +116,20 @@ public partial class SqlSchemaProvider : ISchemaProvider
                                 K.ORDINAL_POSITION
                             """;
 
-        var metadata = new Dictionary<string, object>();
-        var pkColumns = new List<string>();
-        var pkName = string.Empty;
-
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        metadata["name"] = tableName;
-        metadata["owner"] = tableOwner;
-
         var list = helper.Query(string.Format(sql, tableName, tableOwner), SqlHelper.ToArrayList);
-        
+
+        string pkName = null;
+        List<string> pkColumns = [];
+        MetaData metadata = new()
+        {
+            ["name"] = tableName,
+            ["owner"] = tableOwner
+        };
+
         foreach (var values in list)
         {
-            pkName = values[0].ToString();
+            pkName ??= values[0].ToString();
             pkColumns.Add(values[1].ToString());
         }
 
@@ -141,7 +142,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName)
+    public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         const string sql1 = """
                             SELECT
@@ -177,7 +178,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
                                 AND c.name = '{2}'
                             """;
 
-        Dictionary<string, object> metadata = new()
+        MetaData metadata = new()
         {
             ["name"] = columnName,
             ["defaultValue"] = string.Empty
@@ -231,9 +232,9 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName)
+    public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
-        var metadata = new Dictionary<string, object>();
+        var metadata = new MetaData();
         var indexDescription = string.Empty;
         var indexKeys = string.Empty;
 
@@ -256,7 +257,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
+    public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         const string sql = """
                            SELECT
@@ -285,7 +286,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
                            	    KCU1.ORDINAL_POSITION
                            """;
 
-        var metadata = new Dictionary<string, object>();
+        var metadata = new MetaData();
         var fkColumns = new List<string>();
         var relatedColumns = new List<string>();
         var relatedTable = string.Empty;
@@ -317,7 +318,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public (string, string)[] GetTypeNames()
+    public NameOwnerPair[] GetTypeNames()
     {
         const string sql = """
                            SELECT DOMAIN_SCHEMA, DOMAIN_NAME
@@ -328,10 +329,10 @@ public partial class SqlSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
+        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
     }
 
-    public Dictionary<string, object> GetTypeMeta(string typeName, string typeOwner)
+    public MetaData GetTypeMeta(string typeName, string typeOwner)
     {
         const string sql = """
                            SELECT *
@@ -339,7 +340,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
                            WHERE DOMAIN_SCHEMA = '{1}' AND DOMAIN_NAME = '{0}'
                            """;
 
-        Dictionary<string, object> metadata = new()
+        MetaData metadata = new()
         {
             ["name"] = typeName,
             ["owner"] = typeOwner,

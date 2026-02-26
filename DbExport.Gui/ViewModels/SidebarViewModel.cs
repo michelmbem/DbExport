@@ -17,8 +17,11 @@ public partial class SidebarViewModel : ViewModelBase
 
     partial void OnSelectedIndexChanged(int oldValue, int newValue)
     {
-        if (oldValue >= 0 && oldValue < Items.Count) Items[oldValue].IsSelected = false;
-        if (newValue >= 0 && newValue < Items.Count) Items[newValue].IsSelected = true;
+        if (oldValue >= 0 && oldValue < Items.Count)
+            Items[oldValue].IsSelected = false;
+
+        if (newValue >= 0 && newValue < Items.Count)
+            Items[newValue].IsSelected = true;
     }
 }
 

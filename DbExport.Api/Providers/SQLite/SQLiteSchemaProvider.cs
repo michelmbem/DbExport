@@ -31,8 +31,8 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     public string DatabaseName { get; }
 
-    public (string, string)[] GetTableNames() =>
-        tableDefinitions.Keys.Select(name => (name, string.Empty)).ToArray();
+    public NameOwnerPair[] GetTableNames() =>
+        [..tableDefinitions.Keys.Select(name => new NameOwnerPair(name))];
 
     public string[] GetColumnNames(string tableName, string tableOwner)
     {
@@ -42,7 +42,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
         for (var i = 0; i < colNames.Length; ++i)
         {
-            var colAttribs = (Dictionary<string, object>)colSpecList.Children[i].Data;
+            var colAttribs = (MetaData)colSpecList.Children[i].Data;
             colNames[i] = colAttribs["COLUMN_NAME"].ToString();
         }
 
@@ -57,13 +57,13 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
         return [..(from node in tableDef.Children
                 where node.Kind == AstNodeKind.FKSPEC
-                select (Dictionary<string, object>)node.Data into fkAttribs
+                select (MetaData)node.Data into fkAttribs
                 select fkAttribs["CONSTRAINT_NAME"].ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName, string tableOwner)
+    public MetaData GetTableMeta(string tableName, string tableOwner)
     {
-        Dictionary<string, object> metadata = new()
+        MetaData metadata = new()
         {
             ["name"] = tableName,
             ["owner"] = string.Empty
@@ -75,7 +75,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         if (pkNode == null)
         {
             var colAttribs = tableDef.Children[0].Children
-                                     .Select(colSpec => (Dictionary<string, object>)colSpec.Data)
+                                     .Select(colSpec => (MetaData)colSpec.Data)
                                      .FirstOrDefault(colAttribs => Convert.ToBoolean(colAttribs["PRIMARY_KEY"]));
             if (colAttribs == null) return metadata;
             
@@ -91,16 +91,16 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName)
+    public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
-        var metadata = new Dictionary<string, object>
+        var metadata = new MetaData
         {
             ["name"] = columnName
         };
 
         var tableDef = tableDefinitions[tableName];
         var colAttribs = tableDef.Children[0].Children
-                                 .Select(colSpec => (Dictionary<string, object>)colSpec.Data)
+                                 .Select(colSpec => (MetaData)colSpec.Data)
                                  .FirstOrDefault(colAttribs => colAttribs["COLUMN_NAME"].Equals(columnName));
         
         if (colAttribs == null) return metadata;
@@ -131,19 +131,19 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName)
+    public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
         => null; // Note: Ignored for the moment!
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
+    public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
-        var metadata = new Dictionary<string, object>();
+        var metadata = new MetaData();
         var tableDef = tableDefinitions[tableName];
 
         foreach (var fkSpec in tableDef.Children)
         {
             if (fkSpec.Kind != AstNodeKind.FKSPEC) continue;
 
-            var fkAttribs = (Dictionary<string, object>) fkSpec.Data;
+            var fkAttribs = (MetaData) fkSpec.Data;
             if (!fkAttribs["CONSTRAINT_NAME"].Equals(fkName)) continue;
             
             metadata["name"] = fkName;

@@ -24,7 +24,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
 
     public string DatabaseName { get; }
 
-    public (string, string)[] GetTableNames()
+    public NameOwnerPair[] GetTableNames()
     {
         const string sql = """
             SELECT TRIM(RDB$RELATION_NAME)
@@ -37,7 +37,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(sql, SqlHelper.ToList);
 
-        return [.. list.Select(t => (t.ToString(), string.Empty))];
+        return [.. list.Select(t => new NameOwnerPair(t.ToString()))];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -86,7 +86,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         return [.. list.Select(fk => fk.ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName, string tableOwner)
+    public MetaData GetTableMeta(string tableName, string tableOwner)
     {
         const string sql = """
             SELECT
@@ -100,21 +100,20 @@ public class FirebirdSchemaProvider : ISchemaProvider
             ORDER BY seg.RDB$FIELD_POSITION
             """;
 
-        Dictionary<string, object> metadata = new()
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToArrayList);
+
+        string pkName = null;
+        List<string> pkColumns = [];
+        MetaData metadata = new()
         {
             ["name"] = tableName,
             ["owner"] = tableOwner
         };
 
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToArrayList);
-
-        List<string> pkColumns = [];
-        string pkName = string.Empty;
-
         foreach (var row in list)
         {
-            pkName = row[0].ToString();
+            pkName ??= row[0].ToString();
             pkColumns.Add(row[1].ToString());
         }
 
@@ -127,7 +126,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName)
+    public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         const string sql = """
             SELECT
@@ -144,7 +143,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
               AND rf.RDB$FIELD_NAME = '{1}'
             """;
 
-        Dictionary<string, object> metadata = new()
+        MetaData metadata = new()
         {
             ["name"] = columnName,
             ["description"] = string.Empty
@@ -176,7 +175,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName)
+    public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         const string sql = """
             SELECT
@@ -190,7 +189,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
             ORDER BY seg.RDB$FIELD_POSITION
             """;
 
-        Dictionary<string, object> metadata = new()
+        MetaData metadata = new()
         {
             ["name"] = indexName
         };
@@ -214,7 +213,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
+    public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         const string sql = """
             SELECT
@@ -238,7 +237,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
             ORDER BY seg.RDB$FIELD_POSITION
             """;
 
-        Dictionary<string, object> metadata = [];
+        MetaData metadata = [];
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, tableName, fkName), SqlHelper.ToArrayList);

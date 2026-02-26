@@ -121,16 +121,14 @@ public abstract class CodeGenerator : IVisitor, IDisposable
             
             foreach (var table in database.Tables.Where(table => table.IsChecked))
             {
-                var (dr, con) = SqlHelper.OpenTable(table, visitIdent, GeneratesRowVersion);
+                using var rowSet = SqlHelper.OpenTable(table, visitIdent, GeneratesRowVersion);
                 var rowsInserted = false;
 
-                using (con)
-                using (dr)
-                    while (dr.Read())
-                    {
-                        WriteInsertDirective(table, dr);
-                        rowsInserted = true;
-                    }
+                while (rowSet.DataReader.Read())
+                {
+                    WriteInsertDirective(table, rowSet.DataReader);
+                    rowsInserted = true;
+                }
                 
                 if (rowsInserted) WriteLine();
             }

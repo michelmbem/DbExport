@@ -55,7 +55,7 @@
                  Grid.Row="1"
                  Grid.Column="3"
                  b:TextBoxBehavior.NumericOnly="True"
-                 Text="{Binding PageSize, Converter={x:Static c:NullableConverters.Int32}}"
+                 Text="{Binding PageSize, Converter={x:Static c:ValueConverters.Int32}}"
                  Watermark="{Binding DefaultPageSize, StringFormat='g'}"/>
         <Label Grid.Row="2"
                Grid.Column="0"

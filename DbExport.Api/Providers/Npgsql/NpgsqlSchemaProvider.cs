@@ -24,7 +24,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
 
     public string DatabaseName { get; }
 
-    public (string, string)[] GetTableNames()
+    public NameOwnerPair[] GetTableNames()
     {
         const string sql = """
                            SELECT TABLE_SCHEMA, TABLE_NAME
@@ -39,7 +39,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
+        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -98,7 +98,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
-    public Dictionary<string, object> GetTableMeta(string tableName, string tableOwner)
+    public MetaData GetTableMeta(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
@@ -118,21 +118,20 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                            	    C.ORDINAL_POSITION
                            """;
 
-        Dictionary<string, object> metadata = new()
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner), SqlHelper.ToArrayList);
+
+        string pkName = null;
+        List<string> pkColumns = [];
+        MetaData metadata = new()
         {
             ["name"] = tableName,
             ["owner"] = tableOwner
         };
-        
-        List<string> pkColumns = [];
-        var pkName = string.Empty;
 
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, tableOwner), SqlHelper.ToArrayList);
-        
         foreach (var values in list)
         {
-            pkName = values[0].ToString();
+            pkName ??= values[0].ToString();
             pkColumns.Add(values[1].ToString());
         }
 
@@ -145,7 +144,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName)
+    public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         const string sql = """
                            SELECT
@@ -171,7 +170,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                            	    AND COLUMN_NAME = '{2}'
                            """;
 
-        Dictionary<string, object> metadata = new()
+        MetaData metadata = new()
         {
             ["name"] = columnName,
             ["description"] = string.Empty
@@ -228,7 +227,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName)
+    public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         const string sql1 = """
                             SELECT
@@ -253,7 +252,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                                 AND CONSTRAINT_TYPE = 'PRIMARY KEY'
                             """;
 
-        Dictionary<string, object> metadata = new()
+        MetaData metadata = new()
         {
             ["name"] = indexName
         };
@@ -271,7 +270,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
+    public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         const string sql = """
                            SELECT
@@ -304,7 +303,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                                KCU1.ORDINAL_POSITION
                            """;
 
-        Dictionary<string, object> metadata = [];
+        MetaData metadata = [];
         List<string> fkColumns = [];
         List<string> relatedColumns = [];
         var relatedTable = string.Empty;
@@ -336,7 +335,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
-    public (string, string)[] GetTypeNames()
+    public NameOwnerPair[] GetTypeNames()
     {
         const string sql = """
                            SELECT *
@@ -359,10 +358,10 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => (item[1].ToString(), item[0].ToString()))];
+        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
     }
 
-    public Dictionary<string, object> GetTypeMeta(string typeName, string typeOwner)
+    public MetaData GetTypeMeta(string typeName, string typeOwner)
     {
         const string sql = """
                            SELECT *
@@ -386,7 +385,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                                       ORDER BY e.enumsortorder
                                       """;
 
-        Dictionary<string, object> metadata = new()
+        MetaData metadata = new()
         {
             ["name"] = typeName,
             ["owner"] = typeOwner,

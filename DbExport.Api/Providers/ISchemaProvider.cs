@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace DbExport.Providers;
+﻿namespace DbExport.Providers;
 
 public interface ISchemaProvider
 {
@@ -10,7 +8,7 @@ public interface ISchemaProvider
 
     string DatabaseName { get; }
 
-    (string, string)[] GetTableNames();
+    NameOwnerPair[] GetTableNames();
 
     string[] GetColumnNames(string tableName, string tableOwner);
 
@@ -18,15 +16,15 @@ public interface ISchemaProvider
 
     string[] GetFKNames(string tableName, string tableOwner);
 
-    Dictionary<string, object> GetTableMeta(string tableName, string tableOwner);
+    MetaData GetTableMeta(string tableName, string tableOwner);
 
-    Dictionary<string, object> GetColumnMeta(string tableName, string tableOwner, string columnName);
+    MetaData GetColumnMeta(string tableName, string tableOwner, string columnName);
 
-    Dictionary<string, object> GetIndexMeta(string tableName, string tableOwner, string indexName);
+    MetaData GetIndexMeta(string tableName, string tableOwner, string indexName);
 
-    Dictionary<string, object> GetForeignKeyMeta(string tableName, string tableOwner, string fkName);
+    MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName);
 
-    (string, string)[] GetTypeNames() => [];
+    NameOwnerPair[] GetTypeNames() => [];
 
-    Dictionary<string, object> GetTypeMeta(string typeName, string typeOwner) => [];
+    MetaData GetTypeMeta(string typeName, string typeOwner) => [];
 }

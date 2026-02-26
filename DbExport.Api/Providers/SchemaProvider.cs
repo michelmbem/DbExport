@@ -60,8 +60,8 @@ public static class SchemaProvider
 
         return database;
         
-        bool IsInSchema((string name, string owner) pair) =>
-            schema.Equals(pair.owner, StringComparison.OrdinalIgnoreCase);
+        bool IsInSchema(NameOwnerPair pair) =>
+            schema.Equals(pair.Owner, StringComparison.OrdinalIgnoreCase);
     }
 
     public static Database GetDatabase(string providerName, string connectionString, string schema) =>
