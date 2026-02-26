@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+
 using DbExport.Schema;
 
 namespace DbExport.Providers.Firebird;
@@ -33,23 +34,31 @@ public class FirebirdCodeGenerator : CodeGenerator
 
     public override void VisitColumn(Column column)
     {
-        base.VisitColumn(column);
+        Write("{0} {1}", Escape(column.Name), GetTypeName(column));
 
         var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
 
         if (visitIdentities && column.IsIdentity)
             Write(" GENERATED ALWAYS AS IDENTITY");
+        else
+        {
+            var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
+            if (visitDefaults && !Utility.IsEmpty(column.DefaultValue))
+                Write(" DEFAULT {0}", Format(column.DefaultValue, column.ColumnType));
+
+            if (column.IsRequired) Write(" NOT NULL");
+        }
     }
 
     public override void VisitDataType(DataType dataType)
     {
         Write($"CREATE DOMAIN {Escape(dataType.Name)} AS {GetTypeName(dataType)}");
 
-        if (!dataType.IsNullable) Write(" NOT NULL");
-
         var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
         if (visitDefaults && !Utility.IsEmpty(dataType.DefaultValue))
             Write(" DEFAULT {0}", Format(dataType.DefaultValue, dataType.ColumnType));
+
+        if (!dataType.IsNullable) Write(" NOT NULL");
 
         WriteLine(";");
         WriteLine();

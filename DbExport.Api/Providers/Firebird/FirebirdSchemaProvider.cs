@@ -37,7 +37,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(sql, SqlHelper.ToList);
 
-        return [.. list.Select(t => new NameOwnerPair(t.ToString()))];
+        return [..list.Select(t => new NameOwnerPair(t.ToString()))];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -52,7 +52,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
 
-        return [.. list.Select(c => c.ToString())];
+        return [..list.Select(c => c.ToString())];
     }
 
     public string[] GetIndexNames(string tableName, string tableOwner)
@@ -67,7 +67,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
 
-        return [.. list.Select(i => i.ToString())];
+        return [..list.Select(i => i.ToString())];
     }
 
     public string[] GetFKNames(string tableName, string tableOwner)
@@ -83,7 +83,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, tableName), SqlHelper.ToList);
 
-        return [.. list.Select(fk => fk.ToString())];
+        return [..list.Select(fk => fk.ToString())];
     }
 
     public MetaData GetTableMeta(string tableName, string tableOwner)
@@ -130,45 +130,74 @@ public class FirebirdSchemaProvider : ISchemaProvider
     {
         const string sql = """
             SELECT
+                rf.RDB$FIELD_SOURCE,
                 f.RDB$FIELD_TYPE,
-                f.RDB$FIELD_LENGTH,
+                f.RDB$FIELD_SUB_TYPE,
+                f.RDB$CHARACTER_LENGTH,
                 f.RDB$FIELD_PRECISION,
                 f.RDB$FIELD_SCALE,
                 rf.RDB$NULL_FLAG,
-                f.RDB$DEFAULT_SOURCE
+                rf.RDB$DEFAULT_SOURCE,
+                rf.RDB$IDENTITY_TYPE,
+                g.RDB$INITIAL_VALUE,
+                g.RDB$GENERATOR_INCREMENT
             FROM RDB$RELATION_FIELDS rf
             JOIN RDB$FIELDS f
                 ON rf.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME
+            LEFT JOIN RDB$GENERATORS g
+                ON rf.RDB$GENERATOR_NAME = g.RDB$GENERATOR_NAME
             WHERE rf.RDB$RELATION_NAME = '{0}'
               AND rf.RDB$FIELD_NAME = '{1}'
             """;
 
-        MetaData metadata = new()
-        {
-            ["name"] = columnName,
-            ["description"] = string.Empty
-        };
-
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var values = helper.Query(string.Format(sql, tableName, columnName), SqlHelper.ToArray);
 
-        var fieldType = Convert.ToInt32(values[0]);
-        var length = Utility.ToInt16(values[1]);
-        var precision = Utility.ToByte(values[2]);
-        var scale = (byte)Math.Abs(Convert.ToInt32(values[3]));
+        var fieldSource = values[0].ToString().Trim();
+        var fieldType = Convert.ToInt32(values[1]);
+        var subType = Convert.IsDBNull(values[2]) ? (int?)null : Convert.ToInt32(values[2]);
+        var length = Utility.ToInt16(values[3]);
+        var precision = Utility.ToByte(values[4]);
+        var scale = (byte)Math.Abs(Convert.ToInt32(values[5]));
 
-        metadata["type"] = GetColumnType(fieldType);
-        metadata["nativeType"] = metadata["type"].ToString().ToUpper();
-        metadata["size"] = length;
-        metadata["precision"] = precision;
-        metadata["scale"] = scale;
+        MetaData metadata = new()
+        {
+            ["name"] = columnName,
+            ["size"] = length,
+            ["precision"] = precision,
+            ["scale"] = scale,
+            ["defaultValue"] = DBNull.Value,
+            ["description"] = string.Empty,
+        };
 
-        metadata["defaultValue"] = DBNull.Value;
+        if (fieldSource.StartsWith("RDB$", StringComparison.OrdinalIgnoreCase))
+        {
+            metadata["type"] = ResolveColumnType(fieldType, subType, scale);
+            metadata["nativeType"] = GetNativeTypeName(fieldType, subType, scale);
+        }
+        else
+        {
+            metadata["type"] = ColumnType.UserDefined;
+            metadata["nativeType"] = fieldSource;
+        }
 
         var attributes = ColumnAttributes.None;
 
-        if (values[4] != DBNull.Value)
+        if (values[6] != DBNull.Value)
             attributes |= ColumnAttributes.Required;
+
+        if (values[8] != DBNull.Value)
+        {
+            attributes |= ColumnAttributes.Identity;
+
+            metadata["ident_seed"] = values[9] != DBNull.Value
+                ? Convert.ToInt64(values[9])
+                : 0L;
+
+            metadata["ident_incr"] = values[10] != DBNull.Value
+                ? Convert.ToInt64(values[10])
+                : 1L;
+        }
 
         metadata["attributes"] = attributes;
 
@@ -189,11 +218,6 @@ public class FirebirdSchemaProvider : ISchemaProvider
             ORDER BY seg.RDB$FIELD_POSITION
             """;
 
-        MetaData metadata = new()
-        {
-            ["name"] = indexName
-        };
-
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, tableName, indexName), SqlHelper.ToArrayList);
 
@@ -206,11 +230,13 @@ public class FirebirdSchemaProvider : ISchemaProvider
             columns.Add(row[1].ToString().Trim());
         }
 
-        metadata["unique"] = unique;
-        metadata["primaryKey"] = false;
-        metadata["columns"] = columns.ToArray();
-
-        return metadata;
+        return new MetaData()
+        {
+            ["name"] = indexName,
+            ["unique"] = unique,
+            ["primaryKey"] = false,
+            ["columns"] = columns.ToArray()
+        };
     }
 
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
@@ -237,8 +263,6 @@ public class FirebirdSchemaProvider : ISchemaProvider
             ORDER BY seg.RDB$FIELD_POSITION
             """;
 
-        MetaData metadata = [];
-
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, tableName, fkName), SqlHelper.ToArrayList);
 
@@ -257,36 +281,127 @@ public class FirebirdSchemaProvider : ISchemaProvider
             deleteRule = GetFKRule(row[4]?.ToString());
         }
 
-        metadata["name"] = fkName;
-        metadata["columns"] = columns.ToArray();
-        metadata["relatedName"] = relatedTable;
-        metadata["relatedOwner"] = string.Empty;
-        metadata["relatedColumns"] = relatedColumns.ToArray();
-        metadata["updateRule"] = updateRule;
-        metadata["deleteRule"] = deleteRule;
+        return new MetaData
+        {
+            ["name"] = fkName,
+            ["columns"] = columns.ToArray(),
+            ["relatedName"] = relatedTable,
+            ["relatedOwner"] = string.Empty,
+            ["relatedColumns"] = relatedColumns.ToArray(),
+            ["updateRule"] = updateRule,
+            ["deleteRule"] = deleteRule
+        };
+    }
 
-        return metadata;
+    public NameOwnerPair[] GetTypeNames()
+    {
+        const string sql = """
+            SELECT TRIM(RDB$FIELD_NAME)
+            FROM RDB$FIELDS
+            WHERE COALESCE(RDB$SYSTEM_FLAG, 0) = 0
+                AND NOT (RDB$FIELD_NAME STARTING WITH 'RDB$')
+            ORDER BY RDB$FIELD_NAME
+            """;
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(sql, SqlHelper.ToList);
+
+        return [.. list.Select(t => new NameOwnerPair(t.ToString()))];
+    }
+
+    public MetaData GetTypeMeta(string typeName, string typeOwner)
+    {
+        const string sql = """
+            SELECT
+                RDB$FIELD_TYPE,
+                RDB$FIELD_SUB_TYPE,
+                RDB$CHARACTER_LENGTH,
+                RDB$FIELD_PRECISION,
+                RDB$FIELD_SCALE,
+                RDB$DEFAULT_SOURCE,
+                RDB$NULL_FLAG
+            FROM RDB$FIELDS
+            WHERE RDB$FIELD_NAME = '{0}'
+            """;
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var values = helper.Query(string.Format(sql, typeName), SqlHelper.ToArray);
+
+        var fieldType = Convert.ToInt32(values[0]);
+        var subType = Convert.IsDBNull(values[1]) ? (int?)null : Convert.ToInt32(values[1]);
+        var length = Utility.ToInt16(values[2]);
+        var precision = Utility.ToByte(values[3]);
+        var scale = (byte)Math.Abs(Convert.ToInt32(values[4]));
+
+        return new MetaData()
+        {
+            ["name"] = typeName,
+            ["owner"] = typeOwner,
+            ["type"] = ResolveColumnType(fieldType, subType, scale),
+            ["nativeType"] = GetNativeTypeName(fieldType, subType, scale),
+            ["size"] = length,
+            ["precision"] = precision,
+            ["scale"] = scale,
+            ["defaultValue"] = DBNull.Value,
+            ["nullable"] = values[6] == DBNull.Value,
+            ["enumerated"] = false,
+            ["possibleValues"] = Array.Empty<string>()
+        };
     }
 
     #endregion
 
     #region Utilities
 
-    private static ColumnType GetColumnType(int fbType) =>
+    private static ColumnType ResolveColumnType(int fbType, int? subType, int scale) =>
+       fbType switch
+       {
+           7 => scale < 0 ? ColumnType.Decimal : ColumnType.SmallInt,
+           8 => scale < 0 ? ColumnType.Decimal : ColumnType.Integer,
+           16 => subType switch
+           {
+               1 or 2 => ColumnType.Decimal,
+               _ => ColumnType.BigInt
+           },
+           10 => ColumnType.SinglePrecision,
+           27 => ColumnType.DoublePrecision,
+           12 => ColumnType.Date,
+           13 => ColumnType.Time,
+           28 => ColumnType.Time,
+           35 => ColumnType.DateTime,
+           29 => ColumnType.DateTime,
+           14 => ColumnType.Char,
+           37 => ColumnType.VarChar,
+           261 => subType == 1 ? ColumnType.Text : ColumnType.Blob,
+           _ => ColumnType.Unknown
+       };
+
+    private static string GetNativeTypeName(int fbType, int? subType, byte scale) =>
         fbType switch
         {
-            7 => ColumnType.SmallInt,
-            8 => ColumnType.Integer,
-            16 => ColumnType.BigInt,
-            10 => ColumnType.SinglePrecision,
-            27 => ColumnType.DoublePrecision,
-            12 => ColumnType.Date,
-            13 => ColumnType.Time,
-            35 => ColumnType.DateTime,
-            14 => ColumnType.Char,
-            37 => ColumnType.VarChar,
-            261 => ColumnType.Blob,
-            _ => ColumnType.Unknown
+            7 => scale > 0 ? "NUMERIC" : "SMALLINT",
+            8 => scale > 0 ? "NUMERIC" : "INTEGER",
+            16 => subType switch
+            {
+                1 => "NUMERIC",
+                2 => "DECIMAL",
+                _ => "BIGINT"
+            },
+            10 => "FLOAT",
+            27 => "DOUBLE PRECISION",
+            12 => "DATE",
+            13 => "TIME",
+            28 => "TIME WITH TIME ZONE",
+            35 => "TIMESTAMP",
+            29 => "TIMESTAMP WITH TIME ZONE",
+            14 => "CHAR",
+            37 => "VARCHAR",
+            261 => subType switch
+            {
+                1 => "BLOB SUB_TYPE TEXT",
+                _ => "BLOB"
+            },
+            _ => "UNKNOWN"
         };
 
     private static ForeignKeyRule GetFKRule(string rule) =>
