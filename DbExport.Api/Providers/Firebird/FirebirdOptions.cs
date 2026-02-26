@@ -16,12 +16,12 @@ public class FirebirdOptions
 
     public static string[] CharacterSets { get; } =
     [
-        // Unicode
+        "--Unicode--",
         "UTF8",
         "UTF16",
         "UNICODE_FSS",
 
-        // ASCII / Special
+        "--ASCII or Special--",
         "ASCII",
         "NONE",
         "OCTETS",
@@ -31,7 +31,7 @@ public class FirebirdOptions
         "KOI8U",
         "TIS620",
 
-        // ISO-8859
+        "--ISO-8859--",
         "ISO8859_1",
         "ISO8859_2",
         "ISO8859_3",
@@ -44,7 +44,7 @@ public class FirebirdOptions
         "ISO8859_13",
         "ISO8859_15",
 
-        // Windows code pages
+        "--Windows code pages--",
         "WIN1250",
         "WIN1251",
         "WIN1252",
@@ -54,7 +54,7 @@ public class FirebirdOptions
         "WIN1256",
         "WIN1257",
 
-        // DOS code pages
+        "--DOS code pages--",
         "DOS437",
         "DOS737",
         "DOS775",
@@ -71,7 +71,7 @@ public class FirebirdOptions
         "DOS866",
         "DOS869",
 
-        // Asian
+        "--Asian--",
         "GB_2312",
         "GBK",
         "BIG_5",
