@@ -2,21 +2,6 @@
 
 public class UtilityTest
 {
-    [Fact]
-    public void GetBytesTest()
-    {
-        // Arrange
-        var value = @"\\\\banane \\340 gogo\n";
-        byte[] expected = {92, 98, 97, 110, 97, 110, 101, 32, 224, 32, 103, 111, 103, 111, 10};
-
-        // Act
-        var actual = Utility.GetBytes(value);
-
-        // Assert
-        Assert.Equal(BitConverter.ToString(expected), BitConverter.ToString(actual));
-    }
-
-
     [Theory]
     [InlineData("11000000", 2, 192)]
     [InlineData("FE", 16, 254)]

@@ -14,6 +14,9 @@ using MySql.Data.MySqlClient;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
 using SQLitePCL;
+#if WINDOWS
+using System.Data.OleDb;
+#endif
 
 namespace DbExport;
 
@@ -29,7 +32,7 @@ public static partial class Utility
 
 #if WINDOWS
 #pragma warning disable CA1416 // Verify platform compatibility
-        DbProviderFactories.RegisterFactory(ProviderNames.ACCESS, System.Data.OleDb.OleDbFactory.Instance);
+        DbProviderFactories.RegisterFactory(ProviderNames.ACCESS, OleDbFactory.Instance);
 #pragma warning restore CA1416 // Verify platform compatibility
 #endif
         DbProviderFactories.RegisterFactory(ProviderNames.SQLSERVER, SqlClientFactory.Instance);
@@ -116,9 +119,6 @@ public static partial class Utility
     public static short ToInt16(object value) =>
         short.TryParse(Convert.ToString(value, CI), NumberStyles.Any, CI, out var result) ? result : default;
 
-    public static DateTime ToDate(object value) =>
-        DateTime.TryParse(Convert.ToString(value, CI), CI, DateTimeStyles.None, out var result) ? result : default;
-
     public static string QuotedStr(object value, char quote = '\'') =>
         $"{quote}{value.ToString()?.Replace(quote.ToString(), new string(quote, 2))}{quote}";
     
@@ -129,137 +129,6 @@ public static partial class Utility
         bytes.Select(b => b.ToString("x2"))
              .Aggregate(new StringBuilder(), (a, b) => a.Append(b))
              .ToString();
-
-    public static byte[] Hex2Bin(string value)
-    {
-        var bytes = new byte[value.Length / 2];
-
-        for (int i = 0, j = 0; i < bytes.Length; ++i, j += 2)
-            bytes[i] = byte.Parse(value.Substring(j, 2), NumberStyles.AllowHexSpecifier);
-
-        return bytes;
-    }
-
-    public static string GetString(byte[] bytes)
-    {
-        StringBuilder sb = new();
-
-        foreach (var b in bytes)
-        {
-            switch (b)
-            {
-                case 39: // single quote
-                    sb.Append("''");
-                    break;
-                case 92: // backslash
-                    sb.Append(@"\\\\");
-                    break;
-                case >= 32 and < 127:
-                    sb.Append((char)b);
-                    break;
-                default:
-                    sb.Append(@"\\").Append(ToBaseN(b, 8).PadLeft(3, '0'));
-                    break;
-            }
-        }
-
-        return sb.ToString();
-    }
-
-    public static byte[] GetBytes(string value)
-    {
-        List<byte> bytes = [];
-        var counter = 0;
-
-        try
-        {
-            while (counter < value.Length)
-            {
-                var c = value[counter];
-                switch (c)
-                {
-                    case '\'':
-                        switch (value[counter + 1])
-                        {
-                            case '\'':
-                                bytes.Add(39);
-                                counter += 2;
-                                break;
-                            default:
-                                throw new FormatException("Single quotes must be doubled");
-                        }
-                        break;
-                    case '\\':
-                        switch (value[counter + 1])
-                        {
-                            case 'a':
-                                bytes.Add(7);
-                                counter += 2;
-                                break;
-                            case 'b':
-                                bytes.Add(8);
-                                counter += 2;
-                                break;
-                            case 't':
-                                bytes.Add(9);
-                                counter += 2;
-                                break;
-                            case 'n':
-                                bytes.Add(10);
-                                counter += 2;
-                                break;
-                            case 'v':
-                                bytes.Add(11);
-                                counter += 2;
-                                break;
-                            case 'f':
-                                bytes.Add(12);
-                                counter += 2;
-                                break;
-                            case 'r':
-                                bytes.Add(13);
-                                counter += 2;
-                                break;
-                            case '\"':
-                                bytes.Add(34);
-                                counter += 2;
-                                break;
-                            case '\'':
-                                bytes.Add(39);
-                                counter += 2;
-                                break;
-                            case '\\':
-                                if (value.Substring(counter, 4) == @"\\\\")
-                                {
-                                    bytes.Add(92);
-                                    counter += 4;
-                                }
-                                else if (ThreeDigitsRegex().IsMatch(value.AsSpan(counter + 2, 3)))
-                                {
-                                    bytes.Add(FromBaseN(value.Substring(counter + 2, 3), 8));
-                                    counter += 5;
-                                }
-                                else
-                                    throw new FormatException("Invalid escape sequence");
-                                break;
-                            default:
-                                throw new FormatException("Invalid escape sequence");
-                        }
-                        break;
-                    default:
-                        bytes.Add((byte) c);
-                        ++counter;
-                        break;
-                }
-            }
-        }
-        catch (IndexOutOfRangeException)
-        {
-            throw new FormatException("The string terminates incorrectly");
-        }
-
-        return [..bytes];
-    }
 
     public static string ToBitString(byte[] bytes) =>
         bytes.Select(b => ToBaseN(b, 2))
@@ -306,9 +175,6 @@ public static partial class Utility
         >= '0' and <= '9' => c - '0',
         _ => c - 'A' + 10
     };
-    
-    [GeneratedRegex(@"\d{3}", RegexOptions.Compiled)]
-    private static partial Regex ThreeDigitsRegex();
 
     [GeneratedRegex(@"\b(password|pwd)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex PasswordRegex();

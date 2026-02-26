@@ -275,15 +275,17 @@ public sealed partial class SqlHelper : IDisposable
     public static RowSet OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
     {
         StringBuilder sb = new("SELECT ");
+        var providerName = table.Database.ProviderName;
 
         foreach (var column in table.Columns.Where(ShouldNotSkip))
-            sb.Append(Utility.Escape(column.Name, table.Database.ProviderName)).Append(", ");
+            sb.Append(Utility.Escape(column.Name, providerName)).Append(", ");
 
         sb.Length -= 2;
         sb.Append(" FROM ");
+        
         if (!string.IsNullOrEmpty(table.Owner))
-            sb.Append(Utility.Escape(table.Owner, table.Database.ProviderName)).Append('.');
-        sb.Append(Utility.Escape(table.Name, table.Database.ProviderName));
+            sb.Append(Utility.Escape(table.Owner, providerName)).Append('.');
+        sb.Append(Utility.Escape(table.Name, providerName));
 
         var connection = Utility.GetConnection(table.Database);
         connection.Open();

@@ -125,7 +125,7 @@ public class NpgsqlCodeGenerator : CodeGenerator
             ColumnType.Boolean => (bool)value ? "true" : "false",
             ColumnType.RowVersion when value is DateTime => base.Format(value, ColumnType.DateTime),
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion =>
-                $"E'{Utility.GetString((byte[])value)}'::bytea",
+                $@"E'\\x{Utility.BinToHex((byte[])value)}'::bytea",
             _ => base.Format(value, columnType)
         };
     }
