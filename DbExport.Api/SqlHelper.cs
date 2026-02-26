@@ -252,7 +252,7 @@ public sealed partial class SqlHelper : IDisposable
             using (var helper = new SqlHelper(ProviderNames.POSTGRESQL, connectionString))
                 helper.Execute(createDb);
             
-            var builder = new NpgsqlConnectionStringBuilder(connectionString) { Database = dbName };
+            var builder = new NpgsqlConnectionStringBuilder(connectionString) { Database = dbName.ToLower() };
             connectionString = builder.ToString();
             
             script = script[(match.Index + match.Length)..];

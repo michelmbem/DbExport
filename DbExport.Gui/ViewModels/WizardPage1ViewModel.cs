@@ -8,12 +8,13 @@ public class WizardPage1ViewModel : WizardPageViewModel
         Header.Description =
             """
             # Welcome to DbExport.
-
-            DbExport is a relational database migration wizard that lets you migrate tables
-            structure and/or contents from one database to another.
-            DbExport supports seven of the most popular relational database management systems.
-            These are MS Access, MS SQL Server, Oracle, MySQL, PostgreSQL, Firebird, and SQLite.
-
+            
+            DbExport is a relational database migration assistant that allows you to transfer
+            the structure and/or content of your tables from one database to another.
+            
+            DbExport supports seven of the most popular relational database management systems:
+            MS Access, MS SQL Server, Oracle, MySQL, PostgreSQL, Firebird, and SQLite.
+            
             Click the "Next" button to start your own migration process.
             """;
     }
