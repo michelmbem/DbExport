@@ -6,9 +6,7 @@ public abstract class SchemaItem : IVisitorAcceptor
 {
     protected SchemaItem(SchemaItem parent, string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("The name must be set a non-empty value");
-
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
         Parent = parent;
         Name = name;
     }
@@ -21,7 +19,7 @@ public abstract class SchemaItem : IVisitorAcceptor
 
     #region Implementation of IVisitorAcceptor
 
-    public virtual void AcceptVisitor(IVisitor visitor) { }
+    public abstract void AcceptVisitor(IVisitor visitor);
 
     #endregion
 

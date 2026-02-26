@@ -20,5 +20,6 @@ public record RowSet(DbConnection Connection, DbCommand Command, DbDataReader Da
         DataReader.Dispose();
         Command.Dispose();
         Connection.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

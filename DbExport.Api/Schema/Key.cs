@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace DbExport.Schema;
 
-public class Key : ColumnSet
+public abstract class Key : ColumnSet
 {
     protected Key(Table table, string name, IEnumerable<string> columnNames) : base(table, name)
     {
@@ -13,9 +13,6 @@ public class Key : ColumnSet
 
     public Table Table => (Table)Parent;
 
-    public bool MatchesSignature(Key other)
-    {
-        if (Columns.Count != other.Columns.Count) return false;
-        return !Columns.Where((c, i) => c.Name != other.Columns[i].Name).Any();
-    }
+    public bool MatchesSignature(Key other) =>
+        Columns.Count == other.Columns.Count && !Columns.Where((c, i) => c.Name != other.Columns[i].Name).Any();
 }

@@ -31,8 +31,8 @@ public interface IDataItem
         return item.ColumnType switch
         {
             ColumnType.Char or ColumnType.NChar =>  $"{typeName}({item.Size})",
-            ColumnType.VarChar or ColumnType.NVarChar =>
-                item.Size > 0 ? $"{typeName}({item.Size})" : $"{typeName[0]}text",
+            ColumnType.VarChar => item.Size > 0 ? $"{typeName}({item.Size})" : "text",
+            ColumnType.NVarChar => item.Size > 0 ? $"{typeName}({item.Size})" : "ntext",
             ColumnType.Bit => item.Size > 0 ? $"{typeName}({item.Size})" : "blob",
             ColumnType.Decimal when item.Precision == 0 => $"{typeName}",
             ColumnType.Decimal when item.Scale == 0 => $"{typeName}({item.Precision})",

@@ -17,9 +17,9 @@ public class Table(Database db, string name, string owner) : ColumnSet(db, name)
 
     public bool HasPrimaryKey => PrimaryKey?.Columns.Count > 0;
 
-    public bool HasIndex => Indexes.Any(index => index.Columns.Count > 0);
+    public bool HasIndex => Indexes.Count > 0 && Indexes.Any(index => index.Columns.Count > 0);
 
-    public bool HasForeignKey => ForeignKeys.Any(fk => fk.Columns.Count > 0);
+    public bool HasForeignKey => ForeignKeys.Count > 0 && ForeignKeys.Any(fk => fk.Columns.Count > 0);
 
     public ColumnCollection NonPKColumns => [..Columns.Where(column => !column.IsPKColumn)];
 
