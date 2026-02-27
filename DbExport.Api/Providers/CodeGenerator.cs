@@ -657,7 +657,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     /// </summary>
     /// <param name="s">The string to be written. This method will ensure that the string is properly formatted
     /// and written to the output, taking into account the current indentation level and the presence
-    /// of line breaks in the input string.</param>  
+    /// of line breaks in the input string.</param>
     protected void Write(string s)
     {
         foreach (var c in s)
@@ -685,7 +685,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     /// <summary>
     /// Writes a string followed by a line break to the output, taking care of indentation.
     /// </summary>
-    /// <param name="s">The string to be written.</param> 
+    /// <param name="s">The string to be written.</param>
     protected void WriteLine(string s)
     {
         Write(s + Environment.NewLine);
