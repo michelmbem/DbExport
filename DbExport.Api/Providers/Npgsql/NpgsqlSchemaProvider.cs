@@ -370,10 +370,14 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                            """;
 
         const string sqlEnum = """
-                               SELECT t.typlen, t.typnotnull, t.typdefault
+                               SELECT
+                                    MAX(LENGTH(e.enumlabel)) AS maxlen,
+                                    t.typnotnull, t.typdefault
                                FROM pg_type t
+                               JOIN pg_enum e ON t.oid = e.enumtypid
                                JOIN pg_namespace n ON n.oid = t.typnamespace
                                WHERE n.nspname = '{1}' AND t.typname = '{0}'
+                               GROUP BY t.typname, t.typnotnull, t.typdefault
                                """;
 
         const string sqlEnumMembers = """
@@ -412,7 +416,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         else
         {
             values = helper.Query(string.Format(sqlEnum, typeName, typeOwner), SqlHelper.ToDictionary);
-            metadata["size"] = Utility.ToInt16(values["typlen"]);
+            metadata["size"] = Utility.ToInt16(values["maxlen"]);
             metadata["precision"] =  metadata["scale"] = (byte)0;
             metadata["nativeType"] = "character varying";
             metadata["type"] = ColumnType.VarChar;

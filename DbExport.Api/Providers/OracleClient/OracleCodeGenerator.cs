@@ -28,12 +28,20 @@ public class OracleCodeGenerator : CodeGenerator
 
     public override void VisitColumn(Column column)
     {
-        base.VisitColumn(column);
+        Write("{0} {1}", Escape(column.Name), GetTypeName(column));
 
         var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
-        
+
         if (visitIdentities && column.IsIdentity)
             Write($" GENERATED ALWAYS AS IDENTITY (START WITH {column.IdentitySeed}, INCREMENT BY {column.IdentityIncrement})");
+        else
+        {
+            var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
+            if (visitDefaults && !Utility.IsEmpty(column.DefaultValue))
+                Write(" DEFAULT {0}", Format(column.DefaultValue, column.ColumnType));
+
+            if (column.IsRequired) Write(" NOT NULL");
+        }
     }
 
     protected override string GetTypeName(IDataItem item) =>

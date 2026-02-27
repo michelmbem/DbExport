@@ -60,7 +60,7 @@ public class FirebirdCodeGenerator : CodeGenerator
 
         if (!dataType.IsNullable) Write(" NOT NULL");
 
-        WriteLine(";");
+        WriteDelimiter();
         WriteLine();
     }
 

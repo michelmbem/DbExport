@@ -1,0 +1,42 @@
+﻿using System.Text.RegularExpressions;
+using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.Isql;
+
+namespace DbExport.Providers.Firebird;
+
+public partial class FirebirdScriptExecutor : IScriptExecutor
+{
+    public void Execute(string connectionString, string script)
+    {
+        var match = CreateDbRegex().Match(script);
+
+        if (match.Success)
+        {
+            var dbName = match.Groups[1].Value;
+            var builder = new FbConnectionStringBuilder(connectionString) { Database = dbName };
+
+            connectionString = builder.ToString();
+            FbConnection.CreateDatabase(connectionString, FirebirdOptions.PageSize,
+                                        FirebirdOptions.ForcedWrites, FirebirdOptions.Overwrite);
+
+            script = script[(match.Index + match.Length)..];
+        }
+
+        using var conn = new FbConnection(connectionString);
+        using var cmd = conn.CreateCommand();
+
+        var fbScript = new FbScript(script);
+        fbScript.Parse();
+
+        conn.Open();
+
+        foreach (var statement in fbScript.Results)
+        {
+            cmd.CommandText = statement.Text;
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+'([^']+)'[^;]*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    private static partial Regex CreateDbRegex();
+}

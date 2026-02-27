@@ -36,15 +36,14 @@ public class NpgsqlCodeGenerator : CodeGenerator
             var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
             if (visitDefaults && !Utility.IsEmpty(dataType.DefaultValue))
                 Write(" DEFAULT {0}", Format(dataType.DefaultValue, dataType.ColumnType));
-            
-            WriteLine(";");
         }
         else
         {
             var members = dataType.PossibleValues.Select(v => Format(v, dataType.ColumnType));
-            WriteLine($"CREATE TYPE {dataType.Name} AS ENUM ({string.Join(", ", members)});");
+            Write($"CREATE TYPE {dataType.Name} AS ENUM ({string.Join(", ", members)})");
         }
-        
+
+        WriteDelimiter();
         WriteLine();
     }
 

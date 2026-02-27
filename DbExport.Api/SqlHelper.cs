@@ -4,13 +4,11 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using DbExport.Providers;
 using DbExport.Providers.Firebird;
+using DbExport.Providers.Npgsql;
+using DbExport.Providers.SqlClient;
 using DbExport.Schema;
-using FirebirdSql.Data.FirebirdClient;
-using FirebirdSql.Data.Isql;
-using Npgsql;
 
 namespace DbExport;
 
@@ -181,7 +179,7 @@ public sealed partial class SqlHelper : IDisposable
 
     #endregion
 
-    #region ExecuteScript methods
+    #region ExecuteScript method
 
     /// <summary>
     /// Executes the specified SQL script against the database using the provided provider name and connection string.
@@ -191,157 +189,23 @@ public sealed partial class SqlHelper : IDisposable
     /// <param name="script">A string containing the SQL script to be executed.</param>
     public static void ExecuteScript(string providerName, string connectionString, string script)
     {
-        switch (providerName)
-        {
-            case ProviderNames.SQLSERVER:
-                ExecuteSqlScript(connectionString, script);
-                break;
-            case ProviderNames.POSTGRESQL:
-                ExecutePgScript(connectionString, script);
-                break;
-            case ProviderNames.FIREBIRD:
-                ExecuteFbScript(connectionString, script);
-                break;
-            case ProviderNames.ORACLE:
-                ExecuteBatch(providerName, connectionString, script);
-                break;
-            default:
-            {
-                using var helper = new SqlHelper(providerName, connectionString);
-                helper.Execute(script);
-                break;
-            }
-        }
+        GetScripExecutor(providerName).Execute(connectionString, script);
     }
 
     /// <summary>
-    /// Executes the specified SQL script against a SQL Server database using the provided connection string.
-    /// </summary>
-    /// <param name="connectionString">The connection string for the database connection.</param>
-    /// <param name="script">A string containing the SQL script to be executed.</param>
-    public static void ExecuteSqlScript(string connectionString, string script)
-    {
-        using var helper = new SqlHelper(ProviderNames.SQLSERVER, connectionString);
-        var match = SqlCreateDbRegex().Match(script);
-        
-        if (match.Success)
-        {
-            var createDb = match.Value[..^2].TrimEnd();
-            helper.Execute(createDb);
-            script = script[(match.Index + match.Length)..];
-        }
-
-        script = SqlDelimiterRegex().Replace(script, ";\n");
-        helper.Execute(script);
-    }
-
-    /// <summary>
-    /// Executes the specified SQL script against a PostgreSQL database using the provided connection string.
-    /// </summary>
-    /// <param name="connectionString">The connection string for the database connection.</param>
-    /// <param name="script">A string containing the SQL script to be executed.</param>
-    public static void ExecutePgScript(string connectionString, string script)
-    {
-        var match = CreateDbRegex().Match(script);
-        
-        if (match.Success)
-        {
-            var createDb = match.Value[..^1];
-            var dbName = match.Groups[1].Value;
-            
-            using (var helper = new SqlHelper(ProviderNames.POSTGRESQL, connectionString))
-                helper.Execute(createDb);
-            
-            var builder = new NpgsqlConnectionStringBuilder(connectionString) { Database = dbName.ToLower() };
-            connectionString = builder.ToString();
-            
-            script = script[(match.Index + match.Length)..];
-            match = new Regex($@"\\[Cc]\s+({dbName})\s*;").Match(script);
-            
-            if (match.Success)
-                script = script[(match.Index + match.Length)..];
-        }
-        
-        ExecuteBatch(ProviderNames.POSTGRESQL, connectionString, script);
-    }
-
-    /// <summary>
-    /// Executes the specified SQL script against a Firebird database using the provided connection string.
-    /// </summary>
-    /// <param name="connectionString">The connection string for the database connection.</param>
-    /// <param name="script">A string containing the SQL script to be executed.</param>
-    public static void ExecuteFbScript(string connectionString, string script)
-    {
-        var match = FbCreateDbRegex().Match(script);
-        
-        if (match.Success)
-        {
-            var dbName = match.Groups[1].Value;
-            var builder = new FbConnectionStringBuilder(connectionString) { Database = dbName };
-
-            connectionString = builder.ToString();
-            FbConnection.CreateDatabase(connectionString, FirebirdOptions.PageSize,
-                                        FirebirdOptions.ForcedWrites, FirebirdOptions.Overwrite);
-
-            script = script[(match.Index + match.Length)..];
-        }
-        
-        using var conn = Utility.GetConnection(ProviderNames.FIREBIRD, connectionString);
-        using var cmd = conn.CreateCommand();
-
-        var fbScript = new FbScript(script);
-        fbScript.Parse();
-        
-        conn.Open();
-
-        foreach (var statement in fbScript.Results)
-        {
-            cmd.CommandText = statement.Text;
-            cmd.ExecuteNonQuery();
-        }
-    }
-
-    /// <summary>
-    /// Executes the specified SQL script against a database using batch execution if supported by the provider,
-    /// or executes each statement individually if batch execution is not supported.
+    /// Gets the script executor that matches the given provider name.
     /// </summary>
     /// <param name="providerName">The name of the database provider.</param>
-    /// <param name="connectionString">The connection string for the database connection.</param>
-    /// <param name="script">A string containing the SQL script to be executed.</param>
-    public static void ExecuteBatch(string providerName, string connectionString, string script)
-    {
-        using var conn = Utility.GetConnection(providerName, connectionString);
-        var statements = DelimiterRegex().Split(script)
-                                         .Select(s => s.Trim())
-                                         .Where(s => s.Length > 0);
-
-        if (conn.CanCreateBatch)
+    /// <returns>A IScriptExecutor</returns>
+    public static IScriptExecutor GetScripExecutor(string providerName) =>
+        providerName switch
         {
-            var batch = conn.CreateBatch();
-
-            foreach (var statement in statements)
-            {
-                var command = batch.CreateBatchCommand();
-                command.CommandText = statement;
-                batch.BatchCommands.Add(command);
-            }
-
-            conn.Open();
-            batch.ExecuteNonQuery();
-        }
-        else
-        {
-            using var cmd = conn.CreateCommand();
-
-            conn.Open();
-
-            foreach (var statement in statements)
-            {
-                cmd.CommandText = statement;
-                cmd.ExecuteNonQuery();
-            }
-        }
-    }
+            ProviderNames.SQLSERVER => new SqlScripExecutor(),
+            ProviderNames.POSTGRESQL => new NpgsqlScriptExecutor(),
+            ProviderNames.FIREBIRD => new FirebirdScriptExecutor(),
+            ProviderNames.ORACLE => new BatchScriptExecutor(providerName),
+            _ => new DefaultScriptExecutor(providerName)
+        };
 
     #endregion
 
@@ -476,25 +340,6 @@ public sealed partial class SqlHelper : IDisposable
 
         return result;
     }
-
-    #endregion
-
-    #region Regular expressions
-
-    [GeneratedRegex(@"CREATE\s+DATABASE\s+(\w[\w\d]*)[^;]*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
-    private static partial Regex CreateDbRegex();
-    
-    [GeneratedRegex(@";(?=(?:[^']*'[^']*')*[^']*$)", RegexOptions.Compiled)]
-    private static partial Regex DelimiterRegex();
-
-    [GeneratedRegex(@"CREATE\s+DATABASE\s+(.+)\s+GO", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
-    private static partial Regex SqlCreateDbRegex();
-    
-    [GeneratedRegex(@"[\r\n]GO[\r\n]", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
-    private static partial Regex SqlDelimiterRegex();
-
-    [GeneratedRegex(@"CREATE\s+DATABASE\s+'([^']+)'[^;]*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
-    private static partial Regex FbCreateDbRegex();
 
     #endregion
 }

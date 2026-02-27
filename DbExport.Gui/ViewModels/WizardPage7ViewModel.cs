@@ -184,7 +184,7 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
                     """);
         }
 
-        SqlHelper.ExecuteSqlScript(summary.TargetConnectionString, GenerateSqlScript(summary));
+        new SqlScripExecutor().Execute(summary.TargetConnectionString, GenerateSqlScript(summary));
     }
 #endif
 

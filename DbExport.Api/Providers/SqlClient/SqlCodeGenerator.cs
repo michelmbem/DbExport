@@ -46,7 +46,8 @@ public class SqlCodeGenerator : CodeGenerator
 
     public override void VisitDataType(DataType dataType)
     {
-        WriteLine($"CREATE TYPE dbo.{dataType.Name} FROM {GetTypeName(dataType)};");
+        Write($"CREATE TYPE [dbo].{Escape(dataType.Name)} FROM {GetTypeName(dataType)}");
+        WriteDelimiter();
         WriteLine();
     }
 
@@ -77,7 +78,7 @@ public class SqlCodeGenerator : CodeGenerator
             _ => item.NativeType
         };
 
-    protected override string GetTypeReference(DataType dataType) => $"dbo.{dataType.Name}";
+    protected override string GetTypeReference(DataType dataType) => $"[dbo].{Escape(dataType.Name)}";
 
     protected override string Format(object value, ColumnType columnType)
     {
