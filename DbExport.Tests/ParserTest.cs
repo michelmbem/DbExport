@@ -1,4 +1,5 @@
-﻿using DbExport.Providers.SQLite.SqlParser;
+﻿using DbExport.Providers;
+using DbExport.Providers.SQLite.SqlParser;
 using DbExport.Schema;
 
 namespace DbExport.Tests;
@@ -9,17 +10,17 @@ public class ParserTest
     public void TestCreateTable()
     {
         // Arrange
-        var input = """
-            CREATE TABLE city (
-            	ID integer NOT NULL UNIQUE,
-            	Name char(35) NOT NULL DEFAULT '',
-            	CountryCode char(3) NOT NULL DEFAULT '',
-            	District char(20) NOT NULL DEFAULT '',
-            	Population integer NOT NULL,
-            	PRIMARY KEY (ID),
-            	CONSTRAINT city_country_fk FOREIGN KEY (CountryCode) REFERENCES country (Code)
-            )
-            """;
+        const string input = """
+             CREATE TABLE city (
+                ID integer NOT NULL UNIQUE,
+                Name char(35) NOT NULL DEFAULT '',
+                CountryCode char(3) NOT NULL DEFAULT '',
+                District char(20) NOT NULL DEFAULT '',
+                Population integer NOT NULL,
+                PRIMARY KEY (ID),
+                CONSTRAINT city_country_fk FOREIGN KEY (CountryCode) REFERENCES country (Code)
+             )
+             """;
 
         // Act
         var parser = new Parser(new Scanner(input));
@@ -37,7 +38,7 @@ public class ParserTest
         var colSpec = colSpecList.Children[0];
         Assert.Equal(AstNodeKind.COLSPEC, colSpec.Kind);
         
-        var colAttribs = Assert.IsType<Dictionary<string, object>>(colSpec.Data);
+        var colAttribs = Assert.IsType<MetaData>(colSpec.Data);
         Assert.Equal("ID", colAttribs["COLUMN_NAME"]);
         Assert.Equal("integer", colAttribs["TYPE_NAME"]);
         Assert.Equal(false, colAttribs["ALLOW_DBNULL"]);
@@ -46,7 +47,7 @@ public class ParserTest
         colSpec = colSpecList.Children[1];
         Assert.Equal(AstNodeKind.COLSPEC, colSpec.Kind);
         
-        colAttribs = Assert.IsType<Dictionary<string, object>>(colSpec.Data);
+        colAttribs = Assert.IsType<MetaData>(colSpec.Data);
         Assert.Equal("Name", colAttribs["COLUMN_NAME"]);
         Assert.Equal("char", colAttribs["TYPE_NAME"]);
         Assert.Equal(35, colAttribs["PRECISION"]);
@@ -56,7 +57,7 @@ public class ParserTest
         colSpec = colSpecList.Children[2];
         Assert.Equal(AstNodeKind.COLSPEC, colSpec.Kind);
         
-        colAttribs = Assert.IsType<Dictionary<string, object>>(colSpec.Data);
+        colAttribs = Assert.IsType<MetaData>(colSpec.Data);
         Assert.Equal("CountryCode", colAttribs["COLUMN_NAME"]);
         Assert.Equal("char", colAttribs["TYPE_NAME"]);
         Assert.Equal(3, colAttribs["PRECISION"]);
@@ -66,7 +67,7 @@ public class ParserTest
         colSpec = colSpecList.Children[3];
         Assert.Equal(AstNodeKind.COLSPEC, colSpec.Kind);
         
-        colAttribs = Assert.IsType<Dictionary<string, object>>(colSpec.Data);
+        colAttribs = Assert.IsType<MetaData>(colSpec.Data);
         Assert.Equal("District", colAttribs["COLUMN_NAME"]);
         Assert.Equal("char", colAttribs["TYPE_NAME"]);
         Assert.Equal(20, colAttribs["PRECISION"]);
@@ -76,7 +77,7 @@ public class ParserTest
         colSpec = colSpecList.Children[4];
         Assert.Equal(AstNodeKind.COLSPEC, colSpec.Kind);
         
-        colAttribs = Assert.IsType<Dictionary<string, object>>(colSpec.Data);
+        colAttribs = Assert.IsType<MetaData>(colSpec.Data);
         Assert.Equal("Population", colAttribs["COLUMN_NAME"]);
         Assert.Equal("integer", colAttribs["TYPE_NAME"]);
         Assert.Equal(false, colAttribs["ALLOW_DBNULL"]);
@@ -96,7 +97,7 @@ public class ParserTest
         var fkSpec = node.Children[2];
         Assert.Equal(AstNodeKind.FKSPEC, fkSpec.Kind);
         
-        var fkAttribs = Assert.IsType<Dictionary<string, object>>(fkSpec.Data);
+        var fkAttribs = Assert.IsType<MetaData>(fkSpec.Data);
         Assert.Equal("city_country_fk", fkAttribs["CONSTRAINT_NAME"]);
         Assert.Equal("country", fkAttribs["TARGET_TABLE_NAME"]);
         Assert.Equal(ForeignKeyRule.None, fkAttribs["UPDATE_RULE"]);

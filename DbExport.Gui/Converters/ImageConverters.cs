@@ -11,13 +11,14 @@ public static class ImageConverters
 {
     #region Converters
 
-    public static readonly IValueConverter WindowIcon = new FuncValueConverter<WindowIcon?, IImage?>(WinIcon2Img, Img2WinIcon);
+    public static readonly IValueConverter FromWindowIcon =
+        new FuncValueConverter<WindowIcon?, IImage?>(WindowIcon2Image, Image2WindowIcon);
 
     #endregion
 
     #region Helper methods
 
-    private static IImage? WinIcon2Img(WindowIcon? icon)
+    private static IImage? WindowIcon2Image(WindowIcon? icon)
     {
         if (icon == null) return null;
 
@@ -28,7 +29,7 @@ public static class ImageConverters
         return new Bitmap(stream);
     }
 
-    private static WindowIcon? Img2WinIcon(IImage? image) => throw new NotSupportedException();
+    private static WindowIcon Image2WindowIcon(IImage? image) => throw new NotSupportedException();
 
     #endregion
 }

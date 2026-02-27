@@ -34,7 +34,7 @@ public class UtilityTest
     public void FromBitStringTest()
     {
         // Arrange
-        var value = "11111001011";
+        const string value = "11111001011";
         byte[] expected = [7, 203];
 
         // Act
