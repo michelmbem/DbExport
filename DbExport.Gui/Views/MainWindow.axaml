@@ -52,9 +52,10 @@
                 </Style>
             </Border.Styles>
 			<Grid ColumnDefinitions="{OnPlatform '*, Auto', macOS='Auto, *'}"
-                  Margin="{OnPlatform '10, 0, 140, 0', macOS='65, 0, 10, 0'}">
+                  Margin="{OnPlatform '10, 0, 140, 0', macOS='65, 0, 10, 0', Linux='2, 0'}">
                 <StackPanel Grid.Column="{OnPlatform 0, macOS=1}"
-                            HorizontalAlignment="{OnPlatform Left, macOS=Center}">
+                            HorizontalAlignment="{OnPlatform Left, macOS=Center}"
+                            IsVisible="{OnPlatform True, Linux=False}">
                     <Image Source="{Binding $parent[Window].Icon, Converter={x:Static c:ImageConverters.FromWindowIcon}}"/>
                     <TextBlock Text="{Binding $parent[Window].Title}"/>
                 </StackPanel>
