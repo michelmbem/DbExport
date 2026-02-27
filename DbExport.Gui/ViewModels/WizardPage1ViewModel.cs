@@ -5,8 +5,7 @@ public class WizardPage1ViewModel : WizardPageViewModel
     public WizardPage1ViewModel()
     {
         Header.Title = "Welcome";
-        Header.Description =
-            """
+        Header.Description = """
             # Welcome to DbExport.
             
             DbExport is a relational database migration assistant that allows you to transfer
