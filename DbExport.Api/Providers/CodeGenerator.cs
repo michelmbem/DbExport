@@ -63,7 +63,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     /// Factory method to create an instance of a CodeGenerator subclass based on the provided database provider name.
     /// </summary>
     /// <param name="providerName">The name of the database provider for which to create a code generator. Supported values include:
-    /// "Microsoft.Data.SqlClient" for SQL Server, "Oracle.ManagedDataAccess.Client" for Oracle, "MySql.Data.MySqlClient" for MySQL,
+    /// "Microsoft.Data.SqlClient" for SQL Server, "Oracle.ManagedDataAccess.Client" for Oracle, "MySqlConnector" for MySQL,
     /// "Npgsql" for PostgreSQL, "FirebirdSql.Data.FirebirdClient" for Firebird, and "System.Data.SQLite" for SQLite.
     /// Must not be null or empty.</param>
     /// <param name="output">The TextWriter to which the generated SQL will be written. Must not be null.</param>

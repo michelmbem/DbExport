@@ -10,7 +10,7 @@ using DbExport.Providers;
 using DbExport.Schema;
 using FirebirdSql.Data.FirebirdClient;
 using Microsoft.Data.SqlClient;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
 using SQLitePCL;
@@ -51,7 +51,7 @@ public static partial class Utility
 #endif
         DbProviderFactories.RegisterFactory(ProviderNames.SQLSERVER, SqlClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.ORACLE, OracleClientFactory.Instance);
-        DbProviderFactories.RegisterFactory(ProviderNames.MYSQL, MySqlClientFactory.Instance);
+        DbProviderFactories.RegisterFactory(ProviderNames.MYSQL, MySqlConnectorFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.POSTGRESQL, NpgsqlFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.FIREBIRD, FirebirdClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.SQLITE, SQLiteFactory.Instance);

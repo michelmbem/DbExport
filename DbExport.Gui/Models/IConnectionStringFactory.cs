@@ -3,7 +3,7 @@ using System.Data.OleDb;
 #endif
 using Microsoft.Data.SqlClient;
 using Oracle.ManagedDataAccess.Client;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using Npgsql;
 using FirebirdSql.Data.FirebirdClient;
 using System.Data.SQLite;
