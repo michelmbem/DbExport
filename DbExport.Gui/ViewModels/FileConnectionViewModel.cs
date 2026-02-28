@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,16 +39,14 @@ public partial class FileConnectionViewModel : ConnectionViewModel
     {
         if (string.IsNullOrWhiteSpace(pattern)) return [FilePickerFileTypes.All];
         
-        const StringSplitOptions splitOptions = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
-
-        var parts = pattern.Split('|', splitOptions);
+        var parts = Utility.Split(pattern, '|');
         var limit = parts.Length - 2;
         List<FilePickerFileType> fileTypes = [];
         
         for (var i = 0; i <= limit; i += 2)
         {
             var name = parts[i];
-            var extensions = parts[i + 1].Split(';', splitOptions);
+            var extensions = Utility.Split(parts[i + 1], ';');
             
             fileTypes.Add(new FilePickerFileType(name) { Patterns = extensions });
         }

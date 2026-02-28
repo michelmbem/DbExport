@@ -166,18 +166,18 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         var settings = Utility.ParseConnectionString(summary.TargetConnectionString);
         var tmpConStr = $"Data Source={settings["data source"]};Integrated Security=true";
 
-        using (var helper1 = new SqlHelper(summary.TargetProvider.Name, tmpConStr))
+        using (var helper = new SqlHelper(summary.TargetProvider.Name, tmpConStr))
         {
             try
             {
-                helper1.Execute($"DROP Database {summary.Database.Name}");
+                helper.Execute($"DROP Database {summary.Database.Name}");
             }
             catch
             {
                 // Ignore
             }
 
-            helper1.Execute($"""
+            helper.Execute($"""
                     CREATE DATABASE {summary.Database.Name}
                     ON (NAME= N'{summary.Database.Name}',
                     FILENAME='{settings["attachdbfilename"]}')
