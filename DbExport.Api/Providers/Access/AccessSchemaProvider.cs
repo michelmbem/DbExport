@@ -111,7 +111,7 @@ public class AccessSchemaProvider : ISchemaProvider
         {
             ["name"] = column.Name,
             ["type"] = GetColumnType(column.Type),
-            ["nativeType"] = column.Type.ToString(),
+            ["nativeType"] = GetNativeTypeName(column.Type),
             ["size"] = (short)column.DefinedSize,
             ["precision"] = (byte)column.Precision,
             ["scale"] = column.NumericScale,
@@ -195,9 +195,8 @@ public class AccessSchemaProvider : ISchemaProvider
 
     #region Utility
 
-    private static ColumnType GetColumnType(ADOX.DataTypeEnum dataTypeEnum)
-    {
-        return dataTypeEnum switch
+    private static ColumnType GetColumnType(ADOX.DataTypeEnum dataTypeEnum) =>
+        dataTypeEnum switch
         {
             ADOX.DataTypeEnum.adBoolean => ColumnType.Boolean,
             ADOX.DataTypeEnum.adUnsignedTinyInt => ColumnType.UnsignedTinyInt,
@@ -216,7 +215,27 @@ public class AccessSchemaProvider : ISchemaProvider
             ADOX.DataTypeEnum.adGUID => ColumnType.Guid,
             _ => ColumnType.Unknown,
         };
-    }
+
+    private static string GetNativeTypeName(ADOX.DataTypeEnum dataTypeEnum) =>
+        dataTypeEnum switch
+        {
+            ADOX.DataTypeEnum.adBoolean => "bit",
+            ADOX.DataTypeEnum.adUnsignedTinyInt => "byte",
+            ADOX.DataTypeEnum.adSmallInt => "integer",
+            ADOX.DataTypeEnum.adInteger => "long",
+            ADOX.DataTypeEnum.adSingle => "single",
+            ADOX.DataTypeEnum.adDouble => "double",
+            ADOX.DataTypeEnum.adCurrency => "currency",
+            ADOX.DataTypeEnum.adDecimal or ADOX.DataTypeEnum.adNumeric or
+            ADOX.DataTypeEnum.adVarNumeric => "decimal",
+            ADOX.DataTypeEnum.adDate or ADOX.DataTypeEnum.adDBTime or
+                ADOX.DataTypeEnum.adDBTimeStamp => "datetime",
+            ADOX.DataTypeEnum.adVarChar or ADOX.DataTypeEnum.adVarWChar or
+                ADOX.DataTypeEnum.adLongVarChar or ADOX.DataTypeEnum.adLongVarWChar => "text",
+            ADOX.DataTypeEnum.adLongVarBinary => "oleobject",
+            ADOX.DataTypeEnum.adGUID => "uniqueidentifier",
+            _ => "unknown",
+        };
 
     private static object Parse(string value, ColumnType columnType)
     {
