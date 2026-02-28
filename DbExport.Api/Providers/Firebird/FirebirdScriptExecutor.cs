@@ -8,7 +8,8 @@ public partial class FirebirdScriptExecutor : IScriptExecutor
 {
     public void Execute(string connectionString, string script)
     {
-        var match = CreateDbRegex().Match(script);
+        var createDbRegex = CreateDbRegex();
+        var match = createDbRegex.Match(script);
 
         if (match.Success)
         {
@@ -19,7 +20,7 @@ public partial class FirebirdScriptExecutor : IScriptExecutor
             FbConnection.CreateDatabase(connectionString, FirebirdOptions.PageSize,
                                         FirebirdOptions.ForcedWrites, FirebirdOptions.Overwrite);
 
-            script = script[(match.Index + match.Length)..];
+            script = createDbRegex.Replace(script, string.Empty);
         }
 
         using var conn = new FbConnection(connectionString);
@@ -37,6 +38,6 @@ public partial class FirebirdScriptExecutor : IScriptExecutor
         }
     }
 
-    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+'([^']+)'[^;]*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+'([^']+)'[^;]*;\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex CreateDbRegex();
 }

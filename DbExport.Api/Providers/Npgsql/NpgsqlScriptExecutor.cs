@@ -3,17 +3,16 @@ using Npgsql;
 
 namespace DbExport.Providers.Npgsql;
 
-public partial class NpgsqlScriptExecutor : BatchScriptExecutor
+public partial class NpgsqlScriptExecutor() : BatchScriptExecutor(ProviderNames.POSTGRESQL)
 {
-    public NpgsqlScriptExecutor() : base(ProviderNames.POSTGRESQL) { }
-
     public override void Execute(string connectionString, string script)
     {
-        var match = CreateDbRegex().Match(script);
+        var createDbRegex = CreateDbRegex();
+        var match = createDbRegex.Match(script);
 
         if (match.Success)
         {
-            var createDb = match.Value[..^1];
+            var createDb = match.Value.TrimEnd()[..^1];
             var dbName = match.Groups[1].Value;
 
             using (var helper = new SqlHelper(ProviderNames.POSTGRESQL, connectionString))
@@ -21,17 +20,17 @@ public partial class NpgsqlScriptExecutor : BatchScriptExecutor
 
             var builder = new NpgsqlConnectionStringBuilder(connectionString) { Database = dbName.ToLower() };
             connectionString = builder.ToString();
-
-            script = script[(match.Index + match.Length)..];
-            match = new Regex($@"\\[Cc]\s+({dbName})\s*;").Match(script);
-
-            if (match.Success)
-                script = script[(match.Index + match.Length)..];
+            
+            script = createDbRegex.Replace(script, string.Empty);
+            
+            var connectRegex = new Regex($@"\\c\s+({Regex.Escape(dbName)})\s*;\s*", RegexOptions.IgnoreCase);
+            if (connectRegex.IsMatch(script))
+                script = connectRegex.Replace(script, string.Empty);
         }
 
         base.Execute(connectionString, script);
     }
 
-    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+(\w[\w\d]*)[^;]*;", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+(\w+)[^;]*;\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
     private static partial Regex CreateDbRegex();
 }

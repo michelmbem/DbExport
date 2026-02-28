@@ -18,7 +18,7 @@ namespace DbExport;
 /// and executing SQL scripts with support for different database providers.
 /// The class implements IDisposable to ensure proper disposal of database connections when necessary.
 /// </summary>
-public sealed partial class SqlHelper : IDisposable
+public sealed class SqlHelper : IDisposable
 {
     #region Fields
 

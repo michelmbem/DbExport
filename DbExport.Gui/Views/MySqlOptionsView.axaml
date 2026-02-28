@@ -12,7 +12,7 @@
     </Design.DataContext>
 
     <Grid RowDefinitions="Auto, Auto"
-          ColumnDefinitions="Auto, *, Auto, *"
+          ColumnDefinitions="Auto, 180, Auto, *"
           RowSpacing="10"
           ColumnSpacing="10">
         <Grid.Styles>
@@ -32,23 +32,26 @@
                   Grid.Column="1"
                   ItemsSource="{Binding StorageEngines}"
                   SelectedItem="{Binding StorageEngine}"/>
-        <Label Grid.Row="0"
-               Grid.Column="2"
+        <CheckBox Grid.Row="0"
+                  Grid.Column="3"
+                  Content="Optimize SQL for MariaDB"
+                  IsChecked="{Binding IsMariaDb}"/>
+        <Label Grid.Row="1"
+               Grid.Column="0"
                Content="Character set :"
                Target="CharacterSetComboBox"/>
         <ComboBox Name="CharacterSetComboBox"
-                  Grid.Row="0"
-                  Grid.Column="3"
+                  Grid.Row="1"
+                  Grid.Column="1"
                   ItemsSource="{Binding CharacterSets}"
                   SelectedItem="{Binding CharacterSet}"/>
         <Label Grid.Row="1"
-               Grid.Column="0"
+               Grid.Column="2"
                Content="Collation :"
                Target="CollationComboBox"/>
         <ComboBox Name="CollationComboBox"
                   Grid.Row="1"
-                  Grid.Column="1"
-                  Grid.ColumnSpan="3"
+                  Grid.Column="3"
                   ItemsSource="{Binding Collations}"
                   SelectedItem="{Binding Collation}"/>
     </Grid>

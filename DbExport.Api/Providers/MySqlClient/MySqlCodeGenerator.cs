@@ -67,7 +67,7 @@ public class MySqlCodeGenerator : CodeGenerator
             ColumnType.Text or ColumnType.NText or ColumnType.Xml => "longtext",
             ColumnType.Bit => item.Size > 0 ? $"bit({item.Size})" : "longblob",
             ColumnType.Blob => "longblob",
-            ColumnType.Guid => "binary(16)",
+            ColumnType.Guid => MySqlOptions?.IsMariaDb == true ? "uuid" : "binary(16)",
             ColumnType.RowVersion => "tinyblob",
             ColumnType.Geometry => "geometry",
             _ => item.NativeType
@@ -84,6 +84,14 @@ public class MySqlCodeGenerator : CodeGenerator
              ? $"enum({string.Join(", ", members)})"
              : $"set({string.Join(", ", members)})";
     }
+
+    protected override string Format(object value, ColumnType columnType) =>
+        columnType switch
+        {
+            ColumnType.Guid when MySqlOptions?.IsMariaDb == false =>
+                $"UUID_TO_BIN({base.Format(value, columnType)}, 1)",
+            _ => base.Format(value, columnType)
+        };
 
     protected override void WriteTableCreationSuffix(Table table)
     {

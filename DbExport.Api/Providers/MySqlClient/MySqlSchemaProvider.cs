@@ -399,8 +399,9 @@ public partial class MySqlSchemaProvider : ISchemaProvider
             "varchar" => ColumnType.VarChar,
             "text" or "tinytext" or "mediumtext" or "longtext" => ColumnType.Text,
             "bit" => ColumnType.Bit,
-            "blob" or "tinyblob" or "mediumblob" or "longblob" => ColumnType.Blob,
+            "binary" or "varbinary" or "blob" or "tinyblob" or "mediumblob" or "longblob" => ColumnType.Blob,
             "json" => ColumnType.Json,
+            "uuid" => ColumnType.Guid,
             "geometry" => ColumnType.Geometry,
             _ => ColumnType.Unknown
         };

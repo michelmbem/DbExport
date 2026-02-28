@@ -23,6 +23,8 @@ public class MySqlOptions
 
     public string Collation { get; set; }
 
+    public bool IsMariaDb { get; set; }
+
     #region Collections
 
     public static string[] StorageEngines { get; } =
@@ -327,8 +329,11 @@ public class MySqlOptions
     #endregion
 
     public string ToMarkdown() => $"""
-                                  | Storage Engine | Character Set | Collation |
-                                  |----------------|---------------|-----------|
-                                  | {StorageEngine} | {CharacterSet} | {Collation} |
+                                  | Property | Value |
+                                  |----------|-------|
+                                  | Storage Engine | {StorageEngine} |
+                                  | Character Set | {CharacterSet} |
+                                  | Collation | {Collation} |
+                                  | Optimize SQL for MariaDB | {(IsMariaDb ? "Yes" : "No")} |
                                   """;
 }

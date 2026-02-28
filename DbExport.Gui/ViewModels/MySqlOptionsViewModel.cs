@@ -17,6 +17,9 @@ public partial class MySqlOptionsViewModel : ProviderOptionsViewModel
     [ObservableProperty]
     private string? collation;
 
+    [ObservableProperty]
+    private bool isMariaDb;
+
     public MySqlOptionsViewModel()
     {
         StorageEngines = [..MySqlOptions.StorageEngines];
@@ -39,7 +42,8 @@ public partial class MySqlOptionsViewModel : ProviderOptionsViewModel
     {
         StorageEngine = StorageEngine,
         CharacterSet = CharacterSet,
-        Collation = Collation
+        Collation = Collation,
+        IsMariaDb = IsMariaDb
     };
 
     partial void OnCharacterSetChanged(CharacterSet? value)
