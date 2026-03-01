@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using DbExport.Schema;
 
 namespace DbExport.Providers.SQLite;
@@ -86,37 +87,25 @@ public class SQLiteCodeGenerator : CodeGenerator
             WriteDeleteRule(foreignKey.DeleteRule);
     }
 
-    protected override void WriteDataMigrationPrefix()
-    {
-        WriteLine("PRAGMA foreign_keys = OFF;");
-        WriteLine();
-    }
-
-    protected override void WriteDataMigrationSuffix()
-    {
-        WriteLine("PRAGMA foreign_keys = ON;");
-    }
-
     protected override string GetTypeName(IDataItem item) =>
         item.ColumnType switch
         {
-            ColumnType.Boolean => "bit",
-            ColumnType.TinyInt or ColumnType.UnsignedTinyInt => "tinyint",
+            ColumnType.Boolean or ColumnType.TinyInt or ColumnType.UnsignedTinyInt => "tinyint",
             ColumnType.SmallInt or ColumnType.UnsignedSmallInt => "smallint",
             ColumnType.Integer or ColumnType.UnsignedInt => "integer",
             ColumnType.BigInt or ColumnType.UnsignedBigInt => "bigint",
             ColumnType.Currency => "money",
-            ColumnType.Decimal when item.Precision == 0 => "decimal",
-            ColumnType.Decimal when item.Scale == 0 => $"numeric({item.Precision})",
             ColumnType.Decimal => $"numeric({item.Precision}, {item.Scale})",
             ColumnType.SinglePrecision => "float",
-            ColumnType.DoublePrecision or ColumnType.Interval => "real",
-            ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "datetime",
-            ColumnType.Xml or ColumnType.Json => "ntext",
-            ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "image",
-            ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or
-            ColumnType.Text or ColumnType.NText or ColumnType.Guid or ColumnType.Geometry => base.GetTypeName(item),
-            _ => item.NativeType
+            ColumnType.DoublePrecision or ColumnType.Interval => "double",
+            ColumnType.DateTime => "datetime",
+            ColumnType.Date => "date",
+            ColumnType.Time => "time",
+            ColumnType.Char or ColumnType.NChar => $"char({item.Size})",
+            ColumnType.VarChar or ColumnType.NVarChar => $"varchar({item.Size})",
+            ColumnType.Bit => $"bit({item.Size})",
+            ColumnType.Blob or ColumnType.RowVersion or ColumnType.Guid => "blob",
+            _ => "text"
         };
 
     protected override string Format(object value, ColumnType columnType)
@@ -129,6 +118,28 @@ public class SQLiteCodeGenerator : CodeGenerator
                 $"X'{Utility.BinToHex((byte[])value)}'",
             _ => base.Format(value, columnType)
         };
+    }
+
+    protected override string GetKeyName(Key key)
+    {
+        var joinedColumnNames = string.Join('_', key.Columns.Select(c => c.Name));
+        return key switch
+        {
+            Index ix => Escape($"ix_{ix.Table.Name}_{joinedColumnNames}"),
+            ForeignKey fk => Escape($"fk_{fk.Table.Name}_{fk.RelatedTableName}_{joinedColumnNames}"),
+            _ => base.GetKeyName(key)
+        };
+    }
+
+    protected override void WriteDataMigrationPrefix()
+    {
+        WriteLine("PRAGMA foreign_keys = OFF;");
+        WriteLine();
+    }
+
+    protected override void WriteDataMigrationSuffix()
+    {
+        WriteLine("PRAGMA foreign_keys = ON;");
     }
 
     #endregion

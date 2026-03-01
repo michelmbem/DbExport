@@ -196,16 +196,19 @@ public class SQLiteSchemaProvider : ISchemaProvider
     }
 
     /// <summary>
-    /// Maps a specified SQLite data type to an equivalent <see cref="ColumnType"/> enumeration value.
+    /// Determines the corresponding <see cref="ColumnType"/> for a given SQLite data type.
     /// </summary>
-    /// <param name="sqliteType">The SQLite data type name as a string.</param>
-    /// <returns>A <see cref="ColumnType"/> value corresponding to the provided SQLite data type,
-    /// or <see cref="ColumnType.Unknown"/> if no match is found.</returns>
+    /// <remarks>
+    /// This method does not really map SQLite data types to standard column types.
+    /// It tries to recognize common data types and return their corresponding <see cref="ColumnType"/>.
+    /// </remarks>
+    /// <param name="sqliteType">The SQLite data type as a string.</param>
+    /// <returns>The <see cref="ColumnType"/> that corresponds to the specified SQLite data type.</returns>
     private static ColumnType GetColumnType(string sqliteType) =>
         sqliteType switch
         {
-            "bit" => ColumnType.Boolean,
-            "tinyint" => ColumnType.UnsignedTinyInt,
+            "bool" or "boolean" => ColumnType.Boolean,
+            "tinyint" => ColumnType.TinyInt,
             "smallint" => ColumnType.SmallInt,
             "int" or "integer" => ColumnType.Integer,
             "bigint" => ColumnType.BigInt,
@@ -213,16 +216,14 @@ public class SQLiteSchemaProvider : ISchemaProvider
             "double" or "real" => ColumnType.DoublePrecision,
             "money" => ColumnType.Currency,
             "decimal" or "numeric" => ColumnType.Decimal,
-            "datetime" => ColumnType.DateTime,
-            "char" => ColumnType.Char,
-            "nchar" => ColumnType.NChar,
-            "varchar" => ColumnType.VarChar,
-            "nvarchar" => ColumnType.NVarChar,
-            "text" => ColumnType.Text,
-            "ntext" => ColumnType.NText,
-            "blob" or "image" => ColumnType.Blob,
-            "guid" => ColumnType.Guid,
-            "geometry" => ColumnType.Geometry,
+            "date" => ColumnType.Date,
+            "time" => ColumnType.Time,
+            "datetime" or "timestamp" => ColumnType.DateTime,
+            "char" or "character" or "nchar" => ColumnType.Char,
+            "varchar" or "nvarchar" => ColumnType.VarChar,
+            "text" or "ntext" or "clob" or "nclob" => ColumnType.Text,
+            "bit" => ColumnType.Bit,
+            "blob" => ColumnType.Blob,
             _ => ColumnType.Unknown
         };
 

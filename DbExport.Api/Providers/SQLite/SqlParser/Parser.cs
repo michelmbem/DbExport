@@ -112,7 +112,8 @@ public class Parser
         var typeName = string.Empty;
         var (prec, scale) = (0, 0);
 
-        if (TryMatch(TokenId.TYPE, out tok))
+        if (TryMatch(TokenId.TYPE, out tok) ||
+            TryMatch(TokenId.IDENT, out tok))
         {
             typeName = tok.Data.ToString();
 
@@ -124,7 +125,7 @@ public class Parser
                     scale = Convert.ToInt32(Match(TokenId.LT_NUM).Data);
                 
                 if (TryMatch(TokenId.COMMA, out _))
-                    Match(TokenId.LT_NUM); // Appearently, SQLite allows that syntax
+                    Match(TokenId.LT_NUM); // Apparently, SQLite allows that syntax
 
                 Match(TokenId.RPAREN);
             }
@@ -186,7 +187,6 @@ public class Parser
         };
 
         return new AstNode(AstNodeKind.COLSPEC, attributes);
-
     }
 
     /// <summary>
