@@ -49,12 +49,12 @@ public partial class SqlScripExecutor : IScriptExecutor
 
     private static string Unescape(string name) => name.StartsWith('[') ? name[1..^1] : name;
 
-    [GeneratedRegex(@"(?:\s|\r)+GO\s*(?:\r|\n)", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"(?:\s|\r)+GO\s*(?:\r|\n)", RegexOptions.IgnoreCase)]
     private static partial Regex DelimiterRegex();
 
-    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+([\[\]\w\.]+);\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+([\[\]\w\.]+);\s*", RegexOptions.IgnoreCase)]
     private static partial Regex CreateDbRegex();
 
-    [GeneratedRegex(@"\bCREATE\s+TYPE\s+[\[\]\w\.]+\s+FROM\s+[^;]+;\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"\bCREATE\s+TYPE\s+[\[\]\w\.]+\s+FROM\s+[^;]+;\s*", RegexOptions.IgnoreCase)]
     private static partial Regex CreateTypeRegex();
 }

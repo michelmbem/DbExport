@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using DbExport.Providers;
 using DbExport.Providers.Firebird;
+using DbExport.Providers.MySqlClient;
 using DbExport.Providers.Npgsql;
 using DbExport.Providers.SqlClient;
 using DbExport.Schema;
@@ -201,6 +202,7 @@ public sealed class SqlHelper : IDisposable
         providerName switch
         {
             ProviderNames.SQLSERVER => new SqlScripExecutor(),
+            ProviderNames.MYSQL => new MySqlScriptExecutor(),
             ProviderNames.POSTGRESQL => new NpgsqlScriptExecutor(),
             ProviderNames.FIREBIRD => new FirebirdScriptExecutor(),
             ProviderNames.ORACLE => new BatchScriptExecutor(providerName),

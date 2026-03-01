@@ -414,7 +414,7 @@ public static partial class Utility
 
     #region Regular expressions
 
-    [GeneratedRegex(@"\b(password|pwd)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"\b(password|pwd)\b", RegexOptions.IgnoreCase)]
     private static partial Regex PasswordRegex();
 
     #endregion

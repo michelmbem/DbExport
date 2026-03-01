@@ -497,10 +497,10 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
             _ => ForeignKeyRule.None
         };
     
-    [GeneratedRegex(@"\s*\,\s*", RegexOptions.Compiled)]
+    [GeneratedRegex(@"\s*\,\s*")]
     private static partial Regex CommaRegex();
     
-    [GeneratedRegex(@"\butf8\b", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+    [GeneratedRegex(@"\butf8\b", RegexOptions.IgnoreCase)]
     private static partial Regex Utf8Regex();
 
     #endregion

@@ -431,13 +431,13 @@ public partial class SqlSchemaProvider : ISchemaProvider
             _ => ForeignKeyRule.None
         };
 
-    [GeneratedRegex(@"\bunique\b", RegexOptions.Compiled)]
+    [GeneratedRegex(@"\bunique\b")]
     private static partial Regex UniqueRegex();
 
-    [GeneratedRegex(@"\bprimary key\b", RegexOptions.Compiled)]
+    [GeneratedRegex(@"\bprimary key\b")]
     private static partial Regex PrimaryKeyRegex();
 
-    [GeneratedRegex(@"\s*\,\s*", RegexOptions.Compiled)]
+    [GeneratedRegex(@"\s*\,\s*")]
     private static partial Regex CommaRegex();
 
     #endregion

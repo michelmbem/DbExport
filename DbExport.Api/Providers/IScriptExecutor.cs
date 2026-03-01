@@ -71,6 +71,6 @@ public partial class BatchScriptExecutor(string providerName) : DefaultScriptExe
         }
     }
 
-    [GeneratedRegex(@";(?=(?:[^']*'[^']*')*[^']*$)", RegexOptions.Compiled)]
+    [GeneratedRegex(@";(?=(?:[^']*'[^']*')*[^']*$)")]
     private static partial Regex DelimiterRegex();
 }

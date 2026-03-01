@@ -435,35 +435,23 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     {
         if (value == null || value == DBNull.Value) return "NULL";
 
-        switch (columnType)
+        return columnType switch
         {
-            case ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or
-                ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Json or
-                ColumnType.Guid or ColumnType.Geometry:
-                return Utility.QuotedStr(value);
-            case ColumnType.DateTime:
-            case ColumnType.RowVersion when value is DateTime:
-                return $"'{value:yyyy-MM-dd HH:mm:ss}'";
-            case ColumnType.Date:
-                return $"'{value:yyyy-MM-dd}'";
-            case ColumnType.Time when value is TimeSpan:
-                return $"'{value:c}'";
-            case ColumnType.Time:
-                return $"'{value:HH:mm:ss}'";
-            case ColumnType.Bit:
-                return $"B'{Utility.ToBitString((byte[])value)}'";
-            case ColumnType.Blob:
-            case ColumnType.RowVersion when value is byte[]:
-            {
-                var bytes = (byte[])value;
-                return bytes.Length <= 0 ? "''" : $"0x{Utility.BinToHex(bytes)}";
-            }
-            case ColumnType.Boolean:
-            case var _ when Utility.IsBoolean(value):
-                return Convert.ToBoolean(value) ? "1" : "0";
-            default:
-                return Convert.ToString(value, CultureInfo.InvariantCulture);
-        }
+            ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or ColumnType.Text
+                or ColumnType.NText or ColumnType.Xml or ColumnType.Json or ColumnType.Guid
+                or ColumnType.Geometry => Utility.QuotedStr(value),
+            ColumnType.DateTime => $"'{value:yyyy-MM-dd HH:mm:ss}'",
+            ColumnType.RowVersion when value is DateTime => $"'{value:yyyy-MM-dd HH:mm:ss}'",
+            ColumnType.Date => $"'{value:yyyy-MM-dd}'",
+            ColumnType.Time when value is TimeSpan => $"'{value:c}'",
+            ColumnType.Time => $"'{value:HH:mm:ss}'",
+            ColumnType.Bit => $"B'{Utility.ToBitString((byte[])value)}'",
+            ColumnType.Blob => BytesToHexString(value),
+            ColumnType.RowVersion when value is byte[] => BytesToHexString(value),
+            ColumnType.Boolean => Convert.ToBoolean(value) ? "1" : "0",
+            _ when Utility.IsBoolean(value) => Convert.ToBoolean(value) ? "1" : "0",
+            _ => Convert.ToString(value, CultureInfo.InvariantCulture)
+        };
     }
 
     /// <summary>
@@ -701,9 +689,38 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         Write(format + Environment.NewLine, values);
     }
 
+    /// <summary>
+    /// Converts a byte array into a hexadecimal string representation prefixed with "0x".
+    /// </summary>
+    /// <param name="value">The input value, expected to be an object containing a byte array.</param>
+    /// <returns>A string representing the hexadecimal representation of the byte array, prefixed with "0x", or "''" if the array is empty.</returns>
+    private static string BytesToHexString(object value)
+    {
+        var bytes = (byte[])value;
+        return bytes.Length <= 0 ? "''" : $"0x{Utility.BinToHex(bytes)}";
+    }
+
+    /// <summary>
+    /// Determines whether the specified index is selected based on specific criteria,
+    /// including whether it is checked, does not match a key, has at least one column,
+    /// and all of its columns are checked.
+    /// </summary>
+    /// <param name="index">The index to evaluate for selection. Must not be null.</param>
+    /// <returns>
+    /// Returns true if the index is checked, does not match a primary or foreign key,
+    /// has columns, and all the columns are checked; otherwise, returns false.
+    /// </returns>
     private static bool IsSelected(Index index) =>
         index.IsChecked && !index.MatchesKey && index.Columns.Count > 0 && index.AllColumnsAreChecked;
 
+    /// <summary>
+    /// Determines whether the specified foreign key is selected for processing based on its properties and related table state.
+    /// </summary>
+    /// <param name="fk">The foreign key to evaluate. Must not be null.</param>
+    /// <returns>
+    /// Returns <c>true</c> if the foreign key is checked, all its columns are checked,
+    /// and its related table is also checked; otherwise, returns <c>false</c>.
+    /// </returns>
     private static bool IsSelected(ForeignKey fk) =>
         fk.IsChecked && fk.AllColumnsAreChecked && fk.RelatedTable is { IsChecked: true };
 

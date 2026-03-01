@@ -24,13 +24,12 @@ public partial class NpgsqlScriptExecutor() : BatchScriptExecutor(ProviderNames.
             script = createDbRegex.Replace(script, string.Empty);
             
             var connectRegex = new Regex($@"\\c\s+({Regex.Escape(dbName)})\s*;\s*", RegexOptions.IgnoreCase);
-            if (connectRegex.IsMatch(script))
-                script = connectRegex.Replace(script, string.Empty);
+            script = connectRegex.Replace(script, string.Empty);
         }
 
         base.Execute(connectionString, script);
     }
 
-    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+(\w+)[^;]*;\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+(\w+)[^;]*;\s*", RegexOptions.IgnoreCase)]
     private static partial Regex CreateDbRegex();
 }

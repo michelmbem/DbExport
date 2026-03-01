@@ -447,10 +447,10 @@ public partial class MySqlSchemaProvider : ISchemaProvider
             _ => ForeignKeyRule.None
         };
     
-    [GeneratedRegex(@"\b(enum|set)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+    [GeneratedRegex(@"\b(enum|set)\b", RegexOptions.IgnoreCase)]
     private static partial Regex UserTypeRegex();
     
-    [GeneratedRegex(@"\butf8\b", RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+    [GeneratedRegex(@"\butf8\b", RegexOptions.IgnoreCase)]
     private static partial Regex Utf8Regex();
 
     #endregion

@@ -38,6 +38,6 @@ public partial class FirebirdScriptExecutor : IScriptExecutor
         }
     }
 
-    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+'([^']+)'[^;]*;\s*", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"\bCREATE\s+DATABASE\s+'([^']+)'[^;]*;\s*", RegexOptions.IgnoreCase)]
     private static partial Regex CreateDbRegex();
 }

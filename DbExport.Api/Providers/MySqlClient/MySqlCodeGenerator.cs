@@ -75,14 +75,12 @@ public class MySqlCodeGenerator : CodeGenerator
 
     protected override string GetTypeReference(DataType dataType)
     {
-        if (dataType.PossibleValues.IsEmpty)
-            return base.GetTypeReference(dataType);
+        if (dataType.PossibleValues.IsEmpty) return base.GetTypeReference(dataType);
         
-        var members = string.Join(", ", dataType.PossibleValues.Select(v => Format(v, ColumnType.VarChar)));
+        var members = string.Join(", ", dataType.PossibleValues
+                                                .Select(v => Format(v, ColumnType.VarChar)));
         
-        return dataType.IsEnumerated
-             ? $"enum({string.Join(", ", members)})"
-             : $"set({string.Join(", ", members)})";
+        return $"{(dataType.IsEnumerated ? "enum" : "set")}({string.Join(", ", members)})";
     }
 
     protected override string Format(object value, ColumnType columnType) =>
