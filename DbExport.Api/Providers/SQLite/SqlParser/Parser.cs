@@ -16,6 +16,7 @@ public class Parser
     /// This scanner reads the input string and provides the next token in the sequence.
     /// </summary>
     private readonly Scanner scanner;
+    
     /// <summary>
     /// Represents the current token being processed by the parser.
     /// This token is obtained from the scanner and is used to identify and match

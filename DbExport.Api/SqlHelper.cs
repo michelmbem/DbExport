@@ -23,7 +23,17 @@ public sealed class SqlHelper : IDisposable
 {
     #region Fields
 
+    /// <summary>
+    /// Indicates whether the SqlHelper instance is responsible for disposing of the database connection.
+    /// When set to true, the connection will be disposed upon disposing the SqlHelper instance.
+    /// </summary>
     private readonly bool disposeConnection;
+
+    /// <summary>
+    /// Represents the database connection used by the SqlHelper instance to communicate with the database.
+    /// This connection is essential for executing queries, commands, and scripts.
+    /// The connection must be properly initialized and associated with a compatible database provider.
+    /// </summary>
     private readonly DbConnection connection;
 
     #endregion

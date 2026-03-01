@@ -51,24 +51,6 @@ public class FirebirdCodeGenerator : CodeGenerator
 
     #region Overriden Methods
 
-    public override void VisitColumn(Column column)
-    {
-        Write("{0} {1}", Escape(column.Name), GetTypeName(column));
-
-        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
-
-        if (visitIdentities && column.IsIdentity)
-            Write(" GENERATED ALWAYS AS IDENTITY");
-        else
-        {
-            var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
-            if (visitDefaults && !Utility.IsEmpty(column.DefaultValue))
-                Write(" DEFAULT {0}", Format(column.DefaultValue, column.ColumnType));
-
-            if (column.IsRequired) Write(" NOT NULL");
-        }
-    }
-
     public override void VisitDataType(DataType dataType)
     {
         Write($"CREATE DOMAIN {Escape(dataType.Name)} AS {GetTypeName(dataType)}");

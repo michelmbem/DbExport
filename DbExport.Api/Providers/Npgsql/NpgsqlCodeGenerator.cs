@@ -70,8 +70,10 @@ public class NpgsqlCodeGenerator : CodeGenerator
         if (visitIdentities && column.IsIdentity)
             return column.ColumnType switch
             {
-                ColumnType.BigInt or ColumnType.UnsignedBigInt => "bigserial",
-                _ => "serial"
+                ColumnType.TinyInt or ColumnType.UnsignedTinyInt or
+                    ColumnType.SmallInt or ColumnType.UnsignedSmallInt => "smallserial",
+                ColumnType.Integer or ColumnType.UnsignedInt => "serial",
+                _ => "bigserial"
             };
         
         return base.GetTypeName(column);
@@ -152,6 +154,11 @@ public class NpgsqlCodeGenerator : CodeGenerator
         
         WriteLine($@"\c {database.Name};");
         WriteLine();
+    }
+
+    protected override void WriteIdentitySpecification(Column column)
+    {
+        // PostgreSQL identifies columns with IDENTITY by their type name (smallserial, serial, bigserial)
     }
 
     #endregion

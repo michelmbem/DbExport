@@ -23,9 +23,30 @@ namespace DbExport.Providers;
 /// </summary>
 public abstract class CodeGenerator : IVisitor, IDisposable
 {
+    #region Fields
+    
+    /// <summary>
+    /// Indicates whether the output stream should be closed when the CodeGenerator instance is disposed.
+    /// This ensures proper resource management, especially when the output stream is created internally and
+    /// not supplied by the caller.
+    /// </summary>
     private readonly bool closeOutput;
+
+    /// <summary>
+    /// Represents the current indentation level used for formatting output.
+    /// This value determines the number of tab characters written before each line
+    /// to maintain proper hierarchical formatting in the generated code or text output.
+    /// </summary>
     private int indentation;
+
+    /// <summary>
+    /// Tracks the current horizontal position (column) of the text being written to the output stream.
+    /// Used to manage indentation and formatting during code generation, ensuring proper alignment
+    /// and structured output.
+    /// </summary>
     private int textColumn;
+    
+    #endregion
 
     #region Constructors
 
@@ -200,10 +221,8 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
         if (!visitSchema || !visitFKs || RequireInlineConstraints) return;
         
-        foreach (var table in database.Tables)
+        foreach (var table in database.Tables.Where(table => table.IsChecked))
         {
-            if (!table.IsChecked) continue;
-            
             var fkExported = false;
 
             foreach (var fk in table.ForeignKeys.Where(IsSelected))
@@ -228,7 +247,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         WriteLine("CREATE TABLE {0} (", Escape(table.Name));
         Indent();
 
-        bool comma = false;
+        var comma = false;
 
         foreach (var column in table.Columns.Where(c => c.IsChecked))
         {
@@ -271,14 +290,20 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     /// </summary>
     public virtual void VisitColumn(Column column)
     {
+        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true; 
         var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
-
-        Write("{0} {1}", Escape(column.Name), GetTypeName(column));
             
-        if (column.IsRequired) Write(" NOT NULL");
+        Write("{0} {1}", Escape(column.Name), GetTypeName(column));
 
-        if (visitDefaults && !Utility.IsEmpty(column.DefaultValue))
-            Write(" DEFAULT {0}", Format(column.DefaultValue, column.ColumnType));
+        if (visitIdentities && column.IsIdentity)
+            WriteIdentitySpecification(column);
+        else
+        {
+            if (visitDefaults && !Utility.IsEmpty(column.DefaultValue))
+                Write(" DEFAULT {0}", Format(column.DefaultValue, column.ColumnType));
+
+            if (column.IsRequired) Write(" NOT NULL");
+        }
     }
 
     /// <summary>
@@ -491,6 +516,15 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         Write("USE {0}", Escape(database.Name));
         WriteDelimiter();
         WriteLine();
+    }
+
+    /// <summary>
+    /// Writes the identity specification for the specified column.
+    /// </summary>
+    /// <param name="column">The column for which the identity specification is being written.</param>
+    protected virtual void WriteIdentitySpecification(Column column)
+    {
+        Write(" GENERATED ALWAYS AS IDENTITY");
     }
 
     /// <summary>

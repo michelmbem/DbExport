@@ -5,10 +5,24 @@ using System.IO;
 
 namespace DbExport.Providers.Access;
 
+/// <summary>
+/// Provides schema extraction and metadata retrieval functionalities for Microsoft Access databases.
+/// Implements the <see cref="ISchemaProvider"/> interface specific to the Access database provider.
+/// </summary>
 public class AccessSchemaProvider : ISchemaProvider
 {
+    /// <summary>
+    /// Represents an instance of the ADOX.Catalog used for manipulating and retrieving metadata
+    /// from the schema of the connected Microsoft Access database.
+    /// Provides access to tables, columns, indexes, and relationships within the database schema.
+    /// Strongly tied to the connection established through the <see cref="AccessSchemaProvider"/>.
+    /// </summary>
     private readonly ADOX.Catalog catalog;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AccessSchemaProvider"/> class.
+    /// </summary>
+    /// <param name="connectionString">The connection string used to connect to the Access database.</param>
     public AccessSchemaProvider(string connectionString)
     {
         ConnectionString = connectionString;
@@ -195,6 +209,11 @@ public class AccessSchemaProvider : ISchemaProvider
 
     #region Utility
 
+    /// <summary>
+    /// Converts an ADOX data type enumeration value into a corresponding <see cref="ColumnType"/> enumeration value.
+    /// </summary>
+    /// <param name="dataTypeEnum">The ADOX data type enumeration value to convert.</param>
+    /// <returns>A <see cref="ColumnType"/> value that represents the equivalent column type.</returns>
     private static ColumnType GetColumnType(ADOX.DataTypeEnum dataTypeEnum) =>
         dataTypeEnum switch
         {
@@ -216,6 +235,11 @@ public class AccessSchemaProvider : ISchemaProvider
             _ => ColumnType.Unknown,
         };
 
+    /// <summary>
+    /// Converts the specified ADOX data type enumeration value to its corresponding native type name.
+    /// </summary>
+    /// <param name="dataTypeEnum">The ADOX data type enumeration value representing the column data type.</param>
+    /// <returns>A string representing the native type name for the specified ADOX data type.</returns>
     private static string GetNativeTypeName(ADOX.DataTypeEnum dataTypeEnum) =>
         dataTypeEnum switch
         {
@@ -237,6 +261,13 @@ public class AccessSchemaProvider : ISchemaProvider
             _ => "unknown",
         };
 
+    /// <summary>
+    /// Parses a string value into a strongly-typed object based on the specified column type.
+    /// </summary>
+    /// <param name="value">The string value to be parsed.</param>
+    /// <param name="columnType">The type of the column that determines how the value is parsed.</param>
+    /// <returns>An object representing the parsed value. Returns <see cref="DBNull.Value"/>
+    /// if the value is empty, "NULL", or cannot be parsed according to the column type.</returns>
     private static object Parse(string value, ColumnType columnType)
     {
         if (Utility.IsEmpty(value) || "NULL".Equals(value, StringComparison.OrdinalIgnoreCase))
@@ -262,6 +293,11 @@ public class AccessSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <summary>
+    /// Converts an <see cref="ADOX.RuleEnum"/> value to its corresponding <see cref="ForeignKeyRule"/> enumeration value.
+    /// </summary>
+    /// <param name="ruleEnum">The <see cref="ADOX.RuleEnum"/> value representing the foreign key rule in an Access database.</param>
+    /// <returns>A <see cref="ForeignKeyRule"/> enumeration value corresponding to the provided <paramref name="ruleEnum"/>.</returns>
     private static ForeignKeyRule GetFKRule(ADOX.RuleEnum ruleEnum)
     {
         return ruleEnum switch

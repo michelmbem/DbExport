@@ -49,15 +49,6 @@ public class MySqlCodeGenerator : CodeGenerator
 
     #region Overriden Methods
 
-    public override void VisitColumn(Column column)
-    {
-        base.VisitColumn(column);
-
-        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
-        
-        if (visitIdentities && column.IsIdentity) Write(" AUTO_INCREMENT");
-    }
-
     protected override string GetTypeName(IDataItem item) =>
         item.ColumnType switch
         {
@@ -107,6 +98,11 @@ public class MySqlCodeGenerator : CodeGenerator
                 $"UUID_TO_BIN({base.Format(value, columnType)}, 1)",
             _ => base.Format(value, columnType)
         };
+
+    protected override void WriteIdentitySpecification(Column column)
+    {
+        Write($" NOT NULL AUTO_INCREMENT, AUTO_INCREMENT={column.IdentitySeed}");
+    }
 
     protected override void WriteTableCreationSuffix(Table table)
     {

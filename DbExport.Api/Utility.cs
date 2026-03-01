@@ -25,6 +25,14 @@ namespace DbExport;
 /// </summary>
 public static partial class Utility
 {
+    #region Fields
+    
+    /// <summary>
+    /// The default <see cref="CultureInfo"/> instance used throughout the utility for
+    /// culture-specific operations such as string comparisons, parsing, and formatting.
+    /// This is set to <see cref="CultureInfo.InvariantCulture"/> to ensure consistent behavior
+    /// across different cultures and locales.
+    /// </summary>
     private static readonly CultureInfo CI = CultureInfo.InvariantCulture;
 
     /// <summary>
@@ -33,6 +41,8 @@ public static partial class Utility
     /// broad compatibility with various data sources and formats.
     /// </summary>
     public static Encoding Encoding { get; set; } = Encoding.UTF8;
+    
+    #endregion
 
     #region Database utilities
 

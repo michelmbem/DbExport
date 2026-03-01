@@ -54,16 +54,6 @@ public class SqlCodeGenerator : CodeGenerator
 
     #region Overriden Methods
 
-    public override void VisitColumn(Column column)
-    {
-        base.VisitColumn(column);
-
-        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
-
-        if (visitIdentities && column.IsIdentity)
-            Write(" IDENTITY({0}, {1})", column.IdentitySeed, column.IdentityIncrement);
-    }
-
     public override void VisitDataType(DataType dataType)
     {
         Write($"CREATE TYPE [dbo].{Escape(dataType.Name)} FROM {GetTypeName(dataType)}");
@@ -140,6 +130,11 @@ public class SqlCodeGenerator : CodeGenerator
               database.Name);
         WriteDelimiter();
         WriteLine();
+    }
+
+    protected override void WriteIdentitySpecification(Column column)
+    {
+        Write(" IDENTITY({0}, {1}) NOT NULL", column.IdentitySeed, column.IdentityIncrement);
     }
 
     #endregion
