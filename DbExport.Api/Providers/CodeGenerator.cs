@@ -614,7 +614,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     }
 
     /// <summary>
-    /// Decreases the indentation level for the generated SQL output. This method is typically called when exiting a block of SQL statements.
+    /// Decreases the current indentation level by one, ensuring it does not fall below zero.
     /// </summary>
     protected void Unindent()
     {
@@ -623,11 +623,9 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     }
 
     /// <summary>
-    /// Writes a single character to the output, taking care of indentation and line breaks.
+    /// Writes a single character to the output, respecting the current indentation level.
     /// </summary>
-    /// <param name="c">The character to be written. This method will ensure that the character is properly formatted
-    /// and written to the output, taking into account the current indentation level and the presence
-    /// of line breaks in the input string.</param>   
+    /// <param name="c">The character to write. Carriage return characters are ignored.</param>
     protected void Write(char c)
     {
         if (c == '\r') return;
@@ -641,11 +639,9 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     }
 
     /// <summary>
-    /// Writes a string to the output, taking care of indentation and line breaks.
+    /// Writes the specified string to the underlying output.
     /// </summary>
-    /// <param name="s">The string to be written. This method will ensure that the string is properly formatted
-    /// and written to the output, taking into account the current indentation level and the presence
-    /// of line breaks in the input string.</param>
+    /// <param name="s">The string to write. Must not be null.</param>
     protected void Write(string s)
     {
         foreach (var c in s)
@@ -653,17 +649,17 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     }
 
     /// <summary>
-    /// Writes a formatted string to the output, taking care of indentation and line breaks.
+    /// Writes a formatted string to the output stream.
     /// </summary>
-    /// <param name="format">The format string that describes the content to be written.</param>
-    /// <param name="values">The objects to be formatted and written to the output.</param> 
+    /// <param name="format">A composite format string.</param>
+    /// <param name="values">An array of objects to format and write to the output stream.</param>
     protected void Write(string format, params object[] values)
     {
         Write(string.Format(format, values));
     }
 
     /// <summary>
-    /// Writes a line break to the output, taking care of indentation.
+    /// Writes a new line to the current output stream.
     /// </summary>
     protected void WriteLine()
     {
@@ -671,19 +667,21 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     }
 
     /// <summary>
-    /// Writes a string followed by a line break to the output, taking care of indentation.
+    /// Writes a string followed by a line terminator to the output.
     /// </summary>
-    /// <param name="s">The string to be written.</param>
+    /// <param name="s">The string to write. If null, only a line terminator is written.</param>
     protected void WriteLine(string s)
     {
         Write(s + Environment.NewLine);
     }
 
     /// <summary>
-    /// Writes a formatted string followed by a line break to the output, taking care of indentation.
+    /// Writes a formatted line, followed by a line termination string, to the output.
     /// </summary>
-    /// <param name="format">The format string that describes the content to be written.</param>
-    /// <param name="values">The objects to be formatted and written to the output.</param>
+    /// <param name="format">The composite format string. Cannot be null or empty.</param>
+    /// <param name="values">
+    /// An array of objects to format using the specified format string. Can be null if no formatting is required.
+    /// </param>
     protected void WriteLine(string format, params object[] values)
     {
         Write(format + Environment.NewLine, values);

@@ -4,14 +4,28 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.OracleClient;
 
+/// <summary>
+/// Generates Oracle-specific SQL code for database schema objects and related functionality.
+/// </summary>
 public class OracleCodeGenerator : CodeGenerator
 {
     #region Constructors
 
+    /// <summary>
+    /// Initializes a new instance of the OracleCodeGenerator class.
+    /// </summary>
     public OracleCodeGenerator() { }
 
+    /// <summary>
+    /// Initializes a new instance of the OracleCodeGenerator class with the specified TextWriter for output.
+    /// </summary>
+    /// <param name="output">The TextWriter to which the generated SQL will be written. Must not be null.</param>
     public OracleCodeGenerator(TextWriter output) : base(output) { }
 
+    /// <summary>
+    /// Initializes a new instance of the OracleCodeGenerator class that writes output to a file at the specified path.
+    /// </summary>
+    /// <param name="path">The file path where the generated SQL will be written. Must not be null or empty.</param>
     public OracleCodeGenerator(string path) : base(path) { }
 
     #endregion

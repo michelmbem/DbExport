@@ -1,19 +1,42 @@
 namespace DbExport.Providers.Firebird;
 
+/// <summary>
+/// Represents configuration options for Firebird database operations.
+/// </summary>
 public class FirebirdOptions
 {
+    /// <summary>
+    /// Gets or sets the file system path to the directory where Firebird database files
+    /// will be created and stored. This property is essential for specifying the
+    /// location of the database files during database operations.
+    /// </summary>
     public string DataDirectory { get; set; }
     
+    /// <summary>
+    /// Gets or sets the default character set to be used for encoding text data.
+    /// </summary>
     public string DefaultCharSet { get; set; }
     
+    /// <summary>
+    /// Gets or sets the page size for writing data to disk.
+    /// </summary>
     public static int PageSize { get; set; } = 4096;
     
+    /// <summary>
+    /// Gets or sets a value indicating whether to force writes to disk.
+    /// </summary>
     public static bool ForcedWrites { get; set; } = true;
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to overwrite existing files when exporting data.
+    /// </summary>
     public static bool Overwrite { get; set; }
 
     #region Collections
 
+    /// <summary>
+    /// Gets a list of supported character sets for Firebird databases.
+    /// </summary>
     public static string[] CharacterSets { get; } =
     [
         // Unicode
@@ -82,6 +105,12 @@ public class FirebirdOptions
     
     #endregion
 
+    /// <summary>
+    /// Converts the FirebirdOptions properties and their current values into a Markdown table representation.
+    /// </summary>
+    /// <returns>
+    /// A string containing a Markdown-formatted table with the FirebirdOptions properties and their values.
+    /// </returns>
     public string ToMarkdown() => $"""
                                    | Property | Value |
                                    |----------|-------|

@@ -6,8 +6,18 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.Npgsql;
 
+/// <summary>
+/// Provides schema-related metadata for a Npgsql (PostgreSQL) database,
+/// allowing access to table, column, index, foreign key, and type information.
+/// This class implements the <see cref="ISchemaProvider"/> interface and serves as
+/// a provider for PostgreSQL database schemas.
+/// </summary>
 public partial class NpgsqlSchemaProvider : ISchemaProvider
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NpgsqlSchemaProvider"/> class.
+    /// </summary>
+    /// <param name="connectionString">The connection string to use for database access.</param>
     public NpgsqlSchemaProvider(string connectionString)
     {
         ConnectionString = connectionString;
@@ -433,6 +443,11 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
 
     #region Utility
 
+    /// <summary>
+    /// Maps a PostgreSQL native data type to the corresponding <see cref="ColumnType"/> enumeration value.
+    /// </summary>
+    /// <param name="npgsqlType">The native PostgreSQL type as a string.</param>
+    /// <returns>The corresponding <see cref="ColumnType"/> for the specified PostgreSQL type.</returns>
     private static ColumnType GetColumnType(string npgsqlType) =>
         npgsqlType switch
         {
@@ -461,6 +476,15 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
             _ => ColumnType.Unknown
         };
 
+    /// <summary>
+    /// Parses a string value into an object of the appropriate type based on the specified column type.
+    /// </summary>
+    /// <param name="value">The string representation of the value to parse.</param>
+    /// <param name="columnType">The target column type used to determine the type of the parsed value.</param>
+    /// <returns>
+    /// Returns the parsed value as an object of the respective type, or <see cref="DBNull.Value"/>
+    /// if parsing fails or the value is null or "NULL".
+    /// </returns>
     private static object Parse(string value, ColumnType columnType)
     {
         if (Utility.IsEmpty(value) || "NULL".Equals(value, StringComparison.OrdinalIgnoreCase))
@@ -487,6 +511,16 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <summary>
+    /// Converts a string representation of a foreign key rule into its corresponding
+    /// <see cref="ForeignKeyRule"/> enum value.
+    /// </summary>
+    /// <param name="rule">The string representation of the foreign key rule.
+    /// Possible values include "RESTRICT", "CASCADE", "SET DEFAULT", "SET NULL", or other values.
+    /// </param>
+    /// <returns>The corresponding <see cref="ForeignKeyRule"/> enum value.
+    /// If the input does not match any predefined rules, <see cref="ForeignKeyRule.None"/> is returned.
+    /// </returns>
     private static ForeignKeyRule GetFKRule(string rule) =>
         rule switch
         {

@@ -4,14 +4,32 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.SQLite;
 
+/// <summary>
+/// Generates SQLite-specific SQL scripts for database schema and data migrations.
+/// This class is designed to provide a SQLite-compatible implementation of the base
+/// <see cref="CodeGenerator"/> functionalities. It facilitates the generation of
+/// database schema definitions, constraints, and data migration scripts tailored for
+/// SQLite databases.
+/// </summary>
 public class SQLiteCodeGenerator : CodeGenerator
 {
     #region Constructors
 
+    /// <summary>
+    /// Initializes a new instance of the SQLiteCodeGenerator class.
+    /// </summary>
     public SQLiteCodeGenerator() { }
 
+    /// <summary>
+    /// Initializes a new instance of the SQLiteCodeGenerator class with the specified TextWriter for output.
+    /// </summary>
+    /// <param name="output">The TextWriter to which the generated SQL will be written. Must not be null.</param>
     public SQLiteCodeGenerator(TextWriter output) : base(output) { }
 
+    /// <summary>
+    /// Initializes a new instance of the SQLiteCodeGenerator class that writes output to a file at the specified path.
+    /// </summary>
+    /// <param name="path">The file path where the generated SQL will be written. Must not be null or empty.</param>
     public SQLiteCodeGenerator(string path) : base(path) { }
 
     #endregion

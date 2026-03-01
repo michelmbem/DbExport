@@ -4,20 +4,40 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.SqlClient;
 
+/// <summary>
+/// Represents a code generator specifically designed for generating SQL Server-compatible scripts.
+/// Extends the <see cref="CodeGenerator"/> class to provide SQL Server-specific implementation details
+/// for database schema export and related functionality.
+/// </summary>
 public class SqlCodeGenerator : CodeGenerator
 {
     #region Constructors
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqlCodeGenerator"/> class.
+    /// </summary>
     public SqlCodeGenerator() { }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqlCodeGenerator"/> class with the specified TextWriter for output.
+    /// </summary>
+    /// <param name="output">The TextWriter to which the generated SQL will be written. Must not be null.</param>
     public SqlCodeGenerator(TextWriter output) : base(output) { }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqlCodeGenerator"/> class that writes output to a file at the specified path.
+    /// </summary>
+    /// <param name="path">The file path where the generated SQL will be written. Must not be null or empty.</param>
     public SqlCodeGenerator(string path) : base(path) { }
 
     #endregion
 
     #region New Properties
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the SQL Server database is file-based.
+    /// This is typically the case when using SQL Server Express LocalDB.
+    /// </summary>
     public bool IsFileBased { get; set; }
 
     #endregion

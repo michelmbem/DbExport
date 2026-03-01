@@ -7,10 +7,25 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.SQLite;
 
+/// <summary>
+/// Provides schema information for SQLite databases. This class implements
+/// the ISchemaProvider interface, enabling retrieval of database schema
+/// metadata such as table names, column names, foreign key names, and associated metadata.
+/// </summary>
 public class SQLiteSchemaProvider : ISchemaProvider
 {
+    /// <summary>
+    /// A dictionary containing the definitions of tables in the SQLite database schema.
+    /// The keys represent the names of the tables, and the values are instances of
+    /// <see cref="AstNode"/> that describe the table structure, including metadata,
+    /// column definitions, and constraints such as primary keys, foreign keys, and indexes.
+    /// </summary>
     private readonly Dictionary<string, AstNode> tableDefinitions;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SQLiteSchemaProvider"/> class.
+    /// </summary>
+    /// <param name="connectionString">The connection string used to connect to the SQLite database.</param>
     public SQLiteSchemaProvider(string connectionString)
     {
         ConnectionString = connectionString;
@@ -163,6 +178,12 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     #region Utility
 
+    /// <summary>
+    /// Extracts the column names from the specified AST (Abstract Syntax Tree) node at the given child index.
+    /// </summary>
+    /// <param name="node">The root AST node containing the column definition data.</param>
+    /// <param name="index">The index of the child node where column definitions are located.</param>
+    /// <returns>An array of column names extracted from the specified node.</returns>
     private static string[] ExtractColumnNames(AstNode node, int index)
     {
         var columnList = node.Children[index];
@@ -174,6 +195,12 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return columnNames;
     }
 
+    /// <summary>
+    /// Maps a specified SQLite data type to an equivalent <see cref="ColumnType"/> enumeration value.
+    /// </summary>
+    /// <param name="sqliteType">The SQLite data type name as a string.</param>
+    /// <returns>A <see cref="ColumnType"/> value corresponding to the provided SQLite data type,
+    /// or <see cref="ColumnType.Unknown"/> if no match is found.</returns>
     private static ColumnType GetColumnType(string sqliteType) =>
         sqliteType switch
         {
@@ -199,6 +226,10 @@ public class SQLiteSchemaProvider : ISchemaProvider
             _ => ColumnType.Unknown
         };
 
+    /// <summary>
+    /// Loads the definitions of all tables in the connected SQLite database into memory.
+    /// The table definitions are obtained by extracting and parsing their DDL from the sqlite_master table.
+    /// </summary>
     private void LoadTableDefinitions()
     {
         const string sql = "SELECT name, sql FROM sqlite_master WHERE type = 'table'";

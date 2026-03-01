@@ -2,6 +2,14 @@
 
 namespace DbExport.Schema;
 
+/// <summary>
+/// Specifies a set of attributes that can be associated with a database column.
+/// </summary>
+/// <remarks>
+/// This enumeration is used to define specific metadata about a column,
+/// such as whether it is required, part of a key, or represents specific data types.
+/// It supports bitwise combination of its values due to the <see cref="System.FlagsAttribute"/>.
+/// </remarks>
 [Flags]
 public enum ColumnAttributes
 {

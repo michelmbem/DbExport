@@ -6,20 +6,39 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.Firebird;
 
+/// <summary>
+/// Generates SQL code specific to the Firebird database system.
+/// This class provides methods to process various database objects and options,
+/// translating them into Firebird-compatible SQL scripts.
+/// </summary>
 public class FirebirdCodeGenerator : CodeGenerator
 {
     #region Constructors
-
+    
+    /// <summary>
+    /// Initializes a new instance of the FirebirdCodeGenerator class.
+    /// </summary>
     public FirebirdCodeGenerator() { }
 
+    /// <summary>
+    /// Initializes a new instance of the FirebirdCodeGenerator class with the specified TextWriter for output.
+    /// </summary>
+    /// <param name="output">The TextWriter to which the generated SQL will be written. Must not be null.</param>
     public FirebirdCodeGenerator(TextWriter output) : base(output) { }
 
+    /// <summary>
+    /// Initializes a new instance of the FirebirdCodeGenerator class that writes output to a file at the specified path.
+    /// </summary>
+    /// <param name="path">The file path where the generated SQL will be written. Must not be null or empty.</param>
     public FirebirdCodeGenerator(string path) : base(path) { }
 
     #endregion
 
     #region New Properties
 
+    /// <summary>
+    /// Represents configuration options specific to Firebird database generation.
+    /// </summary>
     public FirebirdOptions FirebirdOptions => (FirebirdOptions)ExportOptions?.ProviderSpecific;
 
     #endregion
@@ -154,6 +173,11 @@ public class FirebirdCodeGenerator : CodeGenerator
     
     #region Utility
 
+    /// <summary>
+    /// Formats the given text input by splitting it into UTF-8 encoded chunks and escaping single quotes.
+    /// </summary>
+    /// <param name="input">The text input to be formatted.</param>
+    /// <returns>The formatted text as a single concatenated string of UTF-8 encoded chunks.</returns>
     private static string FormatText(string input)
     {
         if (input.Length == 0) return "_UTF8 ''";

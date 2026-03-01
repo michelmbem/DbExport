@@ -5,14 +5,30 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.Npgsql;
 
+/// <summary>
+/// Provides functionality for generating database-specific code targeting Npgsql (PostgreSQL).
+/// This class extends the <see cref="CodeGenerator"/> base class and overrides certain methods
+/// to tailor code generation to the PostgreSQL database platform.
+/// </summary>
 public class NpgsqlCodeGenerator : CodeGenerator
 {
     #region Constructors
 
+    /// <summary>
+    /// Initializes a new instance of the NpgsqlCodeGenerator class.
+    /// </summary>
     public NpgsqlCodeGenerator() { }
 
+    /// <summary>
+    /// Initializes a new instance of the NpgsqlCodeGenerator class with the specified TextWriter for output.
+    /// </summary>
+    /// <param name="output">The TextWriter to which the generated SQL will be written. Must not be null.</param>
     public NpgsqlCodeGenerator(TextWriter output) : base(output) { }
 
+    /// <summary>
+    /// Initializes a new instance of the NpgsqlCodeGenerator class that writes output to a file at the specified path.
+    /// </summary>
+    /// <param name="path">The file path where the generated SQL will be written. Must not be null or empty.</param>
     public NpgsqlCodeGenerator(string path) : base(path) { }
 
     #endregion

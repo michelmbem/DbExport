@@ -9,7 +9,10 @@ namespace DbExport.Providers.SqlClient;
 
 public partial class SqlSchemaProvider : ISchemaProvider
 {
-    
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SqlSchemaProvider"/> class.
+    /// </summary>
+    /// <param name="connectionString">The connection string used to connect to the database.</param>
     public SqlSchemaProvider(string connectionString)
     {
         ConnectionString = connectionString;
@@ -367,6 +370,11 @@ public partial class SqlSchemaProvider : ISchemaProvider
 
     #region Utility
 
+    /// <summary>
+    /// Converts a given SQL type name to its equivalent <see cref="ColumnType"/> enumeration value.
+    /// </summary>
+    /// <param name="sqlType">The name of the SQL type to be converted.</param>
+    /// <returns>A <see cref="ColumnType"/> value that corresponds to the given SQL type.</returns>
     private static ColumnType GetColumnType(string sqlType) =>
         sqlType switch
         {
@@ -397,6 +405,13 @@ public partial class SqlSchemaProvider : ISchemaProvider
             _ => ColumnType.Unknown
         };
 
+    /// <summary>
+    /// Parses a given string value into the appropriate object type based on the specified column type.
+    /// </summary>
+    /// <param name="value">The string value to be parsed.</param>
+    /// <param name="columnType">The column type that determines how the value is interpreted.</param>
+    /// <returns>An object representing the parsed value. Returns <see cref="DBNull.Value"/>
+    /// if the value is invalid or cannot be parsed for the specified column type.</returns>
     private static object Parse(string value, ColumnType columnType)
     {
         if (Utility.IsEmpty(value) || value.Equals("NULL", StringComparison.OrdinalIgnoreCase))
@@ -424,6 +439,11 @@ public partial class SqlSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <summary>
+    /// Determines the <see cref="ForeignKeyRule"/> based on the provided rule string.
+    /// </summary>
+    /// <param name="rule">The string representing the foreign key rule (e.g., "CASCADE").</param>
+    /// <returns>A <see cref="ForeignKeyRule"/> enumeration value corresponding to the input rule.</returns>
     private static ForeignKeyRule GetFKRule(string rule) =>
         rule switch
         {

@@ -3,6 +3,12 @@ using Npgsql;
 
 namespace DbExport.Providers.Npgsql;
 
+/// <summary>
+/// Represents a script executor specifically designed for executing Npgsql (PostgreSQL)
+/// database scripts. This class extends the <see cref="BatchScriptExecutor"/> and overrides
+/// its behavior to handle PostgreSQL-specific use cases, such as 'CREATE DATABASE' commands
+/// and connection string adjustments for the target database.
+/// </summary>
 public partial class NpgsqlScriptExecutor() : BatchScriptExecutor(ProviderNames.POSTGRESQL)
 {
     public override void Execute(string connectionString, string script)

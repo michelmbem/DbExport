@@ -1,5 +1,8 @@
 ﻿namespace DbExport.Providers.SQLite.SqlParser;
 
+/// <summary>
+/// Represents the different types of tokens in the SQLite SQL parser.
+/// </summary>
 public enum TokenId
 {
     LT_NUM,
@@ -49,20 +52,38 @@ public enum TokenId
     EOL
 }
 
+/// <summary>
+/// Represents a token in the SQLite SQL parser.
+/// </summary>
 public class Token
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Token"/> class with the specified token ID.
+    /// </summary>
+    /// <param name="id">The ID of the token.</param>
     public Token(TokenId id)
     {
         Id = id;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Token"/> class with the specified token ID and data.
+    /// </summary>
+    /// <param name="id">The ID of the token.</param>
+    /// <param name="data">The data associated with the token.</param>
     public Token(TokenId id, object data)
     {
         Id = id;
         Data = data;
     }
 
+    /// <summary>
+    /// Gets the ID of the token.
+    /// </summary>
     public TokenId Id { get; }
     
+    /// <summary>
+    /// Gets the data associated with the token.
+    /// </summary>
     public object Data { get; }
 }

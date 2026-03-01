@@ -5,9 +5,18 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.OracleClient;
 
+/// <summary>
+/// Provides schema metadata for Oracle databases by implementing the
+/// ISchemaProvider interface. This class allows retrieval of database
+/// objects such as tables, columns, indexes, and foreign keys,
+/// as well as their associated metadata.
+/// </summary>
 public class OracleSchemaProvider : ISchemaProvider
 {
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OracleSchemaProvider"/> class.
+    /// </summary>
+    /// <param name="connectionString">The connection string used to connect to the Oracle database.</param>
     public OracleSchemaProvider(string connectionString)
     {
         ConnectionString = connectionString;
@@ -319,6 +328,13 @@ public class OracleSchemaProvider : ISchemaProvider
 
     #region Utility
 
+    /// <summary>
+    /// Determines the corresponding <see cref="ColumnType"/> for the provided Oracle database type based on its type name, precision, and scale.
+    /// </summary>
+    /// <param name="oracleType">The name of the Oracle database type (e.g., "NUMBER", "CHAR").</param>
+    /// <param name="precision">The precision of the Oracle type, used for numeric types.</param>
+    /// <param name="scale">The scale of the Oracle type, used for numeric types.</param>
+    /// <returns>The <see cref="ColumnType"/> representing the equivalent column type for the specified Oracle type.</returns>
     private static ColumnType GetColumnType(string oracleType, byte precision, byte scale)
     {
         return oracleType switch
@@ -351,6 +367,15 @@ public class OracleSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <summary>
+    /// Parses a specified string value into an object of the specified database column type.
+    /// </summary>
+    /// <param name="value">The string value to parse.</param>
+    /// <param name="columnType">The column type that determines the target data type of the parsed value.</param>
+    /// <returns>
+    /// The parsed object of the requested column type, or <see cref="DBNull.Value"/> if the value
+    /// is null, empty, or cannot be converted to the specified column type.
+    /// </returns>
     private static object Parse(string value, ColumnType columnType)
     {
         if (Utility.IsEmpty(value) || "NULL".Equals(value, StringComparison.OrdinalIgnoreCase))

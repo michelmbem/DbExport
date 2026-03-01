@@ -6,8 +6,22 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.MySqlClient;
 
+/// <summary>
+/// Provides functionality to extract schema information from a MySQL database.
+/// </summary>
+/// <remarks>
+/// The <c>MySqlSchemaProvider</c> class implements the <c>ISchemaProvider</c> interface
+/// and allows access to database metadata such as table names, column names,
+/// index names, foreign key names, and their related metadata.
+/// </remarks>
 public partial class MySqlSchemaProvider : ISchemaProvider
 {
+    /// <summary>
+    /// Represents a schema provider for interacting with MySQL databases.
+    /// Provides methods to retrieve schema-related metadata, such as tables, columns, indices, and foreign keys.
+    /// Implements the <see cref="ISchemaProvider"/> interface.
+    /// </summary>
+    /// <param name="connectionString">The connection string used to connect to the MySQL database.</param>
     public MySqlSchemaProvider(string connectionString)
     {
         ConnectionString = connectionString;
@@ -377,6 +391,12 @@ public partial class MySqlSchemaProvider : ISchemaProvider
 
     #region Utility
 
+    /// <summary>
+    /// Determines the corresponding <see cref="ColumnType"/> for the given MySQL data type.
+    /// Maps MySQL-specific type definitions to standard column type enumerations.
+    /// </summary>
+    /// <param name="mysqlType">The MySQL data type as a string.</param>
+    /// <returns>The mapped <see cref="ColumnType"/> that corresponds to the given MySQL data type.</returns>
     private static ColumnType GetColumnType(string mysqlType) =>
         mysqlType switch
         {
@@ -406,6 +426,17 @@ public partial class MySqlSchemaProvider : ISchemaProvider
             _ => ColumnType.Unknown
         };
 
+    /// <summary>
+    /// Parses a string value into an appropriate object based on the specified column type.
+    /// Handles different data types such as numeric types, date/time types, and string types.
+    /// Returns <see cref="DBNull.Value"/> if the value is empty, null, or invalid for the specified type.
+    /// </summary>
+    /// <param name="value">The string value to parse.</param>
+    /// <param name="columnType">The column type that determines how the value should be parsed.</param>
+    /// <returns>
+    /// The parsed object corresponding to the specified column type, or <see cref="DBNull.Value"/>
+    /// if the value cannot be converted.
+    /// </returns>
     private static object Parse(string value, ColumnType columnType)
     {
         if (Utility.IsEmpty(value) || value.Equals("NULL", StringComparison.CurrentCultureIgnoreCase))
@@ -437,6 +468,13 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <summary>
+    /// Maps a string representation of a foreign key constraint rule to its corresponding <see cref="ForeignKeyRule"/> enum value.
+    /// Used to interpret foreign key rules such as "CASCADE" or "SET NULL", as retrieved from the database metadata.
+    /// </summary>
+    /// <param name="rule">A string representing the foreign key rule from the database metadata.</param>
+    /// <returns>A <see cref="ForeignKeyRule"/> enum value corresponding to the provided string representation.
+    /// If no match is found, returns <see cref="ForeignKeyRule.None"/>.</returns>
     private static ForeignKeyRule GetFKRule(string rule) =>
         rule switch
         {

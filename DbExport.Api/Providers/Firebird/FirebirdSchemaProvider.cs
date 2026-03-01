@@ -6,8 +6,18 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.Firebird;
 
+/// <summary>
+/// Provides schema-related operations for Firebird databases, including retrieval
+/// of table names, column names, index names, foreign key names, and metadata.
+/// Implements the <see cref="ISchemaProvider"/> interface to support interaction
+/// with Firebird database schemas.
+/// </summary>
 public class FirebirdSchemaProvider : ISchemaProvider
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FirebirdSchemaProvider"/> class.
+    /// </summary>
+    /// <param name="connectionString">The connection string used to connect to the database.</param>
     public FirebirdSchemaProvider(string connectionString)
     {
         ConnectionString = connectionString;
@@ -353,10 +363,17 @@ public class FirebirdSchemaProvider : ISchemaProvider
 
     #region Utilities
 
+    /// <summary>
+    /// Resolves the column type based on the Firebird field type, subtype, and scale.
+    /// </summary>
+    /// <param name="fbType">The Firebird field type identifier.</param>
+    /// <param name="subType">The Firebird field subtype identifier, if applicable.</param>
+    /// <param name="scale">The scale value associated with the field.</param>
+    /// <returns>The resolved <see cref="ColumnType"/> corresponding to the specified parameters.</returns>
     private static ColumnType ResolveColumnType(int fbType, int? subType, int scale) =>
-       fbType switch
-       {
-           7 => scale < 0 ? ColumnType.Decimal : ColumnType.SmallInt,
+        fbType switch
+        {
+            7 => scale < 0 ? ColumnType.Decimal : ColumnType.SmallInt,
            8 => scale < 0 ? ColumnType.Decimal : ColumnType.Integer,
            16 => subType switch
            {
@@ -366,16 +383,23 @@ public class FirebirdSchemaProvider : ISchemaProvider
            10 => ColumnType.SinglePrecision,
            27 => ColumnType.DoublePrecision,
            12 => ColumnType.Date,
-           13 => ColumnType.Time,
-           28 => ColumnType.Time,
-           35 => ColumnType.DateTime,
-           29 => ColumnType.DateTime,
+           13 or 28 => ColumnType.Time,
+           35 or 29 => ColumnType.DateTime,
            14 => ColumnType.Char,
            37 => ColumnType.VarChar,
            261 => subType == 1 ? ColumnType.Text : ColumnType.Blob,
            _ => ColumnType.Unknown
        };
 
+    /// <summary>
+    /// Resolves the native Firebird type name based on the specified field type, subtype, and scale.
+    /// </summary>
+    /// <param name="fbType">The Firebird field type identifier.</param>
+    /// <param name="subType">The Firebird field subtype identifier, or <see langword="null"/> if not applicable.</param>
+    /// <param name="scale">The scale of the field, indicating decimal places for numeric types.</param>
+    /// <returns>
+    /// A string representing the native Firebird type name that corresponds to the provided type, subtype, and scale.
+    /// </returns>
     private static string GetNativeTypeName(int fbType, int? subType, byte scale) =>
         fbType switch
         {
@@ -404,6 +428,14 @@ public class FirebirdSchemaProvider : ISchemaProvider
             _ => "UNKNOWN"
         };
 
+    /// <summary>
+    /// Converts the provided foreign key rule string into a corresponding <see cref="ForeignKeyRule"/> enumeration value.
+    /// </summary>
+    /// <param name="rule">The foreign key rule as a string, typically provided by the database.</param>
+    /// <returns>
+    /// A <see cref="ForeignKeyRule"/> value that corresponds to the input rule. If the rule is null or does not match any known values,
+    /// the method returns <see cref="ForeignKeyRule.None"/>.
+    /// </returns>
     private static ForeignKeyRule GetFKRule(string rule) =>
         rule?.ToUpperInvariant() switch
         {

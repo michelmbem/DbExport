@@ -4,20 +4,37 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.MySqlClient;
 
+/// <summary>
+/// A code generator responsible for producing SQL scripts for MySQL databases.
+/// </summary>
 public class MySqlCodeGenerator : CodeGenerator
 {
     #region Constructors
 
+    /// <summary>
+    /// Initializes a new instance of the MySqlCodeGenerator class.
+    /// </summary>
     public MySqlCodeGenerator() { }
 
+    /// <summary>
+    /// Initializes a new instance of the MySqlCodeGenerator class with the specified TextWriter for output.
+    /// </summary>
+    /// <param name="output">The TextWriter to which the generated SQL will be written. Must not be null.</param>
     public MySqlCodeGenerator(TextWriter output) : base(output) { }
 
+    /// <summary>
+    /// Initializes a new instance of the MySqlCodeGenerator class that writes output to a file at the specified path.
+    /// </summary>
+    /// <param name="path">The file path where the generated SQL will be written. Must not be null or empty.</param>
     public MySqlCodeGenerator(string path) : base(path) { }
 
     #endregion
 
     #region New Properties
 
+    /// <summary>
+    /// Represents configuration options specific to MySQL database generation.
+    /// </summary>
     public MySqlOptions MySqlOptions => (MySqlOptions)ExportOptions?.ProviderSpecific;
 
     #endregion

@@ -1,11 +1,26 @@
 ﻿namespace DbExport.Providers.MySqlClient;
 
+/// <summary>
+/// Represents a MySQL character set, including its name, supported collations, and default collation.
+/// </summary>
+/// <param name="name">The name of the character set.</param>
+/// <param name="collations">An array of supported collations for the character set.</param>
+/// <param name="defaultCollation">The default collation for the character set.</param>
 public sealed class CharacterSet(string name, string[] collations, string defaultCollation)
 {
+    /// <summary>
+    /// The name of the character set.
+    /// </summary>
     public string Name { get; } = name;
 
+    /// <summary>
+    /// An array of supported collations for the character set.
+    /// </summary>
     public string[] Collations { get; } = collations;
 
+    /// <summary>
+    /// The default collation for the character set.
+    /// </summary>
     public string DefaultCollation { get; } = defaultCollation;
 
     public override bool Equals(object obj) => obj is CharacterSet other && Name == other.Name;
@@ -15,18 +30,36 @@ public sealed class CharacterSet(string name, string[] collations, string defaul
     public override string ToString() => Name;
 }
 
+/// <summary>
+/// Represents options specific to MySQL database generation.
+/// </summary>
 public class MySqlOptions
 {
+    /// <summary>
+    /// Gets or sets the storage engine to be used for the database.
+    /// </summary>
     public string StorageEngine { get; set; }
 
+    /// <summary>
+    /// Gets or sets the character set to be used for the database.
+    /// </summary>
     public CharacterSet CharacterSet { get; set; }
 
+    /// <summary>
+    /// Gets or sets the collation to be used for the database.
+    /// </summary>
     public string Collation { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to optimize SQL for MariaDB.
+    /// </summary>
     public bool IsMariaDb { get; set; }
 
     #region Collections
 
+    /// <summary>
+    /// Gets a list of supported storage engines for MySQL databases.
+    /// </summary>
     public static string[] StorageEngines { get; } =
     [
         "InnoDB",
@@ -40,6 +73,9 @@ public class MySqlOptions
         "NDB"
     ];
 
+    /// <summary>
+    /// Gets a list of supported character sets for MySQL databases.
+    /// </summary>
     public static CharacterSet[] CharacterSets { get; } =
     [
         new(
@@ -328,12 +364,19 @@ public class MySqlOptions
 
     #endregion
 
+    /// <summary>
+    /// Converts the current MySqlOptions instance into a Markdown-formatted table.
+    /// </summary>
+    /// <returns>
+    /// A string representation of the MySqlOptions instance in Markdown table format. The table includes details
+    /// such as Storage Engine, Character Set, Collation, and the optimization flag for MariaDB.
+    /// </returns>
     public string ToMarkdown() => $"""
-                                  | Property | Value |
-                                  |----------|-------|
-                                  | Storage Engine | {StorageEngine} |
-                                  | Character Set | {CharacterSet} |
-                                  | Collation | {Collation} |
-                                  | Optimize SQL for MariaDB | {(IsMariaDb ? "Yes" : "No")} |
-                                  """;
+                                   | Property | Value |
+                                   |----------|-------|
+                                   | Storage Engine | {StorageEngine} |
+                                   | Character Set | {CharacterSet} |
+                                   | Collation | {Collation} |
+                                   | Optimize SQL for MariaDB | {(IsMariaDb ? "Yes" : "No")} |
+                                   """;
 }
