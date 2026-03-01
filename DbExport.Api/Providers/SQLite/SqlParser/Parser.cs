@@ -95,7 +95,7 @@ public class Parser
             colSpec = TryMatch(TokenId.COMMA, out _) ? ColumnSpec() : null;
         }
 
-        return new AstNode(AstNodeKind.COLSPECLIST, null, colSpecs.ToArray());
+        return new AstNode(AstNodeKind.COLSPECLIST, null, [..colSpecs]);
     }
 
     /// <summary>
@@ -112,8 +112,7 @@ public class Parser
         var typeName = string.Empty;
         var (prec, scale) = (0, 0);
 
-        if (TryMatch(TokenId.TYPE, out tok) ||
-            TryMatch(TokenId.IDENT, out tok))
+        if (TryMatch(TokenId.TYPE, out tok) || TryMatch(TokenId.IDENT, out tok))
         {
             typeName = tok.Data.ToString();
 
@@ -331,17 +330,16 @@ public class Parser
     /// </returns>
     private AstNode ExpressionList()
     {
-        Token tok;
-        var expressions = new List<AstNode>();
-
+        List<AstNode> expressions = [];
         var expression = Expression();
+        
         while (expression != null)
         {
             expressions.Add(expression);
-            expression = TryMatch(TokenId.COMMA, out tok) ? Expression() : null;
+            expression = TryMatch(TokenId.COMMA, out _) ? Expression() : null;
         }
 
-        return new AstNode(AstNodeKind.EXPLIST, null, expressions.ToArray());
+        return new AstNode(AstNodeKind.EXPLIST, null, [..expressions]);
     }
 
     /// <summary>
@@ -502,16 +500,13 @@ public class Parser
             case TokenId.IDENT:
                 tok = token;
                 Skip();
-                if (token.Id == TokenId.LPAREN)
-                {
-                    Skip();
-                    node = ExpressionList();
-                    Match(TokenId.RPAREN);
-
-                    return new AstNode(AstNodeKind.FNCALL, tok.Data, node);
-                }
-
-                return new AstNode(AstNodeKind.COLREF, tok.Data);
+                if (token.Id != TokenId.LPAREN)
+                    return new AstNode(AstNodeKind.COLREF, tok.Data);
+                
+                Skip();
+                node = ExpressionList();
+                Match(TokenId.RPAREN);
+                return new AstNode(AstNodeKind.FNCALL, tok.Data, node);
             case TokenId.LPAREN:
                 Skip();
                 node = Expression();
@@ -575,18 +570,17 @@ public class Parser
     /// </returns>
     private AstNode ColumnRefList()
     {
-        var childNodes = new List<AstNode>();
+        List<AstNode> childNodes = [];
         var name = Match(TokenId.IDENT).Data.ToString();
         childNodes.Add(new AstNode(AstNodeKind.COLREF, name));
 
-        Token tok;
-        while (TryMatch(TokenId.COMMA, out tok))
+        while (TryMatch(TokenId.COMMA, out _))
         {
             name = Match(TokenId.IDENT).Data.ToString();
             childNodes.Add(new AstNode(AstNodeKind.COLREF, name));
         }
 
-        return new AstNode(AstNodeKind.COLREFLIST, null, childNodes.ToArray());
+        return new AstNode(AstNodeKind.COLREFLIST, null, [..childNodes]);
     }
 
     #endregion

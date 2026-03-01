@@ -20,7 +20,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
     /// <see cref="AstNode"/> that describe the table structure, including metadata,
     /// column definitions, and constraints such as primary keys, foreign keys, and indexes.
     /// </summary>
-    private readonly Dictionary<string, AstNode> tableDefinitions;
+    private readonly Dictionary<string, AstNode> tableDefinitions = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SQLiteSchemaProvider"/> class.
@@ -34,7 +34,6 @@ public class SQLiteSchemaProvider : ISchemaProvider
         var dbFilename = properties["data source"];
         DatabaseName = Path.GetFileNameWithoutExtension(dbFilename);
 
-        tableDefinitions = [];
         LoadTableDefinitions();
     }
 
@@ -188,7 +187,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
     {
         var columnList = node.Children[index];
         var columnNames = new string[columnList.Children.Count];
-            
+        
         for (var i = 0; i < columnNames.Length; ++i)
             columnNames[i] = columnList.Children[i].Data.ToString();
 
@@ -219,9 +218,12 @@ public class SQLiteSchemaProvider : ISchemaProvider
             "date" => ColumnType.Date,
             "time" => ColumnType.Time,
             "datetime" or "timestamp" => ColumnType.DateTime,
-            "char" or "character" or "nchar" => ColumnType.Char,
-            "varchar" or "nvarchar" => ColumnType.VarChar,
-            "text" or "ntext" or "clob" or "nclob" => ColumnType.Text,
+            "char" or "character" => ColumnType.Char,
+            "nchar" => ColumnType.NChar,
+            "varchar" => ColumnType.VarChar,
+            "nvarchar" => ColumnType.NVarChar,
+            "text" or "clob" => ColumnType.Text,
+            "ntext" or "nclob" => ColumnType.NText,
             "bit" => ColumnType.Bit,
             "blob" => ColumnType.Blob,
             _ => ColumnType.Unknown
