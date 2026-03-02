@@ -35,7 +35,7 @@ public sealed class DataProvider(
     private const string ACCESS_DATABASE_FILE_PATTERN = "Microsoft Access Database (*.accdb;*.mdb)|*.accdb;*.mdb";
     private const string LOCALDB_DATABASE_FILE_PATTERN = "SQL Server Database (*.mdf)|*.mdf";
 #endif
-    private const string SQLITE_DATABASE_FILE_PATTERN = "SQLite Database (*.db)|*.db";
+    private const string SQLITE_DATABASE_FILE_PATTERN = "SQLite Database (*.db;*.sqlite)|*.db;*.sqlite";
     private const string SQLSERVER_DATABASE_LIST_QUERY = "EXEC sp_databases";
     private const string ORACLE_DATABASE_LIST_QUERY = "SELECT * FROM GLOBAL_NAME";
     private const string MYSQL_DATABASE_LIST_QUERY = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA ORDER BY SCHEMA_NAME";

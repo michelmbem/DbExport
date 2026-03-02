@@ -13,8 +13,28 @@ namespace DbExport.Providers.SQLite;
 /// </summary>
 public class SQLiteSchemaProvider : ISchemaProvider
 {
+    /// <summary>
+    /// Represents a data structure that holds information about the columns
+    /// of database tables in the current schema context. This variable acts
+    /// as a cache for table column metadata and is utilized to simplify
+    /// metadata retrievals and avoid redundant database queries.
+    /// </summary>
     private readonly MetaData tableColumns = [];
+
+    /// <summary>
+    /// Represents a data structure that caches metadata related to the indexes
+    /// of database tables within the current schema context. This variable is used to
+    /// store and retrieve index information such as uniqueness and origin, optimizing
+    /// metadata queries and reducing redundant database calls.
+    /// </summary>
     private readonly MetaData tableIndexes = [];
+
+    /// <summary>
+    /// Serves as a data structure to store information about the foreign keys
+    /// of database tables within the current schema context. This variable is used
+    /// to cache foreign key metadata, enabling efficient retrieval and minimizing
+    /// redundant queries to the database.
+    /// </summary>
     private readonly MetaData tableForeignKeys = [];
     
     /// <summary>
@@ -197,11 +217,32 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     #region Utility
 
+    /// <summary>
+    /// Combines the table owner and table name into a single string, separated by a period.
+    /// </summary>
+    /// <param name="tableOwner">The owner of the table, usually representing the schema or database user.</param>
+    /// <param name="tableName">The name of the table for which the owner is being combined.</param>
+    /// <returns>A string that combines the table owner and table name in the format "tableOwner.tableName".</returns>
     private static string Combine(string tableOwner, string tableName) => $"{tableOwner}.{tableName}";
 
+    /// <summary>
+    /// Registers a list of metadata associated with a specific table in the given collection.
+    /// </summary>
+    /// <param name="collection">The metadata collection where the table information will be registered.</param>
+    /// <param name="tableOwner">The owner of the table for which metadata is being registered.</param>
+    /// <param name="tableName">The name of the table for which metadata is being registered.</param>
+    /// <param name="list">The list of metadata entries to be registered, represented as dictionaries of key-value pairs.</param>
     private static void RegisterList(MetaData collection, string tableOwner, string tableName,
-        List<Dictionary<string, object>> list) => collection[Combine(tableOwner, tableName)] = list;
+                                     List<Dictionary<string, object>> list) => collection[Combine(tableOwner, tableName)] = list;
 
+    /// <summary>
+    /// Finds the first item in the specified collection that matches the given predicate for a specific table.
+    /// </summary>
+    /// <param name="collection">The metadata collection containing table-related data.</param>
+    /// <param name="tableOwner">The owner of the table whose data is being queried.</param>
+    /// <param name="tableName">The name of the table whose data is being queried.</param>
+    /// <param name="predicate">The condition to match items in the collection.</param>
+    /// <returns>A dictionary representing the first item in the collection that matches the predicate, or null if no match is found.</returns>
     private static Dictionary<string, object> FindFirst(
         MetaData collection, string tableOwner, string tableName, Predicate<Dictionary<string, object>> predicate) =>
         ((List<Dictionary<string, object>>)collection[Combine(tableOwner, tableName)]).FirstOrDefault(item => predicate(item));
@@ -251,7 +292,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
     /// </summary>
     /// <remarks>
     /// This method does not really map SQLite data types to standard column types.
-    /// It tries to recognize common data types and return their corresponding <see cref="ColumnType"/>.
+    /// It tries to implement an extended version of the SQLite data type mapping.
     /// </remarks>
     /// <param name="sqliteType">The SQLite data type as a string.</param>
     /// <returns>The <see cref="ColumnType"/> that corresponds to the specified SQLite data type.</returns>
@@ -278,6 +319,18 @@ public class SQLiteSchemaProvider : ISchemaProvider
             "ntext" or "nclob" => ColumnType.NText,
             "bit" => ColumnType.Bit,
             "blob" => ColumnType.Blob,
+            not null when sqliteType.Contains("int") => ColumnType.BigInt,
+            not null when sqliteType.Contains("floa") || sqliteType.Contains("doub") ||
+                          sqliteType.Contains("interval") => ColumnType.DoublePrecision,
+            not null when sqliteType.Contains("dec") || sqliteType.Contains("num") => ColumnType.Decimal,
+            not null when sqliteType.Contains("char") || sqliteType.Contains("text") ||
+                          sqliteType.Contains("clob") => ColumnType.Text,
+            not null when sqliteType.Contains("binary") || sqliteType.Contains("blob") ||
+                          sqliteType.Contains("byte") => ColumnType.Blob,
+            not null when sqliteType.Contains("uid") || sqliteType.Contains("uniqueid") => ColumnType.Guid,
+            not null when sqliteType.Contains("xml") => ColumnType.Xml,
+            not null when sqliteType.Contains("json") => ColumnType.Json,
+            not null when sqliteType.Contains("geo") => ColumnType.Geometry,
             _ => ColumnType.Unknown
         };
 
