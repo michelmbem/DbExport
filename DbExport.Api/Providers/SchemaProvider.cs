@@ -110,7 +110,6 @@ public static class SchemaProvider
     /// <returns>A Table object representing the schema of the specified table, including its columns, indexes, and foreign keys.</returns>
     private static Table GetTable(ISchemaProvider provider, Database database, string tableName, string tableOwner)
     {
-        var metadata = provider.GetTableMeta(tableName, tableOwner);
         var table = new Table(database, tableName, tableOwner);
 
         var columnNames = provider.GetColumnNames(tableName, tableOwner);
@@ -127,13 +126,14 @@ public static class SchemaProvider
             table.Indexes.Add(index);
         }
 
-        var fkNames = provider.GetFKNames(tableName, tableOwner);
+        var fkNames = provider.GetForeignKeyNames(tableName, tableOwner);
         foreach (var fkName in fkNames)
         {
             var fk = GetForeignKey(provider, table, fkName);
             table.ForeignKeys.Add(fk);
         }
 
+        var metadata = provider.GetTableMeta(tableName, tableOwner);
         if (metadata.TryGetValue("pk_name", out var pkName))
             table.GeneratePrimaryKey((string)pkName, (IEnumerable<string>)metadata["pk_columns"]);
 

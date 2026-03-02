@@ -80,7 +80,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         return [..list.Select(i => i.ToString())];
     }
 
-    public string[] GetFKNames(string tableName, string tableOwner)
+    public string[] GetForeignKeyNames(string tableName, string tableOwner)
     {
         const string sql = """
             SELECT TRIM(RDB$CONSTRAINT_NAME)

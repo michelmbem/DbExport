@@ -99,7 +99,7 @@ public class OracleSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
-    public string[] GetFKNames(string tableName, string tableOwner)
+    public string[] GetForeignKeyNames(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT

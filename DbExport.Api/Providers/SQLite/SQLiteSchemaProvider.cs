@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using DbExport.Providers.SQLite.SqlParser;
 using DbExport.Schema;
 
 namespace DbExport.Providers.SQLite;
@@ -14,14 +13,10 @@ namespace DbExport.Providers.SQLite;
 /// </summary>
 public class SQLiteSchemaProvider : ISchemaProvider
 {
-    /// <summary>
-    /// A dictionary containing the definitions of tables in the SQLite database schema.
-    /// The keys represent the names of the tables, and the values are instances of
-    /// <see cref="AstNode"/> that describe the table structure, including metadata,
-    /// column definitions, and constraints such as primary keys, foreign keys, and indexes.
-    /// </summary>
-    private readonly Dictionary<string, AstNode> tableDefinitions = [];
-
+    private readonly MetaData tableColumns = [];
+    private readonly MetaData tableIndexes = [];
+    private readonly MetaData tableForeignKeys = [];
+    
     /// <summary>
     /// Initializes a new instance of the <see cref="SQLiteSchemaProvider"/> class.
     /// </summary>
@@ -33,8 +28,6 @@ public class SQLiteSchemaProvider : ISchemaProvider
         var properties = Utility.ParseConnectionString(connectionString);
         var dbFilename = properties["data source"];
         DatabaseName = Path.GetFileNameWithoutExtension(dbFilename);
-
-        LoadTableDefinitions();
     }
 
     #region ISchemaProvider Members
@@ -45,34 +38,66 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     public string DatabaseName { get; }
 
-    public NameOwnerPair[] GetTableNames() =>
-        [..tableDefinitions.Keys.Select(name => new NameOwnerPair(name))];
+    public NameOwnerPair[] GetTableNames()
+    {
+        const string sql = """
+                           SELECT schema, name
+                           FROM pragma_table_list()
+                           WHERE type = 'table'
+                               AND name NOT LIKE 'sqlite_%'
+                           """;
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(sql, SqlHelper.ToArrayList);
+        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
+    }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
     {
-        var tableDef = tableDefinitions[tableName];
-        var colSpecList = tableDef.Children[0];
-        var colNames = new string[colSpecList.Children.Count];
+        const string sql = """
+                           SELECT *
+                           FROM pragma_table_info('{1}', '{0}')
+                           ORDER BY cid
+                           """;
 
-        for (var i = 0; i < colNames.Length; ++i)
-        {
-            var colAttribs = (MetaData)colSpecList.Children[i].Data;
-            colNames[i] = colAttribs["COLUMN_NAME"].ToString();
-        }
-
-        return colNames;
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(string.Format(sql, tableOwner, tableName), SqlHelper.ToDictionaryList);
+        tableColumns[$"{tableOwner}.{tableName}"] = list;
+        
+        return [..list.Select(item => item["name"].ToString() )];
     }
 
-    public string[] GetIndexNames(string tableName, string tableOwner) => []; // Note: Not relevant for now!
-
-    public string[] GetFKNames(string tableName, string tableOwner)
+    public string[] GetIndexNames(string tableName, string tableOwner)
     {
-        var tableDef = tableDefinitions[tableName];
+        const string sql = """
+                           SELECT *
+                           FROM pragma_index_list('{1}', '{0}')
+                           ORDER BY seq
+                           """;
 
-        return [..(from node in tableDef.Children
-                where node.Kind == AstNodeKind.FKSPEC
-                select (MetaData)node.Data into fkAttribs
-                select fkAttribs["CONSTRAINT_NAME"].ToString())];
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(string.Format(sql, tableOwner, tableName), SqlHelper.ToDictionaryList);
+        tableIndexes[$"{tableOwner}.{tableName}"] = list;
+        
+        return [..list.Select(item => item["name"].ToString() )];
+    }
+
+    public string[] GetForeignKeyNames(string tableName, string tableOwner)
+    {
+        const string sql = """
+                           SELECT *
+                           FROM pragma_foreign_key_list('{1}', '{0}')
+                           ORDER BY seq
+                           """;
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(string.Format(sql, tableOwner, tableName), SqlHelper.ToDictionaryList);
+        tableForeignKeys[$"{tableOwner}.{tableName}"] = list;
+        
+        foreach (var item in list)
+            item["name"] = $"fk_{tableName}_{item["id"]}";
+        
+        return [..list.Select(item => item["name"].ToString() )];
     }
 
     public MetaData GetTableMeta(string tableName, string tableOwner)
@@ -80,97 +105,111 @@ public class SQLiteSchemaProvider : ISchemaProvider
         MetaData metadata = new()
         {
             ["name"] = tableName,
-            ["owner"] = string.Empty
+            ["owner"] = tableOwner
         };
+        
+        var pkIndex = ((List<Dictionary<string, object>>)tableIndexes[$"{tableOwner}.{tableName}"])
+            .FirstOrDefault(item => item["origin"].Equals("pk"));
+        var pkName = pkIndex?["name"];
 
-        var tableDef = tableDefinitions[tableName];
-        var pkNode = tableDef.Children.FirstOrDefault(node => node.Kind == AstNodeKind.PKSPEC);
-
-        if (pkNode == null)
+        if (pkName != null)
         {
-            var colAttribs = tableDef.Children[0].Children
-                                     .Select(colSpec => (MetaData)colSpec.Data)
-                                     .FirstOrDefault(colAttribs => Convert.ToBoolean(colAttribs["PRIMARY_KEY"]));
-            if (colAttribs == null) return metadata;
+            const string sql = """
+                            SELECT name
+                            FROM pragma_index_info('{0}')
+                            ORDER BY seqno
+                            """;
+
+            using var helper = new SqlHelper(ProviderName, ConnectionString);
+            var pkColumns = helper.Query(string.Format(sql, pkName), SqlHelper.ToList)
+                                  .Select(item => item.ToString())
+                                  .ToArray();
             
-            metadata["pk_name"] = $"PK_{tableName}";
-            metadata["pk_columns"] = (string[])[colAttribs["COLUMN_NAME"].ToString()];
+            metadata["pk_name"] = pkName;
+            metadata["pk_columns"] = pkColumns;
         }
-        else
-        {
-            metadata["pk_name"] = $"PK_{tableName}";
-            metadata["pk_columns"] = ExtractColumnNames(pkNode, 0);
-        }
-
+        
         return metadata;
     }
 
     public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
-        var metadata = new MetaData
+        MetaData metadata = new()
         {
-            ["name"] = columnName
+            ["name"] = columnName,
+            ["description"] = string.Empty
         };
 
-        var tableDef = tableDefinitions[tableName];
-        var colAttribs = tableDef.Children[0].Children
-                                 .Select(colSpec => (MetaData)colSpec.Data)
-                                 .FirstOrDefault(colAttribs => colAttribs["COLUMN_NAME"].Equals(columnName));
-        
-        if (colAttribs == null) return metadata;
+        var column = ((List<Dictionary<string, object>>)tableColumns[$"{tableOwner}.{tableName}"])
+            .FirstOrDefault(item => item["name"].Equals(columnName));
         
         ColumnType columnType;
-        metadata["type"] = columnType = GetColumnType(colAttribs["TYPE_NAME"].ToString());
-        metadata["nativeType"] = colAttribs["TYPE_NAME"];
-        metadata["size"] = Utility.ToInt16(colAttribs["PRECISION"]);
-        metadata["precision"] = Utility.ToByte(colAttribs["PRECISION"]);
-        metadata["scale"] = Utility.ToByte(colAttribs["SCALE"]);
-        metadata["defaultValue"] = colAttribs["DEFAULT_VALUE"];
-        metadata["description"] = string.Empty;
-                    
+        string nativeType;
+        short size;
+        byte precision;
+        byte scale;
+        
+        ResolveColumnType(column!["type"].ToString(), out columnType, out nativeType, out size, out precision, out scale);
+        metadata["type"] = columnType;
+        metadata["nativeType"] = nativeType;
+        metadata["size"] = size;
+        metadata["precision"] = precision;
+        metadata["scale"] = scale;
+        metadata["defaultValue"] = ParseValue(column["dflt_value"], columnType);
+
         var attributes = ColumnAttributes.None;
-        if (Convert.ToBoolean(colAttribs["PRIMARY_KEY"]) ||
-            !Convert.ToBoolean(colAttribs["ALLOW_DBNULL"]))
-        {
+        
+        if (column["notnull"].Equals(1))
             attributes |= ColumnAttributes.Required;
-            if (Convert.ToBoolean(colAttribs["AUTO_INCREMENT"]) ||
-                (columnType == ColumnType.Integer && Convert.ToBoolean(colAttribs["UNIQUE"])))
-            {
-                attributes |= ColumnAttributes.Identity;
-                metadata["ident_seed"] = metadata["ident_incr"] = 1L;
-            }
-        }
+
         metadata["attributes"] = attributes;
 
         return metadata;
     }
 
     public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
-        => null; // Note: Ignored for the moment!
+    {
+        var index = ((List<Dictionary<string, object>>)tableIndexes[$"{tableOwner}.{tableName}"])
+            .FirstOrDefault(item => item["name"].Equals(indexName));
+        
+        MetaData metadata = new()
+        {
+            ["name"] = indexName,
+            ["unique"] = index!["unique"].Equals(1),
+            ["primaryKey"] = index["origin"].Equals("pk")
+        };
+        
+        const string sql = """
+                           SELECT name
+                           FROM pragma_index_info('{0}')
+                           ORDER BY seqno
+                           """;
+
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var indexColumns = helper.Query(string.Format(sql, indexName), SqlHelper.ToList)
+                              .Select(item => item.ToString())
+                              .ToArray();
+
+        metadata["columns"] = indexColumns;
+
+        return metadata;
+    }
 
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
-        var metadata = new MetaData();
-        var tableDef = tableDefinitions[tableName];
+        var fk = ((List<Dictionary<string, object>>)tableForeignKeys[$"{tableOwner}.{tableName}"])
+            .FirstOrDefault(item => item["name"].Equals(fkName));
 
-        foreach (var fkSpec in tableDef.Children)
+        return new MetaData()
         {
-            if (fkSpec.Kind != AstNodeKind.FKSPEC) continue;
-
-            var fkAttribs = (MetaData) fkSpec.Data;
-            if (!fkAttribs["CONSTRAINT_NAME"].Equals(fkName)) continue;
-            
-            metadata["name"] = fkName;
-            metadata["columns"] = ExtractColumnNames(fkSpec, 0);
-            metadata["relatedName"] = fkAttribs["TARGET_TABLE_NAME"];
-            metadata["relatedOwner"] = string.Empty;
-            metadata["relatedColumns"] = ExtractColumnNames(fkSpec, 1);
-            metadata["updateRule"] = fkAttribs["UPDATE_RULE"];
-            metadata["deleteRule"] = fkAttribs["DELETE_RULE"];
-            break;
-        }
-
-        return metadata;
+            ["name"] = fkName,
+            ["columns"] = Utility.Split(fk!["from"].ToString(), ','),
+            ["relatedName"] = fk["table"].ToString(),
+            ["relatedOwner"] = tableOwner,
+            ["relatedColumns"] = Utility.Split(fk!["to"].ToString(), ','),
+            ["updateRule"] = ParseForeignKeyRule(fk["on_update"].ToString()),
+            ["deleteRule"] = ParseForeignKeyRule(fk["on_delete"].ToString()),
+        };
     }
 
     #endregion
@@ -178,20 +217,43 @@ public class SQLiteSchemaProvider : ISchemaProvider
     #region Utility
 
     /// <summary>
-    /// Extracts the column names from the specified AST (Abstract Syntax Tree) node at the given child index.
+    /// Resolves the column type based on the provided SQL type string. Determines the corresponding
+    /// <see cref="ColumnType"/>, native database type, size, precision, and scale of the column.
     /// </summary>
-    /// <param name="node">The root AST node containing the column definition data.</param>
-    /// <param name="index">The index of the child node where column definitions are located.</param>
-    /// <returns>An array of column names extracted from the specified node.</returns>
-    private static string[] ExtractColumnNames(AstNode node, int index)
+    /// <param name="sqlType">The SQL type string to be analyzed.</param>
+    /// <param name="columnType">Outputs the resolved <see cref="ColumnType"/> enumeration value.</param>
+    /// <param name="nativeType">Outputs the native SQL type associated with the column.</param>
+    /// <param name="size">Outputs the size of the column, if applicable.</param>
+    /// <param name="precision">Outputs the precision of the column, if applicable.</param>
+    /// <param name="scale">Outputs the scale of the column, if applicable.</param>
+    private static void ResolveColumnType(string sqlType, out ColumnType columnType, out string nativeType,
+                                          out short size, out byte precision, out byte scale)
     {
-        var columnList = node.Children[index];
-        var columnNames = new string[columnList.Children.Count];
-        
-        for (var i = 0; i < columnNames.Length; ++i)
-            columnNames[i] = columnList.Children[i].Data.ToString();
+        size = precision = scale = 0;
 
-        return columnNames;
+        var lParen = sqlType.IndexOf('(');
+
+        if (lParen > 0)
+        {
+            var rParen = sqlType.IndexOf(')');
+            var sizeStr = sqlType[(lParen + 1)..rParen];
+            var parts = Utility.Split(sizeStr, ',');
+            
+            nativeType = sqlType[..lParen].ToLowerInvariant();
+            
+            if (nativeType.StartsWith("numeric", StringComparison.OrdinalIgnoreCase) ||
+                nativeType.StartsWith("decimal", StringComparison.OrdinalIgnoreCase))
+            {
+                precision = Utility.ToByte(parts[0]);
+                if (parts.Length > 1) scale = Utility.ToByte(parts[1]);
+            }
+            else
+                size = Utility.ToInt16(parts[0]);
+        }
+        else
+            nativeType = sqlType.ToLowerInvariant();
+
+        columnType = GetColumnType(nativeType);
     }
 
     /// <summary>
@@ -230,23 +292,50 @@ public class SQLiteSchemaProvider : ISchemaProvider
         };
 
     /// <summary>
-    /// Loads the definitions of all tables in the connected SQLite database into memory.
-    /// The table definitions are obtained by extracting and parsing their DDL from the sqlite_master table.
+    /// Parses the input value into a strongly typed object based on the specified column type.
     /// </summary>
-    private void LoadTableDefinitions()
+    /// <param name="value">The value to be parsed, which can be any object or null.</param>
+    /// <param name="columnType">The type of column to determine the parsing logic for the value.</param>
+    /// <returns>An object representing the parsed value, or <see cref="DBNull.Value"/>
+    /// if parsing fails or the value is null.</returns>
+    private static object ParseValue(object value, ColumnType columnType)
     {
-        const string sql = "SELECT name, sql FROM sqlite_master WHERE type = 'table'";
-
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToArrayList);
+        if (value == null || value == DBNull.Value) return null;
         
-        foreach (var values in list)
+        return columnType switch
         {
-            var parser = new Parser(new Scanner(values[1].ToString()));
-            var tableDef = parser.CreateTable();
-            tableDefinitions.Add(values[0].ToString()!, tableDef);
-        }
+            ColumnType.Boolean => value.ToString()!.ToLower() switch
+            {
+                "0" or "false" => false,
+                "1" or "true" => true,
+                _ => DBNull.Value
+            },
+            ColumnType.TinyInt => Utility.IsNumeric(value, out var number) ? (sbyte)number : DBNull.Value,
+            ColumnType.SmallInt => Utility.IsNumeric(value, out var number) ? (short)number : DBNull.Value,
+            ColumnType.Integer => Utility.IsNumeric(value, out var number) ? (int)number : DBNull.Value,
+            ColumnType.BigInt => Utility.IsNumeric(value, out var number) ? (long)number : DBNull.Value,
+            ColumnType.SinglePrecision => Utility.IsNumeric(value, out var number) ? (float)number : DBNull.Value,
+            ColumnType.DoublePrecision => Utility.IsNumeric(value, out var number) ? (double)number : DBNull.Value,
+            ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value, out var number) ? number : DBNull.Value,
+            ColumnType.Date or ColumnType.Time or ColumnType.DateTime => Utility.IsDate(value, out var date) ? date : DBNull.Value,
+            ColumnType.Char or ColumnType.VarChar or ColumnType.Text => Utility.UnquotedStr(value),
+            ColumnType.Bit => Utility.FromBitString(value.ToString()),
+            _ => DBNull.Value
+        };
     }
+
+    /// <summary>
+    /// Converts a SQLite foreign key rule string into a corresponding <see cref="ForeignKeyRule"/> enumeration value.
+    /// </summary>
+    /// <param name="sqlFkRule">The foreign key rule as represented in the SQLite metadata (e.g., "NO ACTION", "CASCADE").</param>
+    /// <returns>A <see cref="ForeignKeyRule"/> enumeration value that corresponds to the specified SQLite foreign key rule.</returns>
+    private static ForeignKeyRule ParseForeignKeyRule(string sqlFkRule) =>
+        sqlFkRule switch
+        {
+            "NO ACTION" => ForeignKeyRule.None,
+            "CASCADE" => ForeignKeyRule.Cascade,
+            _ => ForeignKeyRule.Restrict
+        };
 
     #endregion
 }

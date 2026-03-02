@@ -51,7 +51,7 @@ public interface ISchemaProvider
     /// <param name="tableName">That name of the table for which to retrieve foreign key names.</param>
     /// <param name="tableOwner">The owner of the table for which to retrieve foreign key names.</param>
     /// <returns>An array of foreign key names for the specified table and owner.</returns>
-    string[] GetFKNames(string tableName, string tableOwner);
+    string[] GetForeignKeyNames(string tableName, string tableOwner);
 
     /// <summary>
     /// Extracts the metadata for a specified table and its owner, including information such as column data types,

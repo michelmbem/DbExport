@@ -83,7 +83,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return [..list.Select(values => values[0].ToString())];
     }
 
-    public string[] GetFKNames(string tableName, string tableOwner)
+    public string[] GetForeignKeyNames(string tableName, string tableOwner)
     {
         const string sql = """
                            SELECT
