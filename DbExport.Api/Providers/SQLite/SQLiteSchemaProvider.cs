@@ -109,8 +109,8 @@ public class SQLiteSchemaProvider : ISchemaProvider
             ["name"] = tableName,
             ["owner"] = tableOwner
         };
-        
-        var pkIndex = FindFirst(tableIndexes, tableOwner, tableName, item => "pk".Equals(item["origin"]));
+
+        var pkIndex = FindFirst(tableIndexes, tableOwner, tableName, IsPrimaryKey);
         var pkName = pkIndex?["name"];
 
         if (pkName != null)
@@ -122,13 +122,19 @@ public class SQLiteSchemaProvider : ISchemaProvider
                             """;
 
             using var helper = new SqlHelper(ProviderName, ConnectionString);
-            var pkColumns = helper.Query(string.Format(sql, pkName), SqlHelper.ToList).Cast<string>();
-            
+            var pkColumns = helper.Query(string.Format(sql, pkName), SqlHelper.ToList)
+                                  .Select(item => item.ToString())
+                                  .ToArray();
+
             metadata["pk_name"] = pkName;
             metadata["pk_columns"] = pkColumns.ToArray();
         }
-        
+
         return metadata;
+
+        static bool IsPrimaryKey(Dictionary<string, object> index) =>
+            "pk".Equals(index["origin"]) ||
+            ("u".Equals(index["origin"]) && index["name"].ToString().StartsWith("sqlite_autoindex_"));
     }
 
     public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
@@ -177,9 +183,10 @@ public class SQLiteSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var indexColumns = helper.Query(string.Format(sql, indexName), SqlHelper.ToList).Cast<string>();
 
-        metadata["columns"] = indexColumns.ToArray();
+        metadata["columns"] = helper.Query(string.Format(sql, indexName), SqlHelper.ToList)
+                                    .Select(item => item.ToString())
+                                    .ToArray();
 
         return metadata;
     }
