@@ -47,28 +47,24 @@ public class Parser
         Match(TokenId.KW_TABLE);
         var tableName = Match(TokenId.IDENT).Data.ToString();
         Match(TokenId.LPAREN);
-        var colSpecList = ColumnSpecList();
 
-        List<AstNode> children = [colSpecList];
-        var loop = true;
+        List<AstNode> children = [ColumnSpecList()];
+        var inTableBody = true;
 
-        while (loop)
+        while (inTableBody)
         {
-            AstNode child;
             switch (token.Id)
             {
                 case TokenId.KW_PRIMARY:
-                    child = PrimaryKeySpec();
-                    children.Add(child);
+                    children.Add(PrimaryKeySpec());
                     if (token.Id == TokenId.COMMA) Skip();
                     break;
                 case TokenId.KW_CONSTRAINT:
-                    child = ConstraintSpec();
-                    children.Add(child);
+                    children.Add(ConstraintSpec());
                     if (token.Id == TokenId.COMMA) Skip();
                     break;
                 default:
-                    loop = false;
+                    inTableBody = false;
                     break;
             }
         }
@@ -108,9 +104,9 @@ public class Parser
     {
         if (!TryMatch(TokenId.IDENT, out var tok)) return null;
 
-        var colName = tok.Data.ToString();
+        var columnName = tok.Data.ToString();
         var typeName = string.Empty;
-        var (prec, scale) = (0, 0);
+        var (precision, scale) = (0, 0);
 
         if (TryMatch(TokenId.TYPE, out tok) || TryMatch(TokenId.IDENT, out tok))
         {
@@ -118,7 +114,7 @@ public class Parser
 
             if (TryMatch(TokenId.LPAREN, out _))
             {
-                prec = Convert.ToInt32(Match(TokenId.LT_NUM).Data);
+                precision = Convert.ToInt32(Match(TokenId.LT_NUM).Data);
                 
                 if (TryMatch(TokenId.COMMA, out _))
                     scale = Convert.ToInt32(Match(TokenId.LT_NUM).Data);
@@ -130,35 +126,34 @@ public class Parser
             }
         }
 
-        var loop = true;
-        var allowDbNull = true;
-        var unique = false;
-        var pk = false;
-        var autoinc = false;
+        var onAttributes = true;
+        var isNullable = true;
+        var isUnique = false;
+        var isPrimaryKey = false;
+        var autoIncrement = false;
         object defaultValue = null;
 
-        while (loop)
+        while (onAttributes)
         {
             switch (token.Id)
             {
-                case TokenId.KW_NOT:
-                    Skip();
-                    Match(TokenId.KW_NULL);
-                    allowDbNull = false;
-                    break;
                 case TokenId.KW_NULL:
                     Skip();
                     break;
+                case TokenId.KW_NOT:
+                    Skip();
+                    Match(TokenId.KW_NULL);
+                    isNullable = false;
+                    break;
                 case TokenId.KW_UNIQUE:
                     Skip();
-                    unique = true;
+                    isUnique = true;
                     break;
                 case TokenId.KW_PRIMARY:
                     Skip();
                     Match(TokenId.KW_KEY);
-                    pk = true;
-                    if (TryMatch(TokenId.KW_AUTOINC, out _))
-                        autoinc = true;
+                    isPrimaryKey = true;
+                    autoIncrement = TryMatch(TokenId.KW_AUTOINC, out _);
                     break;
                 case TokenId.KW_DEFAULT:
                     Skip();
@@ -167,21 +162,21 @@ public class Parser
                     defaultValue = tok.Data;
                     break;
                 default:
-                    loop = false;
+                    onAttributes = false;
                     break;
             }
         }
 
         MetaData attributes = new()
         {
-            ["COLUMN_NAME"] = colName,
+            ["COLUMN_NAME"] = columnName,
             ["TYPE_NAME"] = typeName,
-            ["PRECISION"] = prec,
+            ["PRECISION"] = precision,
             ["SCALE"] = scale,
-            ["ALLOW_DBNULL"] = allowDbNull,
-            ["UNIQUE"] = unique,
-            ["PRIMARY_KEY"] = pk,
-            ["AUTO_INCREMENT"] = autoinc,
+            ["ALLOW_DBNULL"] = isNullable,
+            ["UNIQUE"] = isUnique,
+            ["PRIMARY_KEY"] = isPrimaryKey,
+            ["AUTO_INCREMENT"] = autoIncrement,
             ["DEFAULT_VALUE"] = defaultValue
         };
 
@@ -230,37 +225,37 @@ public class Parser
     /// Creates a unique key specification node in the abstract syntax tree (AST),
     /// representing a UNIQUE constraint on one or more columns in a SQL table.
     /// </summary>
-    /// <param name="ukName">The name of the UNIQUE constraint being defined.</param>
+    /// <param name="keyName">The name of the UNIQUE constraint being defined.</param>
     /// <returns>
     /// An <see cref="AstNode"/> representing the unique key specification,
     /// which includes the constraint name and a list of column references.
     /// </returns>
-    private AstNode UniqueKeySpec(string ukName)
+    private AstNode UniqueKeySpec(string keyName)
     {
         Match(TokenId.KW_UNIQUE);
         Match(TokenId.LPAREN);
-        var colNames = ColumnRefList();
+        var columnNames = ColumnRefList();
         Match(TokenId.RPAREN);
 
-        return new AstNode(AstNodeKind.UKSPEC, ukName, colNames);
+        return new AstNode(AstNodeKind.UKSPEC, keyName, columnNames);
     }
 
     /// <summary>
     /// Creates and returns a specification for a foreign key constraint.
     /// </summary>
-    /// <param name="fkName">The name of the foreign key constraint.</param>
+    /// <param name="keyName">The name of the foreign key constraint.</param>
     /// <returns>An <see cref="AstNode"/> that represents the foreign key constraint specification.</returns>
-    private AstNode ForeignKeySpec(string fkName)
+    private AstNode ForeignKeySpec(string keyName)
     {
         Match(TokenId.KW_FOREIGN);
         Match(TokenId.KW_KEY);
         Match(TokenId.LPAREN);
-        var fkColNames = ColumnRefList();
+        var fkColumnNames = ColumnRefList();
         Match(TokenId.RPAREN);
         Match(TokenId.KW_REFERENCES);
         var targetTableName = Match(TokenId.IDENT).Data.ToString();
         Match(TokenId.LPAREN);
-        var pkColNames = ColumnRefList();
+        var pkColumnNames = ColumnRefList();
         Match(TokenId.RPAREN);
 
         var updateRule = ForeignKeyRule.None;
@@ -282,13 +277,13 @@ public class Parser
 
         MetaData attributes = new()
         {
-            ["CONSTRAINT_NAME"] = fkName,
+            ["CONSTRAINT_NAME"] = keyName,
             ["TARGET_TABLE_NAME"] = targetTableName,
             ["UPDATE_RULE"] = updateRule,
             ["DELETE_RULE"] = deleteRule
         };
 
-        return new AstNode(AstNodeKind.FKSPEC, attributes, fkColNames, pkColNames);
+        return new AstNode(AstNodeKind.FKSPEC, attributes, fkColumnNames, pkColumnNames);
     }
 
     /// <summary>
