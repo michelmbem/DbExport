@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace DbExport.Providers.SQLite.SqlParser;
 
@@ -10,7 +9,7 @@ namespace DbExport.Providers.SQLite.SqlParser;
 /// This class is designed to process and tokenize input data for use
 /// with higher-level parsers in the context of SQLite SQL parsing.
 /// </summary>
-public partial class Scanner(string input)
+public class Scanner(string input)
 {
     /// <summary>
     /// Indicates the current position within the input string being processed by the scanner.
@@ -56,6 +55,9 @@ public partial class Scanner(string input)
             case ';':
                 ++offset;
                 return new Token(TokenId.SEMICOLON);
+            case '.':
+                ++offset;
+                return new Token(TokenId.DOT);
             case '+':
                 ++offset;
                 return new Token(TokenId.PLUS);
@@ -284,6 +286,8 @@ public partial class Scanner(string input)
         {
             "CREATE" => new Token(TokenId.KW_CREATE),
             "TABLE" => new Token(TokenId.KW_TABLE),
+            "IF" => new Token(TokenId.KW_IF),
+            "EXISTS" => new Token(TokenId.KW_EXISTS),
             "PRIMARY" => new Token(TokenId.KW_PRIMARY),
             "KEY" => new Token(TokenId.KW_KEY),
             "CONSTRAINT" => new Token(TokenId.KW_CONSTRAINT),
@@ -304,14 +308,9 @@ public partial class Scanner(string input)
             "GLOB" => new Token(TokenId.KW_GLOB),
             "AND" => new Token(TokenId.KW_AND),
             "OR" => new Token(TokenId.KW_OR),
-            _ => SqlTypeRegex().IsMatch(text)
-                ? new Token(TokenId.TYPE, text)
-                : new Token(TokenId.IDENT, text)
+            "WITHOUT" => new Token(TokenId.KW_WITHOUT),
+            "ROWID" => new Token(TokenId.KW_ROWID),
+            _ => new Token(TokenId.IDENT, text)
         };
     }
-    
-    [GeneratedRegex(
-        @"\b(?:int|integer|smallint|bigint|tinyint|decimal|numeric|real|float|double|char|character|varchar|nvarchar|nchar|text|ntext|blob|clob|date|time|timestamp|datetime|boolean|bool|bit|money)\b",
-        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
-    private static partial Regex SqlTypeRegex();
 }

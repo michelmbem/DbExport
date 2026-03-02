@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using DbExport.Schema;
 
 namespace DbExport.Providers.SQLite.SqlParser;
@@ -45,7 +46,22 @@ public class Parser
     {
         Match(TokenId.KW_CREATE);
         Match(TokenId.KW_TABLE);
+        
+        var schemaName = string.Empty;
         var tableName = Match(TokenId.IDENT).Data.ToString();
+        
+        if (TryMatch(TokenId.DOT, out _))
+        {
+            schemaName = tableName;
+            tableName = Match(TokenId.IDENT).Data.ToString();
+        }
+
+        if (TryMatch(TokenId.KW_IF, out _))
+        {
+            Match(TokenId.KW_NOT);
+            Match(TokenId.KW_EXISTS);
+        }
+
         Match(TokenId.LPAREN);
 
         List<AstNode> children = [ColumnSpecList()];
@@ -59,6 +75,10 @@ public class Parser
                     children.Add(PrimaryKeySpec());
                     if (token.Id == TokenId.COMMA) Skip();
                     break;
+                case TokenId.KW_FOREIGN:
+                    children.Add(ForeignKeySpec($"fk_{tableName}_{children.Count}"));
+                    if (token.Id == TokenId.COMMA) Skip();
+                    break;
                 case TokenId.KW_CONSTRAINT:
                     children.Add(ConstraintSpec());
                     if (token.Id == TokenId.COMMA) Skip();
@@ -70,8 +90,9 @@ public class Parser
         }
 
         Match(TokenId.RPAREN);
+        if (TryMatch(TokenId.KW_WITHOUT, out _)) Match(TokenId.KW_ROWID);
 
-        return new AstNode(AstNodeKind.CREATE_TBL, tableName, [..children]);
+        return new AstNode(AstNodeKind.CREATE_TBL, new NameOwnerPair(tableName, schemaName), [..children]);
     }
 
     /// <summary>
@@ -105,12 +126,15 @@ public class Parser
         if (!TryMatch(TokenId.IDENT, out var tok)) return null;
 
         var columnName = tok.Data.ToString();
-        var typeName = string.Empty;
+        var typeName = new StringBuilder();
         var (precision, scale) = (0, 0);
 
-        if (TryMatch(TokenId.TYPE, out tok) || TryMatch(TokenId.IDENT, out tok))
+        if (TryMatch(TokenId.IDENT, out tok))
         {
-            typeName = tok.Data.ToString();
+            typeName.Append(tok.Data);
+            
+            while (TryMatch(TokenId.IDENT, out tok))
+                typeName.Append(' ').Append(tok.Data);
 
             if (TryMatch(TokenId.LPAREN, out _))
             {
@@ -170,7 +194,7 @@ public class Parser
         MetaData attributes = new()
         {
             ["COLUMN_NAME"] = columnName,
-            ["TYPE_NAME"] = typeName,
+            ["TYPE_NAME"] = typeName.ToString(),
             ["PRECISION"] = precision,
             ["SCALE"] = scale,
             ["ALLOW_DBNULL"] = isNullable,
