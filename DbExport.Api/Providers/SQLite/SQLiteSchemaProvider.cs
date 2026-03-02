@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
-
 using DbExport.Schema;
 
 namespace DbExport.Providers.SQLite;
@@ -110,31 +108,19 @@ public class SQLiteSchemaProvider : ISchemaProvider
             ["owner"] = tableOwner
         };
 
-        var pkIndex = FindFirst(tableIndexes, tableOwner, tableName, IsPrimaryKey);
-        var pkName = pkIndex?["name"];
+        var pkColumns = ((List<Dictionary<string, object>>)tableColumns[Combine(tableOwner, tableName)])
+                        .Where(column => Convert.ToInt32(column["pk"]) > 0)
+                        .OrderBy(column => Convert.ToInt32(column["pk"]))
+                        .Select(column => column["name"].ToString())
+                        .ToArray();
 
-        if (pkName != null)
+        if (pkColumns.Length > 0)
         {
-            const string sql = """
-                            SELECT name
-                            FROM pragma_index_info('{0}')
-                            ORDER BY seqno
-                            """;
-
-            using var helper = new SqlHelper(ProviderName, ConnectionString);
-            var pkColumns = helper.Query(string.Format(sql, pkName), SqlHelper.ToList)
-                                  .Select(item => item.ToString())
-                                  .ToArray();
-
-            metadata["pk_name"] = pkName;
-            metadata["pk_columns"] = pkColumns.ToArray();
+            metadata["pk_name"] = $"pk_{tableName}";
+            metadata["pk_columns"] = pkColumns;
         }
 
         return metadata;
-
-        static bool IsPrimaryKey(Dictionary<string, object> index) =>
-            "pk".Equals(index["origin"]) ||
-            ("u".Equals(index["origin"]) && index["name"].ToString().StartsWith("sqlite_autoindex_"));
     }
 
     public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
@@ -158,7 +144,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
         var attributes = ColumnAttributes.None;
         
-        if (column["notnull"].Equals(1))
+        if (Convert.ToInt32(column["notnull"]) == 1)
             attributes |= ColumnAttributes.Required;
 
         metadata["attributes"] = attributes;
@@ -172,7 +158,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         MetaData metadata = new()
         {
             ["name"] = indexName,
-            ["unique"] = index!["unique"].Equals(1),
+            ["unique"] = Convert.ToInt32(index!["unique"]) == 1,
             ["primaryKey"] = index["origin"].Equals("pk")
         };
         
@@ -322,7 +308,8 @@ public class SQLiteSchemaProvider : ISchemaProvider
             ColumnType.DoublePrecision => Utility.IsNumeric(value, out var number) ? (double)number : DBNull.Value,
             ColumnType.Currency or ColumnType.Decimal => Utility.IsNumeric(value, out var number) ? number : DBNull.Value,
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => Utility.IsDate(value, out var date) ? date : DBNull.Value,
-            ColumnType.Char or ColumnType.VarChar or ColumnType.Text => Utility.UnquotedStr(value),
+            ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or ColumnType.Text or
+                ColumnType.NText => Utility.UnquotedStr(value),
             ColumnType.Bit => Utility.FromBitString(value.ToString()),
             _ => DBNull.Value
         };
