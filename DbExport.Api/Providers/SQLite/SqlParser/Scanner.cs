@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -138,14 +139,18 @@ public partial class Scanner(string input)
 
                 ++offset;
                 return new Token(TokenId.GT);
-            case >= '0' and <= '9':
-                return LiteralNumber();
             case '\'':
                 return LiteralChar();
             case '[':
-                return SafeIdentifier();
+                return SafeIdentifier(']');
+            case '`' or '"':
+                return SafeIdentifier(c);
+            case >= '0' and <= '9':
+                return LiteralNumber();
+            case '_':
+            case {} when char.IsLetter(c):
+                return Identifier();
             default:
-                if (c == '_' || char.IsLetter(c)) return Identifier();
                 throw new LexicalException("Unexpected symbol " + c + " encountered at " + offset);
         }
     }
@@ -183,7 +188,7 @@ public partial class Scanner(string input)
         var text = input.Substring(offset, n - offset);
         offset = n;
 	
-        return new Token(TokenId.LT_NUM, decimal.Parse(text));
+        return new Token(TokenId.LT_NUM, decimal.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture));
     }
 
     /// <summary>
@@ -231,20 +236,23 @@ public partial class Scanner(string input)
     }
 
     /// <summary>
-    /// Parses a delimited identifier enclosed in square brackets ('[' and ']') from the input string.
-    /// Extracts the identifier text and creates a new token representing the identifier.
-    /// Throws a <see cref="LexicalException"/> if the input contains an incomplete or improperly delimited identifier.
+    /// Parses a safely quoted identifier from the input string, using a specified quote character
+    /// to determine the bounds of the identifier. Handles square brackets, backticks, or double quotes
+    /// as valid quoting characters.
     /// </summary>
+    /// <param name="quote">
+    /// The character used to enclose the identifier, such as '[', '`', or '"'.
+    /// </param>
     /// <returns>
-    /// A <see cref="Token"/> object representing the extracted identifier, with its value set to the parsed text.
+    /// A <see cref="Token"/> object representing the parsed identifier with its associated text.
     /// </returns>
     /// <exception cref="LexicalException">
-    /// Thrown when the end of the input is reached without encountering the closing ']' character.
+    /// Thrown if the closing quote character is not found before the end of the input string.
     /// </exception>
-    private Token SafeIdentifier()
+    private Token SafeIdentifier(char quote)
     {
         var n = offset + 1;
-        for (; n < input.Length && input[n] != ']'; ++n) ;
+        for (; n < input.Length && input[n] != quote; ++n) ;
 
         if (n >= input.Length)
             throw new LexicalException("Unexpected end of line at " + n);
