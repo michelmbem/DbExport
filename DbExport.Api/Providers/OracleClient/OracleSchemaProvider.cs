@@ -246,20 +246,17 @@ public class OracleSchemaProvider : ISchemaProvider
                                 AND CONSTRAINT_TYPE = 'P'
                             """;
 
-        MetaData metadata = new()
-        {
-            ["name"] = indexName
-        };
-
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql1, tableName, tableOwner, indexName), SqlHelper.ToArrayList);
         List<string> indexColumns = [..list.Select(values => values[0].ToString())];
 
-        metadata["columns"] = indexColumns.ToArray();
-        metadata["unique"] = helper.QueryScalar(string.Format(sql2, tableName, tableOwner, indexName)).Equals("UNIQUE");
-        metadata["primaryKey"] = helper.QueryScalar(string.Format(sql3, tableName, tableOwner, indexName)).Equals(1);
-
-        return metadata;
+        return new MetaData
+        {
+            ["name"] = indexName,
+            ["columns"] = indexColumns.ToArray(),
+            ["unique"] = helper.QueryScalar(string.Format(sql2, tableName, tableOwner, indexName)).Equals("UNIQUE"),
+            ["primaryKey"] = helper.QueryScalar(string.Format(sql3, tableName, tableOwner, indexName)).Equals(1)
+        };
     }
 
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
@@ -294,16 +291,15 @@ public class OracleSchemaProvider : ISchemaProvider
                                FK.POSITION
                            """;
 
-        MetaData metadata = [];
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner, fkName), SqlHelper.ToArrayList);
+
         List<string> fkColumns = [];
         List<string> relatedColumns = [];
         var relatedTable = string.Empty;
         var relatedOwner = string.Empty;
         var deleteRule = ForeignKeyRule.None;
 
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, tableOwner, fkName), SqlHelper.ToArrayList);
-        
         foreach (object[] values in list)
         {
             fkColumns.Add(values[0].ToString());
@@ -313,15 +309,16 @@ public class OracleSchemaProvider : ISchemaProvider
             deleteRule = values[4].Equals("NO ACTION")? ForeignKeyRule.None : ForeignKeyRule.Cascade;
         }
 
-        metadata["name"] = fkName;
-        metadata["columns"] = fkColumns.ToArray();
-        metadata["relatedName"] = relatedTable;
-        metadata["relatedOwner"] = relatedOwner;
-        metadata["relatedColumns"] = relatedColumns.ToArray();
-        metadata["updateRule"] = ForeignKeyRule.None;
-        metadata["deleteRule"] = deleteRule;
-
-        return metadata;
+        return new MetaData
+        {
+            ["name"] = fkName,
+            ["columns"] = fkColumns.ToArray(),
+            ["relatedName"] = relatedTable,
+            ["relatedOwner"] = relatedOwner,
+            ["relatedColumns"] = relatedColumns.ToArray(),
+            ["updateRule"] = ForeignKeyRule.None,
+            ["deleteRule"] = deleteRule
+        };
     }
 
     #endregion

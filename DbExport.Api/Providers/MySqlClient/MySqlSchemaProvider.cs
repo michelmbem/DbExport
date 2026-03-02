@@ -252,12 +252,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
                                A.SEQ_IN_INDEX
                            """;
 
-        MetaData metadata = new()
-        {
-            ["name"] = indexName
-        };
-
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
+       using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, DatabaseName, tableName, indexName), SqlHelper.ToArrayList);
         List<string> indexColumns = [];
         var unique = false;
@@ -270,11 +265,13 @@ public partial class MySqlSchemaProvider : ISchemaProvider
             primaryKey = values[2].Equals("PRIMARY KEY");
         }
 
-        metadata["unique"] = unique;
-        metadata["primaryKey"] = primaryKey;
-        metadata["columns"] = indexColumns.ToArray();
-
-        return metadata;
+        return new MetaData
+        {
+            ["name"] = indexName,
+            ["unique"] = unique,
+            ["primaryKey"] = primaryKey,
+            ["columns"] = indexColumns.ToArray()
+        };
     }
 
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
@@ -301,16 +298,15 @@ public partial class MySqlSchemaProvider : ISchemaProvider
                                C.ORDINAL_POSITION
                            """;
 
-        MetaData metadata = [];
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(string.Format(sql, DatabaseName, tableName, fkName), SqlHelper.ToArrayList);
+
         List<string> fkColumns = [];
         List<string> relatedColumns = [];
         var relatedTable = string.Empty;
         var updateRule = ForeignKeyRule.None;
         var deleteRule = ForeignKeyRule.None;
 
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, DatabaseName, tableName, fkName), SqlHelper.ToArrayList);
-        
         foreach (var values in list)
         {
             fkColumns.Add(values[0].ToString());
@@ -320,15 +316,16 @@ public partial class MySqlSchemaProvider : ISchemaProvider
             deleteRule = GetFKRule(values[4].ToString());
         }
 
-        metadata["name"] = fkName;
-        metadata["columns"] = fkColumns.ToArray();
-        metadata["relatedName"] = relatedTable;
-        metadata["relatedOwner"] = string.Empty;
-        metadata["relatedColumns"] = relatedColumns.ToArray();
-        metadata["updateRule"] = updateRule;
-        metadata["deleteRule"] = deleteRule;
-
-        return metadata;
+        return new MetaData
+        {
+            ["name"] = fkName,
+            ["columns"] = fkColumns.ToArray(),
+            ["relatedName"] = relatedTable,
+            ["relatedOwner"] = string.Empty,
+            ["relatedColumns"] = relatedColumns.ToArray(),
+            ["updateRule"] = updateRule,
+            ["deleteRule"] = deleteRule,
+        };
     }
 
     public NameOwnerPair[] GetTypeNames()
@@ -361,30 +358,25 @@ public partial class MySqlSchemaProvider : ISchemaProvider
                            WHERE TABLE_SCHEMA = '{1}' AND CONCAT(TABLE_NAME, '_', COLUMN_NAME) = '{0}'
                            """;
 
-        MetaData metadata = new()
-        {
-            ["name"] = typeName,
-            ["owner"] = typeOwner
-        };
-
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var values = helper.Query(string.Format(sql, typeName, DatabaseName), SqlHelper.ToDictionary);
         var nativeType = values["COLUMN_TYPE"].ToString();
         var isEnum = nativeType!.StartsWith("enum(", StringComparison.OrdinalIgnoreCase);
-                
-        metadata["nativeType"] = "varchar";
-        metadata["type"] = ColumnType.VarChar;
-        metadata["size"] = Utility.ToInt16(values["character_maximum_length"]);
-        metadata["precision"] = Utility.ToByte(values["numeric_precision"]);
-        metadata["scale"] = Utility.ToByte(values["numeric_scale"]);
-        metadata["defaultValue"] = Parse(Convert.ToString(values["column_default"]), ColumnType.VarChar);
-        metadata["nullable"] = "YES".Equals(values["is_nullable"].ToString(), StringComparison.OrdinalIgnoreCase);
-        metadata["enumerated"] = isEnum;
-        metadata["possibleValues"] = isEnum
-            ? nativeType[5..^1].Split(',').Select(s => Parse(s, ColumnType.VarChar)).ToArray()
-            : nativeType[4..^1].Split(',').Select(s => Parse(s, ColumnType.VarChar)).ToArray();
 
-        return metadata;
+        return new MetaData
+        {
+            ["name"] = typeName,
+            ["owner"] = typeOwner,
+            ["nativeType"] = "varchar",
+            ["type"] = ColumnType.VarChar,
+            ["size"] = Utility.ToInt16(values["character_maximum_length"]),
+            ["precision"] = Utility.ToByte(values["numeric_precision"]),
+            ["scale"] = Utility.ToByte(values["numeric_scale"]),
+            ["defaultValue"] = Parse(Convert.ToString(values["column_default"]), ColumnType.VarChar),
+            ["nullable"] = "YES".Equals(values["is_nullable"].ToString(), StringComparison.OrdinalIgnoreCase),
+            ["enumerated"] = isEnum,
+            ["possibleValues"] = nativeType[(isEnum ? 5 : 4)..^1].Split(',').Select(s => Parse(s, ColumnType.VarChar)).ToArray()
+        };
     }
 
     #endregion

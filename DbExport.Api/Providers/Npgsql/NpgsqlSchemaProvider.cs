@@ -262,22 +262,19 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                                 AND CONSTRAINT_TYPE = 'PRIMARY KEY'
                             """;
 
-        MetaData metadata = new()
-        {
-            ["name"] = indexName
-        };
-
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var def = helper.QueryScalar(string.Format(sql1, tableName, tableOwner, indexName)).ToString();
         var lparen = def!.IndexOf('(');
         var rparen = def.LastIndexOf(')');
         var columnNames = def[(lparen + 1)..rparen];
 
-        metadata["unique"] = def.StartsWith("CREATE UNIQUE INDEX");
-        metadata["columns"] = CommaRegex().Split(columnNames).Select(s => s.StartsWith('"') ? s[1..^1] : s);
-        metadata["primaryKey"] = helper.QueryScalar(string.Format(sql2, tableName, tableOwner, indexName)).Equals(1);
-
-        return metadata;
+        return new MetaData
+        {
+            ["name"] = indexName,
+            ["unique"] = def.StartsWith("CREATE UNIQUE INDEX"),
+            ["columns"] = CommaRegex().Split(columnNames).Select(s => s.StartsWith('"') ? s[1..^1] : s),
+            ["primaryKey"] = helper.QueryScalar(string.Format(sql2, tableName, tableOwner, indexName)).Equals(1)
+        };
     }
 
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
@@ -313,7 +310,9 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                                KCU1.ORDINAL_POSITION
                            """;
 
-        MetaData metadata = [];
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner, fkName), SqlHelper.ToArrayList);
+
         List<string> fkColumns = [];
         List<string> relatedColumns = [];
         var relatedTable = string.Empty;
@@ -321,9 +320,6 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         var updateRule = ForeignKeyRule.None;
         var deleteRule = ForeignKeyRule.None;
 
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, tableOwner, fkName), SqlHelper.ToArrayList);
-        
         foreach (object[] values in list)
         {
             fkColumns.Add(values[0].ToString());
@@ -334,15 +330,16 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
             deleteRule = GetFKRule(values[5].ToString());
         }
 
-        metadata["name"] = fkName;
-        metadata["columns"] = fkColumns.ToArray();
-        metadata["relatedName"] = relatedTable;
-        metadata["relatedOwner"] = relatedOwner;
-        metadata["relatedColumns"] = relatedColumns.ToArray();
-        metadata["updateRule"] = updateRule;
-        metadata["deleteRule"] = deleteRule;
-
-        return metadata;
+        return new MetaData
+        {
+            ["name"] = fkName,
+            ["columns"] = fkColumns.ToArray(),
+            ["relatedName"] = relatedTable,
+            ["relatedOwner"] = relatedOwner,
+            ["relatedColumns"] = relatedColumns.ToArray(),
+            ["updateRule"] = updateRule,
+            ["deleteRule"] = deleteRule
+        };
     }
 
     public NameOwnerPair[] GetTypeNames()
@@ -410,14 +407,14 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
 
         if (values != null)
         {
-            string nativeType;
-            ColumnType columnType;
+            var nativeType = values["data_type"].ToString();
+            var columnType = GetColumnType(nativeType);
 
+            metadata["type"] = columnType;
+            metadata["nativeType"] = nativeType;
             metadata["size"] = Utility.ToInt16(values["character_maximum_length"]);
             metadata["precision"] = Utility.ToByte(values["numeric_precision"]);
             metadata["scale"] = Utility.ToByte(values["numeric_scale"]);
-            metadata["nativeType"] = nativeType= values["data_type"].ToString();
-            metadata["type"] = columnType = GetColumnType(nativeType);
             metadata["defaultValue"] = Parse(Convert.ToString(values["domain_default"]), columnType);
             metadata["nullable"] = false;
             metadata["enumerated"] = false;
@@ -426,10 +423,11 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
         else
         {
             values = helper.Query(string.Format(sqlEnum, typeName, typeOwner), SqlHelper.ToDictionary);
+
+            metadata["type"] = ColumnType.VarChar;
+            metadata["nativeType"] = "character varying";
             metadata["size"] = Utility.ToInt16(values["maxlen"]);
             metadata["precision"] =  metadata["scale"] = (byte)0;
-            metadata["nativeType"] = "character varying";
-            metadata["type"] = ColumnType.VarChar;
             metadata["defaultValue"] = Parse(Convert.ToString(values["typdefault"]), ColumnType.VarChar);
             metadata["nullable"] = !(bool)values["typnotnull"];
             metadata["enumerated"] = true;

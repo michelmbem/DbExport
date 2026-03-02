@@ -240,7 +240,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
             columns.Add(row[1].ToString().Trim());
         }
 
-        return new MetaData()
+        return new MetaData
         {
             ["name"] = indexName,
             ["unique"] = unique,
@@ -343,7 +343,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
         var precision = Utility.ToByte(values[3]);
         var scale = (byte)Math.Abs(Convert.ToInt32(values[4]));
 
-        return new MetaData()
+        return new MetaData
         {
             ["name"] = typeName,
             ["owner"] = typeOwner,

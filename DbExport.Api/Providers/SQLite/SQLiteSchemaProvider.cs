@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
+
 using DbExport.Schema;
 
 namespace DbExport.Providers.SQLite;
@@ -62,9 +64,9 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, tableOwner, tableName), SqlHelper.ToDictionaryList);
-        tableColumns[$"{tableOwner}.{tableName}"] = list;
+        RegisterList(tableColumns, tableOwner, tableName, list);
         
-        return [..list.Select(item => item["name"].ToString() )];
+        return [..list.Select(item => item["name"].ToString())];
     }
 
     public string[] GetIndexNames(string tableName, string tableOwner)
@@ -77,9 +79,9 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, tableOwner, tableName), SqlHelper.ToDictionaryList);
-        tableIndexes[$"{tableOwner}.{tableName}"] = list;
+        RegisterList(tableIndexes, tableOwner, tableName, list);
         
-        return [..list.Select(item => item["name"].ToString() )];
+        return [..list.Select(item => item["name"].ToString())];
     }
 
     public string[] GetForeignKeyNames(string tableName, string tableOwner)
@@ -92,12 +94,12 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
         var list = helper.Query(string.Format(sql, tableOwner, tableName), SqlHelper.ToDictionaryList);
-        tableForeignKeys[$"{tableOwner}.{tableName}"] = list;
+        RegisterList(tableForeignKeys, tableOwner, tableName, list);
         
         foreach (var item in list)
             item["name"] = $"fk_{tableName}_{item["id"]}";
         
-        return [..list.Select(item => item["name"].ToString() )];
+        return [..list.Select(item => item["name"].ToString())];
     }
 
     public MetaData GetTableMeta(string tableName, string tableOwner)
@@ -108,8 +110,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
             ["owner"] = tableOwner
         };
         
-        var pkIndex = ((List<Dictionary<string, object>>)tableIndexes[$"{tableOwner}.{tableName}"])
-            .FirstOrDefault(item => item["origin"].Equals("pk"));
+        var pkIndex = FindFirst(tableIndexes, tableOwner, tableName, item => "pk".Equals(item["origin"]));
         var pkName = pkIndex?["name"];
 
         if (pkName != null)
@@ -121,12 +122,10 @@ public class SQLiteSchemaProvider : ISchemaProvider
                             """;
 
             using var helper = new SqlHelper(ProviderName, ConnectionString);
-            var pkColumns = helper.Query(string.Format(sql, pkName), SqlHelper.ToList)
-                                  .Select(item => item.ToString())
-                                  .ToArray();
+            var pkColumns = helper.Query(string.Format(sql, pkName), SqlHelper.ToList).Cast<string>();
             
             metadata["pk_name"] = pkName;
-            metadata["pk_columns"] = pkColumns;
+            metadata["pk_columns"] = pkColumns.ToArray();
         }
         
         return metadata;
@@ -134,28 +133,22 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
+        var column = FindFirst(tableColumns, tableOwner, tableName, item => columnName.Equals(item["name"]));
+
+        ResolveColumnType(column!["type"].ToString(), out ColumnType columnType, out string nativeType,
+                          out short size, out byte precision, out byte scale);
+
         MetaData metadata = new()
         {
             ["name"] = columnName,
-            ["description"] = string.Empty
+            ["type"] = columnType,
+            ["nativeType"] = nativeType,
+            ["size"] = size,
+            ["precision"] = precision,
+            ["scale"] = scale,
+            ["defaultValue"] = ParseValue(column["dflt_value"], columnType),
+            ["description"] = string.Empty,
         };
-
-        var column = ((List<Dictionary<string, object>>)tableColumns[$"{tableOwner}.{tableName}"])
-            .FirstOrDefault(item => item["name"].Equals(columnName));
-        
-        ColumnType columnType;
-        string nativeType;
-        short size;
-        byte precision;
-        byte scale;
-        
-        ResolveColumnType(column!["type"].ToString(), out columnType, out nativeType, out size, out precision, out scale);
-        metadata["type"] = columnType;
-        metadata["nativeType"] = nativeType;
-        metadata["size"] = size;
-        metadata["precision"] = precision;
-        metadata["scale"] = scale;
-        metadata["defaultValue"] = ParseValue(column["dflt_value"], columnType);
 
         var attributes = ColumnAttributes.None;
         
@@ -169,9 +162,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
-        var index = ((List<Dictionary<string, object>>)tableIndexes[$"{tableOwner}.{tableName}"])
-            .FirstOrDefault(item => item["name"].Equals(indexName));
-        
+        var index = FindFirst(tableIndexes, tableOwner, tableName, item => indexName.Equals(item["name"]));
         MetaData metadata = new()
         {
             ["name"] = indexName,
@@ -186,27 +177,24 @@ public class SQLiteSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var indexColumns = helper.Query(string.Format(sql, indexName), SqlHelper.ToList)
-                              .Select(item => item.ToString())
-                              .ToArray();
+        var indexColumns = helper.Query(string.Format(sql, indexName), SqlHelper.ToList).Cast<string>();
 
-        metadata["columns"] = indexColumns;
+        metadata["columns"] = indexColumns.ToArray();
 
         return metadata;
     }
 
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
-        var fk = ((List<Dictionary<string, object>>)tableForeignKeys[$"{tableOwner}.{tableName}"])
-            .FirstOrDefault(item => item["name"].Equals(fkName));
+        var fk = FindFirst(tableForeignKeys, tableOwner, tableName, item => fkName.Equals(item["name"]));
 
-        return new MetaData()
+        return new MetaData
         {
             ["name"] = fkName,
             ["columns"] = Utility.Split(fk!["from"].ToString(), ','),
             ["relatedName"] = fk["table"].ToString(),
             ["relatedOwner"] = tableOwner,
-            ["relatedColumns"] = Utility.Split(fk!["to"].ToString(), ','),
+            ["relatedColumns"] = Utility.Split(fk["to"].ToString(), ','),
             ["updateRule"] = ParseForeignKeyRule(fk["on_update"].ToString()),
             ["deleteRule"] = ParseForeignKeyRule(fk["on_delete"].ToString()),
         };
@@ -215,6 +203,15 @@ public class SQLiteSchemaProvider : ISchemaProvider
     #endregion
 
     #region Utility
+
+    private static string Combine(string tableOwner, string tableName) => $"{tableOwner}.{tableName}";
+
+    private static void RegisterList(MetaData collection, string tableOwner, string tableName,
+        List<Dictionary<string, object>> list) => collection[Combine(tableOwner, tableName)] = list;
+
+    private static Dictionary<string, object> FindFirst(
+        MetaData collection, string tableOwner, string tableName, Predicate<Dictionary<string, object>> predicate) =>
+        ((List<Dictionary<string, object>>)collection[Combine(tableOwner, tableName)]).FirstOrDefault(item => predicate(item));
 
     /// <summary>
     /// Resolves the column type based on the provided SQL type string. Determines the corresponding
@@ -239,7 +236,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
             var sizeStr = sqlType[(lParen + 1)..rParen];
             var parts = Utility.Split(sizeStr, ',');
             
-            nativeType = sqlType[..lParen].ToLowerInvariant();
+            nativeType = sqlType[..lParen].Trim().ToLowerInvariant();
             
             if (nativeType.StartsWith("numeric", StringComparison.OrdinalIgnoreCase) ||
                 nativeType.StartsWith("decimal", StringComparison.OrdinalIgnoreCase))
@@ -251,7 +248,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
                 size = Utility.ToInt16(parts[0]);
         }
         else
-            nativeType = sqlType.ToLowerInvariant();
+            nativeType = sqlType.Trim().ToLowerInvariant();
 
         columnType = GetColumnType(nativeType);
     }
@@ -304,7 +301,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         
         return columnType switch
         {
-            ColumnType.Boolean => value.ToString()!.ToLower() switch
+            ColumnType.Boolean => value.ToString()!.ToLowerInvariant() switch
             {
                 "0" or "false" => false,
                 "1" or "true" => true,

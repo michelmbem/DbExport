@@ -78,7 +78,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return [..indexNames];
     }
 
-    public string[] GetFKNames(string tableName, string tableOwner)
+    public string[] GetForeignKeyNames(string tableName, string tableOwner)
     {
         List<string> fkNames = [];
         var table = catalog.Tables[tableName];

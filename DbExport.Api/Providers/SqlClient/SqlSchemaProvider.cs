@@ -237,13 +237,12 @@ public partial class SqlSchemaProvider : ISchemaProvider
 
     public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
-        var metadata = new MetaData();
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query($"EXEC sp_helpindex '{tableOwner}.{tableName}'", SqlHelper.ToArrayList);
+
         var indexDescription = string.Empty;
         var indexKeys = string.Empty;
 
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query($"EXEC sp_helpindex '{tableOwner}.{tableName}'", SqlHelper.ToArrayList);
-        
         foreach (object[] values in list)
         {
             if (!values[0].Equals(indexName)) continue;
@@ -252,12 +251,13 @@ public partial class SqlSchemaProvider : ISchemaProvider
             break;
         }
 
-        metadata["name"] = indexName;
-        metadata["unique"] = UniqueRegex().IsMatch(indexDescription);
-        metadata["primaryKey"] = PrimaryKeyRegex().IsMatch(indexDescription);
-        metadata["columns"] = CommaRegex().Split(indexKeys);
-
-        return metadata;
+        return new MetaData
+        {
+            ["name"] = indexName,
+            ["unique"] = UniqueRegex().IsMatch(indexDescription),
+            ["primaryKey"] = PrimaryKeyRegex().IsMatch(indexDescription),
+            ["columns"] = CommaRegex().Split(indexKeys)
+        };
     }
 
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
@@ -289,7 +289,9 @@ public partial class SqlSchemaProvider : ISchemaProvider
                            	    KCU1.ORDINAL_POSITION
                            """;
 
-        var metadata = new MetaData();
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var list = helper.Query(string.Format(sql, tableName, tableOwner, fkName), SqlHelper.ToArrayList);
+
         var fkColumns = new List<string>();
         var relatedColumns = new List<string>();
         var relatedTable = string.Empty;
@@ -297,9 +299,6 @@ public partial class SqlSchemaProvider : ISchemaProvider
         var updateRule = ForeignKeyRule.None;
         var deleteRule = ForeignKeyRule.None;
 
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(string.Format(sql, tableName, tableOwner, fkName), SqlHelper.ToArrayList);
-        
         foreach (object[] values in list)
         {
             fkColumns.Add(values[0].ToString());
@@ -310,15 +309,16 @@ public partial class SqlSchemaProvider : ISchemaProvider
             deleteRule = GetFKRule(values[5].ToString());
         }
 
-        metadata["name"] = fkName;
-        metadata["columns"] = fkColumns.ToArray();
-        metadata["relatedName"] = relatedTable;
-        metadata["relatedOwner"] = relatedOwner;
-        metadata["relatedColumns"] = relatedColumns.ToArray();
-        metadata["updateRule"] = updateRule;
-        metadata["deleteRule"] = deleteRule;
-
-        return metadata;
+        return new MetaData
+        {
+            ["name"] = fkName,
+            ["columns"] = fkColumns.ToArray(),
+            ["relatedName"] = relatedTable,
+            ["relatedOwner"] = relatedOwner,
+            ["relatedColumns"] = relatedColumns.ToArray(),
+            ["updateRule"] = updateRule,
+            ["deleteRule"] = deleteRule
+        };
     }
 
     public NameOwnerPair[] GetTypeNames()
@@ -343,27 +343,25 @@ public partial class SqlSchemaProvider : ISchemaProvider
                            WHERE DOMAIN_SCHEMA = '{1}' AND DOMAIN_NAME = '{0}'
                            """;
 
-        MetaData metadata = new()
+        using var helper = new SqlHelper(ProviderName, ConnectionString);
+        var values = helper.Query(string.Format(sql, typeName, typeOwner), SqlHelper.ToDictionary);
+        var nativeType = values["data_type"].ToString();
+        var columnType = GetColumnType(nativeType);
+
+        return new MetaData
         {
             ["name"] = typeName,
             ["owner"] = typeOwner,
+            ["type"] = columnType,
+            ["nativeType"] = nativeType,
+            ["size"] = Utility.ToInt16(values["character_maximum_length"]),
+            ["precision"] = Utility.ToByte(values["numeric_precision"]),
+            ["scale"] = Utility.ToByte(values["numeric_scale"]),
+            ["defaultValue"] = Parse(Convert.ToString(values["domain_default"]), columnType),
             ["nullable"] = false,
             ["enumerated"] = false,
-            ["possibleValues"] = Array.Empty<object>()
+            ["possibleValues"] = Array.Empty<object>(),
         };
-
-        using var helper = new SqlHelper(ProviderName, ConnectionString);
-        ColumnType columnType;
-        var values = helper.Query(string.Format(sql, typeName, typeOwner), SqlHelper.ToDictionary);
-                
-        metadata["type"] = columnType = GetColumnType(values["data_type"].ToString());
-        metadata["nativeType"] = values["data_type"].ToString();
-        metadata["size"] = Utility.ToInt16(values["character_maximum_length"]);
-        metadata["precision"] = Utility.ToByte(values["numeric_precision"]);
-        metadata["scale"] = Utility.ToByte(values["numeric_scale"]);
-        metadata["defaultValue"] = Parse(Convert.ToString(values["domain_default"]), columnType);
-
-        return metadata;
     }
 
     #endregion
