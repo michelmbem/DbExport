@@ -272,7 +272,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
     /// <param name="predicate">The condition to match items in the collection.</param>
     /// <returns>A dictionary representing the first item in the collection that matches the predicate, or null if no match is found.</returns>
     private static Dictionary<string, object> FindFirst(
-        MetaData collection, string tableOwner, string tableName, System.Predicate<Dictionary<string, object>> predicate) =>
+        MetaData collection, string tableOwner, string tableName, Predicate<Dictionary<string, object>> predicate) =>
         ((List<Dictionary<string, object>>)collection[Combine(tableOwner, tableName)]).FirstOrDefault(item => predicate(item));
 
     /// <summary>
