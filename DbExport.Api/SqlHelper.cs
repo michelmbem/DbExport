@@ -207,7 +207,7 @@ public sealed class SqlHelper : IDisposable
     /// Gets the script executor that matches the given provider name.
     /// </summary>
     /// <param name="providerName">The name of the database provider.</param>
-    /// <returns>A IScriptExecutor</returns>
+    /// <returns>An instance of a class that implements the <see cref="IScriptExecutor"/> interface.</returns>
     public static IScriptExecutor GetScripExecutor(string providerName) =>
         providerName switch
         {
@@ -216,7 +216,7 @@ public sealed class SqlHelper : IDisposable
             ProviderNames.POSTGRESQL => new NpgsqlScriptExecutor(),
             ProviderNames.FIREBIRD => new FirebirdScriptExecutor(),
             ProviderNames.ORACLE => new BatchScriptExecutor(providerName),
-            _ => new DefaultScriptExecutor(providerName)
+            _ => new SimpleScriptExecutor(providerName)
         };
 
     #endregion

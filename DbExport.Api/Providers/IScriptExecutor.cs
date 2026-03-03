@@ -17,16 +17,13 @@ public interface IScriptExecutor
 }
 
 /// <summary>
-/// Provides a default implementation of the IScriptExecutor interface that executes SQL scripts
-/// against a database connection using a specified provider.
+/// Provides a simple implementation of the <see cref="IScriptExecutor"/> interface that executes SQL scripts
+/// against a database connection using the <see cref="SqlHelper"/> class.
 /// </summary>
-/// <remarks>
-/// This class uses the SqlHelper class to execute the script against the database.
-/// </remarks>
 /// <param name="providerName">The name of the database provider used to establish the connection.</param>
-public class DefaultScriptExecutor(string providerName) : IScriptExecutor
+public class SimpleScriptExecutor(string providerName) : IScriptExecutor
 {
-    public virtual void Execute(string connectionString, string script)
+    public void Execute(string connectionString, string script)
     {
         using var helper = new SqlHelper(providerName, connectionString);
         helper.Execute(script);
@@ -34,7 +31,7 @@ public class DefaultScriptExecutor(string providerName) : IScriptExecutor
 }
 
 /// <summary>
-/// A specialized implementation of the DefaultScriptExecutor class that executes SQL scripts
+/// An implementation of the <see cref="IScriptExecutor"/> interface that executes SQL scripts
 /// using batch processing when supported by the database provider.
 /// </summary>
 /// <remarks>
@@ -43,11 +40,9 @@ public class DefaultScriptExecutor(string providerName) : IScriptExecutor
 /// commands are executed sequentially.
 /// </remarks>
 /// <param name="providerName">The name of the database provider used to establish the connection.</param>
-#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
-public partial class BatchScriptExecutor(string providerName) : DefaultScriptExecutor(providerName)
-#pragma warning restore CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+public partial class BatchScriptExecutor(string providerName) : IScriptExecutor
 {
-    public override void Execute(string connectionString, string script)
+    public virtual void Execute(string connectionString, string script)
     {
         using var conn = Utility.GetConnection(providerName, connectionString);
         var statements = DelimiterRegex().Split(script)
