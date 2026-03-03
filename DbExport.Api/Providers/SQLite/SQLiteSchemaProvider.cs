@@ -13,6 +13,8 @@ namespace DbExport.Providers.SQLite;
 /// </summary>
 public class SQLiteSchemaProvider : ISchemaProvider
 {
+    #region Fields
+    
     /// <summary>
     /// Represents a data structure that holds information about the columns
     /// of database tables in the current schema context. This variable acts
@@ -36,6 +38,16 @@ public class SQLiteSchemaProvider : ISchemaProvider
     /// redundant queries to the database.
     /// </summary>
     private readonly MetaData tableForeignKeys = [];
+
+    /// <summary>
+    /// Stores a mapping of table names to a boolean value indicating whether
+    /// each table has an auto-increment column. This variable is used to cache
+    /// the auto-increment metadata for tables, optimizing performance by reducing
+    /// the need for repetitive queries to the database.
+    /// </summary>
+    private readonly Dictionary<string, bool> tableHasAutoIncrement = [];
+
+    #endregion
     
     /// <summary>
     /// Initializes a new instance of the <see cref="SQLiteSchemaProvider"/> class.
@@ -60,16 +72,26 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     public NameOwnerPair[] GetTableNames()
     {
-        const string sql = """
+        const string sql1 = """
                            SELECT schema, name
                            FROM pragma_table_list()
                            WHERE type = 'table'
                                AND name NOT LIKE 'sqlite_%'
                            """;
 
+        const string sql2 = "SELECT name, sql FROM sqlite_master WHERE type = 'table'";
+
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
+        var list1 = helper.Query(sql1, SqlHelper.ToArrayList);
+        var list2 = helper.Query(sql2, SqlHelper.ToArrayList);
+        
+        foreach (var item in list2)
+        {
+            tableHasAutoIncrement[item[0].ToString()!] =
+                item[1].ToString()!.Contains("AUTOINCREMENT", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return [..list1.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -167,6 +189,12 @@ public class SQLiteSchemaProvider : ISchemaProvider
         if (Convert.ToInt32(column["notnull"]) == 1)
             attributes |= ColumnAttributes.Required;
 
+        if (Convert.ToInt32(column["pk"]) == 1 && tableHasAutoIncrement[tableName])
+        {
+            attributes |= ColumnAttributes.Identity;
+            metadata["ident_seed"] = metadata["ident_incr"] = 1L;
+        }
+
         metadata["attributes"] = attributes;
 
         return metadata;
@@ -244,7 +272,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
     /// <param name="predicate">The condition to match items in the collection.</param>
     /// <returns>A dictionary representing the first item in the collection that matches the predicate, or null if no match is found.</returns>
     private static Dictionary<string, object> FindFirst(
-        MetaData collection, string tableOwner, string tableName, Predicate<Dictionary<string, object>> predicate) =>
+        MetaData collection, string tableOwner, string tableName, System.Predicate<Dictionary<string, object>> predicate) =>
         ((List<Dictionary<string, object>>)collection[Combine(tableOwner, tableName)]).FirstOrDefault(item => predicate(item));
 
     /// <summary>
@@ -292,7 +320,8 @@ public class SQLiteSchemaProvider : ISchemaProvider
     /// </summary>
     /// <remarks>
     /// This method does not really map SQLite data types to standard column types.
-    /// It tries to implement an extended version of the SQLite data type mapping.
+    /// It first tries to match some common SQL types, then fallback in implementing
+    /// an extended version of the SQLite data type affinity mechanism.
     /// </remarks>
     /// <param name="sqliteType">The SQLite data type as a string.</param>
     /// <returns>The <see cref="ColumnType"/> that corresponds to the specified SQLite data type.</returns>
@@ -318,13 +347,15 @@ public class SQLiteSchemaProvider : ISchemaProvider
             "text" or "clob" => ColumnType.Text,
             "ntext" or "nclob" => ColumnType.NText,
             "bit" => ColumnType.Bit,
-            "blob" => ColumnType.Blob,
+            "blob" or "" => ColumnType.Blob,
             not null when sqliteType.Contains("int") => ColumnType.BigInt,
-            not null when sqliteType.Contains("floa") || sqliteType.Contains("doub") ||
-                          sqliteType.Contains("interval") => ColumnType.DoublePrecision,
+            not null when sqliteType.Contains("floa") || sqliteType.Contains("doub") => ColumnType.DoublePrecision,
             not null when sqliteType.Contains("dec") || sqliteType.Contains("num") => ColumnType.Decimal,
             not null when sqliteType.Contains("char") || sqliteType.Contains("text") ||
                           sqliteType.Contains("clob") => ColumnType.Text,
+            not null when sqliteType.Contains("date") || sqliteType.Contains("time") => ColumnType.DateTime,
+            not null when sqliteType.Contains("interval") => ColumnType.Interval,
+            not null when sqliteType.Contains("row") => ColumnType.RowVersion,
             not null when sqliteType.Contains("binary") || sqliteType.Contains("blob") ||
                           sqliteType.Contains("byte") => ColumnType.Blob,
             not null when sqliteType.Contains("uid") || sqliteType.Contains("uniqueid") => ColumnType.Guid,

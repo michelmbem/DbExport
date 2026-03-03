@@ -143,9 +143,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     #region IDisposable Members
 
-    /// <summary>
     /// <inheritdoc />
-    /// </summary>
     public void Dispose()
     {
         Dispose(true);
@@ -167,9 +165,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
 
     #region IVisitor Members
 
-    /// <summary>
     /// <inheritdoc />
-    /// </summary>
     public virtual void VisitDatabase(Database database)
     {
         var visitSchema = ExportOptions?.ExportSchema == true;
@@ -235,9 +231,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         }
     }
 
-    /// <summary>
     /// <inheritdoc />
-    /// </summary>
     public virtual void VisitTable(Table table)
     {
         var visitPKs = ExportOptions?.HasFlag(ExportFlags.ExportPrimaryKeys) == true;
@@ -285,9 +279,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         if (indexVisited) WriteLine();
     }
 
-    /// <summary>
     /// <inheritdoc />
-    /// </summary>
     public virtual void VisitColumn(Column column)
     {
         var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true; 
@@ -306,9 +298,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         }
     }
 
-    /// <summary>
     /// <inheritdoc />
-    /// </summary>
     public virtual void VisitPrimaryKey(PrimaryKey primaryKey)
     {
         WriteLine(",");
@@ -323,9 +313,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         Write(")");
     }
 
-    /// <summary>
     /// <inheritdoc />
-    /// </summary>
     public virtual void VisitIndex(Index index)
     {
         Write("CREATE");
@@ -342,9 +330,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         WriteDelimiter();
     }
 
-    /// <summary>
     /// <inheritdoc />
-    /// </summary>
     public virtual void VisitForeignKey(ForeignKey foreignKey)
     {
         Write("ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY (",
@@ -377,9 +363,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         WriteDelimiter();
     }
 
-    /// <summary>
     /// <inheritdoc />
-    /// </summary>
     public virtual void VisitDataType(DataType dataType) { }
 
     #endregion

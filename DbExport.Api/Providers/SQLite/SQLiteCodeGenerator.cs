@@ -52,9 +52,15 @@ public class SQLiteCodeGenerator : CodeGenerator
         var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
 
         if (visitIdentities && column.IsIdentity)
-            Write("{0} integer NOT NULL UNIQUE", Escape(column.Name));
+            Write("{0} integer PRIMARY KEY AUTOINCREMENT", Escape(column.Name));
         else
             base.VisitColumn(column);
+    }
+
+    public override void VisitPrimaryKey(PrimaryKey primaryKey)
+    {
+        if (primaryKey.IsIdentity) return;
+        base.VisitPrimaryKey(primaryKey);
     }
 
     public override void VisitForeignKey(ForeignKey foreignKey)
