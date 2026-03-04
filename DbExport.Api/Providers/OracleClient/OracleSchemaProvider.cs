@@ -42,7 +42,7 @@ public class OracleSchemaProvider : ISchemaProvider
         const string sql = """
                            SELECT
                                OWNER,
-                               TABLE_NAME
+                               TABLE_NAME AS NAME
                            FROM
                                ALL_TABLES
                            WHERE
@@ -57,12 +57,11 @@ public class OracleSchemaProvider : ISchemaProvider
                                        WHERE USERNAME = 'OPS$ORACLE'))
                            ORDER BY
                                OWNER,
-                               TABLE_NAME
+                               NAME
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
+        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)

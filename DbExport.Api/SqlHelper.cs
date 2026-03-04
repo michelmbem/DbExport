@@ -25,6 +25,18 @@ public sealed class SqlHelper : IDisposable
     #region Fields
 
     /// <summary>
+    /// Specifies the binding flags used for setting properties when invoking members on an object via reflection.
+    /// These flags include:
+    /// - `SetProperty`: Allows setting property values.
+    /// - `Instance`: Targets instance members.
+    /// - `Public`: Includes public members of the object.
+    /// - `IgnoreCase`: Allows case-insensitive member name matching.
+    /// This constant is primarily used within reflection-based utility methods, such as object mapping from database results.
+    /// </summary>
+    private const BindingFlags SET_PROPERTY_FLAGS = BindingFlags.SetProperty | BindingFlags.Instance |
+                                                    BindingFlags.Public | BindingFlags.IgnoreCase;
+
+    /// <summary>
     /// Indicates whether the SqlHelper instance is responsible for disposing of the database connection.
     /// When set to true, the connection will be disposed upon disposing the SqlHelper instance.
     /// </summary>
@@ -305,13 +317,11 @@ public sealed class SqlHelper : IDisposable
     {
         if (!dataReader.Read()) return null;
 
-        const BindingFlags flags = BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.Public;
-
         var entity = new TEntity();
         var entityType = typeof(TEntity);
         
         for (var i = 0; i < dataReader.FieldCount; ++i)
-            entityType.InvokeMember(dataReader.GetName(i), flags, null, entity, [dataReader.GetValue(i)]);
+            entityType.InvokeMember(dataReader.GetName(i), SET_PROPERTY_FLAGS, null, entity, [dataReader.GetValue(i)]);
         
         return entity;
     }
@@ -367,8 +377,6 @@ public sealed class SqlHelper : IDisposable
     /// <returns>A list of entities of type TEntity, with each entity representing a row from the DbDataReader.</returns>
     public static List<TEntity> ToEntityList<TEntity>(DbDataReader dataReader) where TEntity : class, new()
     {
-        const BindingFlags flags = BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.Public;
-
         List<TEntity> entities = [];
         var entityType = typeof(TEntity);
         
@@ -376,7 +384,7 @@ public sealed class SqlHelper : IDisposable
         {
             var entity = new TEntity();
             for (var i = 0; i < dataReader.FieldCount; ++i)
-                entityType.InvokeMember(dataReader.GetName(i), flags, null, entity, [dataReader.GetValue(i)]);
+                entityType.InvokeMember(dataReader.GetName(i), SET_PROPERTY_FLAGS, null, entity, [dataReader.GetValue(i)]);
             entities.Add(entity);
         }
         

@@ -73,7 +73,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
     public NameOwnerPair[] GetTableNames()
     {
         const string sql1 = """
-                           SELECT schema, name
+                           SELECT schema AS owner, name
                            FROM pragma_table_list()
                            WHERE type = 'table'
                                AND name NOT LIKE 'sqlite_%'
@@ -82,7 +82,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         const string sql2 = "SELECT name, sql FROM sqlite_master WHERE type = 'table'";
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list1 = helper.Query(sql1, SqlHelper.ToArrayList);
+        var list1 = helper.Query(sql1, SqlHelper.ToEntityList<NameOwnerPair>);
         var list2 = helper.Query(sql2, SqlHelper.ToArrayList);
         
         foreach (var item in list2)
@@ -91,7 +91,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
                 item[1].ToString()!.Contains("AUTOINCREMENT", StringComparison.OrdinalIgnoreCase);
         }
 
-        return [..list1.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
+        return [..list1];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)

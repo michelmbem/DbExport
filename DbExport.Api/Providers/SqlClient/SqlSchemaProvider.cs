@@ -39,8 +39,8 @@ public partial class SqlSchemaProvider : ISchemaProvider
     {
         const string sql = """
                            SELECT
-                               TABLE_SCHEMA,
-                               TABLE_NAME
+                               TABLE_SCHEMA AS Owner,
+                               TABLE_NAME AS Name
                            FROM INFORMATION_SCHEMA.TABLES
                            WHERE TABLE_TYPE = 'BASE TABLE'
                              AND TABLE_SCHEMA NOT IN ('sys', 'INFORMATION_SCHEMA')
@@ -49,12 +49,11 @@ public partial class SqlSchemaProvider : ISchemaProvider
                                    'OBJECT',
                                    'SELECT'
                                  ) = 1
-                           ORDER BY TABLE_SCHEMA, TABLE_NAME;
+                           ORDER BY Owner, Name;
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
+        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -324,15 +323,16 @@ public partial class SqlSchemaProvider : ISchemaProvider
     public NameOwnerPair[] GetTypeNames()
     {
         const string sql = """
-                           SELECT DOMAIN_SCHEMA, DOMAIN_NAME
+                           SELECT
+                                DOMAIN_SCHEMA AS Owner,
+                                DOMAIN_NAME AS Name
                            FROM INFORMATION_SCHEMA.DOMAINS
                            WHERE DOMAIN_SCHEMA NOT IN ('sys', 'information_schema')
-                           ORDER BY DOMAIN_SCHEMA, DOMAIN_NAME
+                           ORDER BY Owner, Name
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
+        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
     }
 
     public MetaData GetTypeMeta(string typeName, string typeOwner)

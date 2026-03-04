@@ -37,7 +37,9 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
     public NameOwnerPair[] GetTableNames()
     {
         const string sql = """
-                           SELECT TABLE_SCHEMA, TABLE_NAME
+                           SELECT
+                                TABLE_SCHEMA As Owner,
+                                TABLE_NAME As Name
                            FROM INFORMATION_SCHEMA.TABLES
                            WHERE TABLE_TYPE = 'BASE TABLE'
                              AND TABLE_SCHEMA NOT IN ('pg_catalog', 'information_schema')
@@ -48,8 +50,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
+        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -348,24 +349,25 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                            SELECT *
                            FROM (
                            	(
-                           		SELECT DOMAIN_SCHEMA, DOMAIN_NAME
+                           		SELECT
+                           		    DOMAIN_SCHEMA As Owner,
+                           		    DOMAIN_NAME As Name
                            		FROM INFORMATION_SCHEMA.DOMAINS
                            		WHERE DOMAIN_SCHEMA NOT IN ('pg_catalog', 'information_schema')
                            	) UNION (
                            		SELECT
-                           		    n.nspname AS DOMAIN_SCHEMA,
-                           		    t.typname AS DOMAIN_NAME
+                           		    n.nspname AS Owner,
+                           		    t.typname AS Name
                            		FROM pg_type t
                            		    JOIN pg_namespace n ON n.oid = t.typnamespace
                            		WHERE t.typtype = 'e'
                            	)
                            )
-                           ORDER BY DOMAIN_SCHEMA, DOMAIN_NAME
+                           ORDER BY Owner, Name
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToArrayList);
-        return [..list.Select(item => new NameOwnerPair(item[1].ToString(), item[0].ToString()))];
+        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
     }
 
     public MetaData GetTypeMeta(string typeName, string typeOwner)

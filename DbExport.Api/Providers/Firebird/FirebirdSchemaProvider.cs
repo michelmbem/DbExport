@@ -37,7 +37,9 @@ public class FirebirdSchemaProvider : ISchemaProvider
     public NameOwnerPair[] GetTableNames()
     {
         const string sql = """
-            SELECT TRIM(RDB$RELATION_NAME)
+            SELECT
+                TRIM(RDB$RELATION_NAME) AS Name,
+                '' As Owner
             FROM RDB$RELATIONS
             WHERE RDB$SYSTEM_FLAG = 0
               AND RDB$VIEW_BLR IS NULL
@@ -45,9 +47,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
             """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToList);
-
-        return [..list.Select(t => new NameOwnerPair(t.ToString()))];
+        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -306,7 +306,9 @@ public class FirebirdSchemaProvider : ISchemaProvider
     public NameOwnerPair[] GetTypeNames()
     {
         const string sql = """
-            SELECT TRIM(RDB$FIELD_NAME)
+            SELECT
+                TRIM(RDB$FIELD_NAME) As Name,
+                '' As Owner
             FROM RDB$FIELDS
             WHERE COALESCE(RDB$SYSTEM_FLAG, 0) = 0
                 AND NOT (RDB$FIELD_NAME STARTING WITH 'RDB$')
@@ -314,9 +316,7 @@ public class FirebirdSchemaProvider : ISchemaProvider
             """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        var list = helper.Query(sql, SqlHelper.ToList);
-
-        return [.. list.Select(t => new NameOwnerPair(t.ToString()))];
+        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
     }
 
     public MetaData GetTypeMeta(string typeName, string typeOwner)
