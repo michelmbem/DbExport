@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using DbExport.Providers;
 using DbExport.Providers.Firebird;
@@ -292,6 +293,30 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
+    /// Converts the current row of the specified <see cref="DbDataReader"/> into an instance of the specified entity type.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the entity to create. Must be a reference type with a parameterless constructor.</typeparam>
+    /// <param name="dataReader">The <see cref="DbDataReader"/> positioned on the row to be converted.</param>
+    /// <returns>
+    /// An instance of <typeparamref name="TEntity"/> populated with values from the current row of the
+    /// <paramref name="dataReader"/>, or null if no rows are available to read.
+    /// </returns>
+    public static TEntity ToEntity<TEntity>(DbDataReader dataReader) where TEntity : class, new()
+    {
+        if (!dataReader.Read()) return null;
+
+        const BindingFlags flags = BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.Public;
+
+        var entity = new TEntity();
+        var entityType = typeof(TEntity);
+        
+        for (var i = 0; i < dataReader.FieldCount; ++i)
+            entityType.InvokeMember(dataReader.GetName(i), flags, null, entity, [dataReader.GetValue(i)]);
+        
+        return entity;
+    }
+
+    /// <summary>
     /// Extracts the values of the columns from all rows of the data reader and returns them as a list of object arrays,
     /// where each object array represents a row of data, and the elements of the array correspond to the column values in that row.
     /// </summary>
@@ -332,6 +357,30 @@ public sealed class SqlHelper : IDisposable
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Converts the data retrieved by a DbDataReader into a list of entities of the specified type.
+    /// </summary>
+    /// <typeparam name="TEntity">The type of the entity to convert each row into. This type must be a class and have a parameterless constructor.</typeparam>
+    /// <param name="dataReader">The DbDataReader containing the data to be converted.</param>
+    /// <returns>A list of entities of type TEntity, with each entity representing a row from the DbDataReader.</returns>
+    public static List<TEntity> ToEntityList<TEntity>(DbDataReader dataReader) where TEntity : class, new()
+    {
+        const BindingFlags flags = BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.Public;
+
+        List<TEntity> entities = [];
+        var entityType = typeof(TEntity);
+        
+        while (dataReader.Read())
+        {
+            var entity = new TEntity();
+            for (var i = 0; i < dataReader.FieldCount; ++i)
+                entityType.InvokeMember(dataReader.GetName(i), flags, null, entity, [dataReader.GetValue(i)]);
+            entities.Add(entity);
+        }
+        
+        return entities;
     }
 
     /// <summary>
