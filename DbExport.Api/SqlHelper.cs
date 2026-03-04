@@ -74,6 +74,12 @@ public sealed partial class SqlHelper : IDisposable
     {
         this.connection = connection;
 
+        if (connection.State == ConnectionState.Closed)
+        {
+            connection.Open();
+            disposeConnection = true;
+        }
+
         var fullName = connection.GetType().FullName;
         var lastDot = fullName!.LastIndexOf('.');
         ProviderName = fullName[..lastDot];
@@ -85,21 +91,13 @@ public sealed partial class SqlHelper : IDisposable
     /// <param name="providerName">The name of the database provider.</param>
     /// <param name="connectionString">The connection string for the database connection.</param>
     public SqlHelper(string providerName, string connectionString) :
-        this(Utility.GetConnection(providerName, connectionString))
-    {
-        connection.Open();
-        disposeConnection = true;
-    }
+        this(Utility.GetConnection(providerName, connectionString)) { }
 
     /// <summary>
     /// Initializes a new instance of the SqlHelper class with the specified Database object.
     /// </summary>
     /// <param name="database">The Database object containing the provider name and connection string for the database connection.</param>
-    public SqlHelper(Database database) : this(Utility.GetConnection(database))
-    {
-        connection.Open();
-        disposeConnection = true;
-    }
+    public SqlHelper(Database database) : this(Utility.GetConnection(database)) { }
 
     #endregion
 
@@ -151,6 +149,29 @@ public sealed partial class SqlHelper : IDisposable
     }
 
     /// <summary>
+    /// Executes the specified SQL query using the provided parameter source, binder, and extractor
+    /// to set parameter values and process the results from the data reader.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the parameter source object.</typeparam>
+    /// <typeparam name="TResult">The type of the result returned by the extractor function.</typeparam>
+    /// <param name="sql">The SQL query to be executed.</param>
+    /// <param name="paramSource">The source object providing parameter values for the query.</param>
+    /// <param name="binder">The action to bind the parameter values from the source object to the command.</param>
+    /// <param name="extractor">The function that processes the data reader and returns a result of type TResult.</param>
+    /// <returns>A result of type TResult obtained by processing the data reader with the extractor function.</returns>
+    public TResult Query<TSource, TResult>(
+        string sql, TSource paramSource, Action<DbCommand, TSource> binder, Func<DbDataReader, TResult> extractor)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = sql;
+        PrepareCommand(command);
+        binder(command, paramSource);
+
+        using var dataReader = command.ExecuteReader();
+        return extractor(dataReader);
+    }
+
+    /// <summary>
     /// Executes the specified SQL query and returns the value of the first column of the first row in the result set.
     /// </summary>
     /// <param name="sql">The SQL query to be executed.</param>
@@ -159,6 +180,24 @@ public sealed partial class SqlHelper : IDisposable
     {
         using var command = connection.CreateCommand();
         command.CommandText = sql;
+        return command.ExecuteScalar();
+    }
+
+    /// <summary>
+    /// Executes the specified SQL query using the specified parameter source and binder and returns
+    /// the value of the first column of the first row in the result set.
+    /// </summary>
+    /// <param name="sql">The SQL query to be executed.</param>
+    /// <param name="paramSource">The source object providing parameter values for the command.</param>
+    /// <param name="binder">The action to bind the parameter values from the source object to the command.</param>
+    /// <typeparam name="TSource">The type of the parameter source object.</typeparam>
+    /// <returns>The value of the first column of the first row in the result set, or null if the result set is empty.</returns>
+    public object QueryScalar<TSource>(string sql, TSource paramSource, Action<DbCommand, TSource> binder)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = sql;
+        PrepareCommand(command);
+        binder(command, paramSource);
         return command.ExecuteScalar();
     }
 
@@ -202,19 +241,23 @@ public sealed partial class SqlHelper : IDisposable
     /// <returns>The total number of rows affected by all executed commands in the batch.</returns>
     public int ExecuteBatch<TSource>(string sql, IEnumerable<TSource> paramSources, Action<DbCommand, TSource> binder)
     {
-        var result = 0;
+        int affectedRows = 0;
 
+        using var transaction = connection.BeginTransaction();
         using var command = connection.CreateCommand();
+        command.Transaction = transaction;
         command.CommandText = sql;
         PrepareCommand(command);
 
         foreach (var paramSource in paramSources)
         {
             binder(command, paramSource);
-            result += command.ExecuteNonQuery();
+            affectedRows += command.ExecuteNonQuery();
         }
 
-        return result;
+        transaction.Commit();
+
+        return affectedRows;
     }
 
     #endregion

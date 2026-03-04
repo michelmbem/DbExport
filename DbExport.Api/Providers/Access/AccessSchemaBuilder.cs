@@ -64,10 +64,10 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         if (visitData)
             foreach (Table table in database.Tables.Where(t => t.IsChecked))
             {
-                using var rowSet = SqlHelper.OpenTable(table, visitIdent, false);
+                using var dataReader = SqlHelper.OpenTable(table, visitIdent, false);
 
-                while (rowSet.DataReader.Read())
-                    ImportRecord(table, rowSet.DataReader);
+                while (dataReader.Read())
+                    ImportRecord(table, dataReader);
             }
 
         if (!visitSchema || !visitFKs) return;

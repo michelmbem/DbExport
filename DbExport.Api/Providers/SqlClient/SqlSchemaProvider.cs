@@ -53,7 +53,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
+        return [..helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -332,7 +332,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
+        return [..helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
     public MetaData GetTypeMeta(string typeName, string typeOwner)

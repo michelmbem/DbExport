@@ -46,19 +46,18 @@ public partial class MySqlSchemaProvider : ISchemaProvider
     {
         const string sql = """
                            SELECT
-                               TABLE_NAME AS Name,
-                               '' AS Owner
+                               TABLE_NAME AS NAME
                            FROM
                                INFORMATION_SCHEMA.TABLES
                            WHERE
                                TABLE_TYPE = 'BASE TABLE' AND
                                TABLE_SCHEMA = '{0}'
                            ORDER BY
-                               Name
+                               NAME
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        return helper.Query(string.Format(sql, DatabaseName), SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
+        return [..helper.Query(string.Format(sql, DatabaseName), SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -332,8 +331,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
     {
         const string sql = """
                            SELECT
-                               CONCAT(C.TABLE_NAME, '_', C.COLUMN_NAME) AS Name,
-                               '' AS Owner
+                               CONCAT(C.TABLE_NAME, '_', C.COLUMN_NAME) AS NAME
                            FROM
                                INFORMATION_SCHEMA.COLUMNS C
                            JOIN INFORMATION_SCHEMA.TABLES T ON
@@ -343,11 +341,11 @@ public partial class MySqlSchemaProvider : ISchemaProvider
                            WHERE
                                C.DATA_TYPE IN('enum', 'set') AND C.TABLE_SCHEMA = '{0}'
                            ORDER BY
-                               Name
+                               NAME
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        return helper.Query(string.Format(sql, DatabaseName), SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
+        return [..helper.Query(string.Format(sql, DatabaseName), SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
     public MetaData GetTypeMeta(string typeName, string typeOwner)

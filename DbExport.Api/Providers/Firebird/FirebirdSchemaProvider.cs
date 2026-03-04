@@ -38,16 +38,15 @@ public class FirebirdSchemaProvider : ISchemaProvider
     {
         const string sql = """
             SELECT
-                TRIM(RDB$RELATION_NAME) AS Name,
-                '' As Owner
+                TRIM(RDB$RELATION_NAME) AS NAME
             FROM RDB$RELATIONS
             WHERE RDB$SYSTEM_FLAG = 0
               AND RDB$VIEW_BLR IS NULL
-            ORDER BY RDB$RELATION_NAME
+            ORDER BY NAME
             """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
+        return [..helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -307,16 +306,15 @@ public class FirebirdSchemaProvider : ISchemaProvider
     {
         const string sql = """
             SELECT
-                TRIM(RDB$FIELD_NAME) As Name,
-                '' As Owner
+                TRIM(RDB$FIELD_NAME) As NAME
             FROM RDB$FIELDS
             WHERE COALESCE(RDB$SYSTEM_FLAG, 0) = 0
                 AND NOT (RDB$FIELD_NAME STARTING WITH 'RDB$')
-            ORDER BY RDB$FIELD_NAME
+            ORDER BY NAME
             """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
+        return [..helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
     public MetaData GetTypeMeta(string typeName, string typeOwner)

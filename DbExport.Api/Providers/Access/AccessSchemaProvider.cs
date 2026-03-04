@@ -50,7 +50,7 @@ public class AccessSchemaProvider : ISchemaProvider
         foreach (ADOX.Table table in catalog.Tables)
         {
             if (table.Type != "TABLE") continue;
-            tablePairs.Add(new NameOwnerPair(table.Name));
+            tablePairs.Add(new NameOwnerPair { Name = table.Name });
         }
 
         return [..tablePairs];

@@ -46,11 +46,11 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                              AND HAS_TABLE_PRIVILEGE(
                                 FORMAT('%I.%I', TABLE_SCHEMA, TABLE_NAME),
                                 'SELECT')
-                           ORDER BY TABLE_SCHEMA, TABLE_NAME
+                           ORDER BY Owner, Name
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
+        return [..helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -367,7 +367,7 @@ public partial class NpgsqlSchemaProvider : ISchemaProvider
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        return helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>).ToArray();
+        return [..helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
     public MetaData GetTypeMeta(string typeName, string typeOwner)
