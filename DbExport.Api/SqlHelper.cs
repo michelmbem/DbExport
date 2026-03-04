@@ -251,6 +251,26 @@ public sealed class SqlHelper : IDisposable
         return affectedRows;
     }
 
+    public int ExecuteBatch(string sql, DbDataReader dataReader)
+    {
+        int affectedRows = 0;
+
+        using var transaction = connection.BeginTransaction();
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        PrepareCommand(command, sql);
+
+        while (dataReader.Read())
+        {
+            FromDataReader(command, dataReader);
+            affectedRows += command.ExecuteNonQuery();
+        }
+
+        transaction.Commit();
+
+        return affectedRows;
+    }
+
     /// <summary>
     /// Prepares the specified database command by ensuring that all parameters
     /// referenced in the command's text are added to its parameters collection
@@ -524,6 +544,12 @@ public sealed class SqlHelper : IDisposable
             var value = entityType.InvokeMember(parameter.ParameterName, GET_PROPERTY_FLAGS, null, entity, null);
             parameter.Value = value;
         }
+    }
+
+    private static void FromDataReader(DbCommand command, DbDataReader dataReader)
+    {
+        foreach (DbParameter parameter in command.Parameters)
+            parameter.Value = dataReader[parameter.ParameterName];
     }
 
     #endregion
