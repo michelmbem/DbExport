@@ -5,12 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using DbExport.Providers;
-using DbExport.Providers.Firebird;
-using DbExport.Providers.MySqlClient;
-using DbExport.Providers.Npgsql;
-using DbExport.Providers.SqlClient;
 using DbExport.Schema;
 
 namespace DbExport;
@@ -21,7 +16,7 @@ namespace DbExport;
 /// and executing SQL scripts with support for different database providers.
 /// The class implements IDisposable to ensure proper disposal of database connections when necessary.
 /// </summary>
-public sealed partial class SqlHelper : IDisposable
+public sealed class SqlHelper : IDisposable
 {
     #region Constants
 
@@ -279,10 +274,10 @@ public sealed partial class SqlHelper : IDisposable
     public static IScriptExecutor GetScripExecutor(string providerName) =>
         providerName switch
         {
-            ProviderNames.SQLSERVER => new SqlScripExecutor(),
-            ProviderNames.MYSQL => new MySqlScriptExecutor(),
-            ProviderNames.POSTGRESQL => new NpgsqlScriptExecutor(),
-            ProviderNames.FIREBIRD => new FirebirdScriptExecutor(),
+            ProviderNames.SQLSERVER => new Providers.SqlClient.SqlScripExecutor(),
+            ProviderNames.MYSQL => new Providers.MySqlClient.MySqlScriptExecutor(),
+            ProviderNames.POSTGRESQL => new Providers.Npgsql.NpgsqlScriptExecutor(),
+            ProviderNames.FIREBIRD => new Providers.Firebird.FirebirdScriptExecutor(),
             ProviderNames.ORACLE => new BatchScriptExecutor(providerName),
             _ => new SimpleScriptExecutor(providerName)
         };
