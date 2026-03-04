@@ -187,6 +187,24 @@ public static partial class Utility
             _ => $"\"{name}\""
         };
 
+    /// <summary>
+    /// Converts a column name into a parameter name formatted according to the conventions of the specified database provider.
+    /// </summary>
+    /// <param name="columnName">The name of the column to be converted into a parameter name.</param>
+    /// <param name="providerName">The name of the database provider that determines the parameter name format.</param>
+    /// <returns>A string representing the formatted parameter name suitable for the specified database provider.</returns>
+    public static string ToParameterName(string columnName, string providerName)
+    {
+        var paramName = IllegalCharRegex().Replace(columnName, "_");
+        
+        return providerName switch
+        {
+            ProviderNames.ACCESS => "?",
+            ProviderNames.ORACLE or ProviderNames.FIREBIRD => $":{paramName}",
+            _ => $"@{paramName}"
+        };
+    }
+
     #endregion
 
     #region General utilities
@@ -426,6 +444,9 @@ public static partial class Utility
 
     [GeneratedRegex(@"\b(password|pwd)\b", RegexOptions.IgnoreCase)]
     private static partial Regex PasswordRegex();
+
+    [GeneratedRegex(@"\W+", RegexOptions.IgnoreCase)]
+    private static partial Regex IllegalCharRegex();
 
     #endregion
 }

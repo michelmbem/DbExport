@@ -6,6 +6,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using DbExport.Providers;
+using DbExport.Providers.Firebird;
+using DbExport.Providers.MySqlClient;
+using DbExport.Providers.Npgsql;
+using DbExport.Providers.SqlClient;
 using DbExport.Schema;
 
 namespace DbExport;
@@ -144,16 +148,16 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// Executes the specified SQL query using the provided parameter source, binder, and extractor
-    /// to set parameter values and process the results from the data reader.
+    /// Executes a SQL query with the specified parameters, binds them to the command,
+    /// and extracts the result using the provided extractor function.
     /// </summary>
-    /// <typeparam name="TSource">The type of the parameter source object.</typeparam>
-    /// <typeparam name="TResult">The type of the result returned by the extractor function.</typeparam>
     /// <param name="sql">The SQL query to be executed.</param>
-    /// <param name="paramSource">The source object providing parameter values for the query.</param>
-    /// <param name="binder">The action to bind the parameter values from the source object to the command.</param>
-    /// <param name="extractor">The function that processes the data reader and returns a result of type TResult.</param>
-    /// <returns>A result of type TResult obtained by processing the data reader with the extractor function.</returns>
+    /// <param name="paramSource">The source object containing parameters to be bound to the query.</param>
+    /// <param name="binder">An action that binds parameters from the source object to the database command.</param>
+    /// <param name="extractor">A function that processes the data reader and extracts the desired result.</param>
+    /// <typeparam name="TSource">The type of the parameter source object.</typeparam>
+    /// <typeparam name="TResult">The type of the result to be returned.</typeparam>
+    /// <returns>The result extracted from the data reader based on the extractor function.</returns>
     public TResult Query<TSource, TResult>(
         string sql, TSource paramSource, Action<DbCommand, TSource> binder, Func<DbDataReader, TResult> extractor)
     {
@@ -178,14 +182,14 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// Executes the specified SQL query using the specified parameter source and binder and returns
-    /// the value of the first column of the first row in the result set.
+    /// Executes the specified SQL query with parameters, using a custom binder to bind the parameters,
+    /// and returns a single scalar value resulting from the query.
     /// </summary>
+    /// <typeparam name="TSource">The type of the parameter source.</typeparam>
     /// <param name="sql">The SQL query to be executed.</param>
-    /// <param name="paramSource">The source object providing parameter values for the command.</param>
-    /// <param name="binder">The action to bind the parameter values from the source object to the command.</param>
-    /// <typeparam name="TSource">The type of the parameter source object.</typeparam>
-    /// <returns>The value of the first column of the first row in the result set, or null if the result set is empty.</returns>
+    /// <param name="paramSource">The object containing the parameter values to be used in the SQL query.</param>
+    /// <param name="binder">An action that binds the parameter values to the SQL command.</param>
+    /// <returns>The scalar value returned from the execution of the SQL query.</returns>
     public object QueryScalar<TSource>(string sql, TSource paramSource, Action<DbCommand, TSource> binder)
     {
         using var command = connection.CreateCommand();
@@ -251,6 +255,12 @@ public sealed class SqlHelper : IDisposable
         return affectedRows;
     }
 
+    /// <summary>
+    /// Executes a batch of SQL statements using the provided SQL command template and a data reader as the source for parameters.
+    /// </summary>
+    /// <param name="sql">The SQL command template to be executed for each row of data read from the data reader.</param>
+    /// <param name="dataReader">The data reader containing the rows of data to be processed in the batch.</param>
+    /// <returns>The total number of rows affected by executing the batch.</returns>
     public int ExecuteBatch(string sql, DbDataReader dataReader)
     {
         int affectedRows = 0;
@@ -272,12 +282,11 @@ public sealed class SqlHelper : IDisposable
     }
 
     /// <summary>
-    /// Prepares the specified database command by ensuring that all parameters
-    /// referenced in the command's text are added to its parameters collection
-    /// and are ready for use during execution.
+    /// Configures the specified <see cref="DbCommand"/> with the provided SQL statement,
+    /// sets its command text, and prepares parameters for execution.
     /// </summary>
-    /// <param name="command">The database command to be prepared.</param>
-    /// <param name="sql">The command's text.</param>
+    /// <param name="command">The <see cref="DbCommand"/> to be configured.</param>
+    /// <param name="sql">The SQL query or command text to be assigned to the <paramref name="command"/>.</param>
     private static void PrepareCommand(DbCommand command, string sql)
     {
         command.CommandText = sql;
@@ -317,26 +326,67 @@ public sealed class SqlHelper : IDisposable
     public static IScriptExecutor GetScripExecutor(string providerName) =>
         providerName switch
         {
-            ProviderNames.SQLSERVER => new Providers.SqlClient.SqlScripExecutor(),
-            ProviderNames.MYSQL => new Providers.MySqlClient.MySqlScriptExecutor(),
-            ProviderNames.POSTGRESQL => new Providers.Npgsql.NpgsqlScriptExecutor(),
-            ProviderNames.FIREBIRD => new Providers.Firebird.FirebirdScriptExecutor(),
+            ProviderNames.SQLSERVER => new SqlScripExecutor(),
+            ProviderNames.MYSQL => new MySqlScriptExecutor(),
+            ProviderNames.POSTGRESQL => new NpgsqlScriptExecutor(),
+            ProviderNames.FIREBIRD => new FirebirdScriptExecutor(),
             ProviderNames.ORACLE => new BatchScriptExecutor(providerName),
             _ => new SimpleScriptExecutor(providerName)
         };
 
     #endregion
 
-    #region OpenTable method
+    #region OpenTable and CopyTable methods
 
     /// <summary>
-    /// Executes a SELECT query to retrieve all columns from the specified table, with options to skip identity and row version columns.
+    /// Opens a database table for reading and returns a data reader for the resulting query.
     /// </summary>
-    /// <param name="table">The Table object representing the database table to be queried.</param>
-    /// <param name="skipIdentity">A boolean value indicating whether to skip identity columns in the SELECT query.</param>
-    /// <param name="skipRowVersion">A boolean value indicating whether to skip row version columns in the SELECT query.</param>
-    /// <returns>A RowSet object containing the database connection, command, and data reader for the executed SELECT query.</returns>
+    /// <param name="table">The table to be queried.</param>
+    /// <param name="skipIdentity">Specifies whether to exclude identity columns in the query.</param>
+    /// <param name="skipRowVersion">Specifies whether to exclude row version columns in the query.</param>
+    /// <returns>A data reader containing the results of the query.</returns>
     public static DbDataReader OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
+    {
+        var connection = Utility.GetConnection(table.Database);
+        connection.Open();
+
+        var command = connection.CreateCommand();
+        command.CommandText = GenerateSelect(table, skipIdentity, skipRowVersion);
+        
+        return command.ExecuteReader(CommandBehavior.CloseConnection);
+    }
+
+    /// <summary>
+    /// Copies the data from the specified source table to the target database connection.
+    /// </summary>
+    /// <remarks>
+    /// There should be a table with the same name and similar structure in the target database.
+    /// </remarks>
+    /// <param name="targetConnection">The database connection where the table data will be inserted.</param>
+    /// <param name="table">The source table containing the data to be copied.</param>
+    /// <param name="skipIdentity">A flag indicating whether to skip identity columns during the operation.</param>
+    /// <param name="skipRowVersion">A flag indicating whether to skip row version columns during the operation.</param>
+    public static void CopyTable(DbConnection targetConnection, Table table, bool skipIdentity, bool skipRowVersion)
+    {
+        using var helper = new SqlHelper(targetConnection);
+        using var sourceReader = OpenTable(table, skipIdentity, skipRowVersion);
+        var insertSql = GenerateInsert(table, helper.ProviderName, skipIdentity);
+        helper.ExecuteBatch(insertSql, sourceReader);
+    }
+
+    #endregion
+    
+    #region SQL generation methods
+
+    /// <summary>
+    /// Generates a SQL SELECT statement for the specified table,
+    /// optionally skipping identity and row version columns.
+    /// </summary>
+    /// <param name="table">The table for which the SELECT statement is generated.</param>
+    /// <param name="skipIdentity">Determines whether identity columns should be excluded from the SELECT statement.</param>
+    /// <param name="skipRowVersion">Determines whether row version columns should be excluded from the SELECT statement.</param>
+    /// <returns>A string representing the generated SQL SELECT statement.</returns>
+    public static string GenerateSelect(Table table, bool skipIdentity, bool skipRowVersion)
     {
         StringBuilder sb = new("SELECT ");
         var providerName = table.Database.ProviderName;
@@ -350,17 +400,96 @@ public sealed class SqlHelper : IDisposable
         if (!string.IsNullOrEmpty(table.Owner))
             sb.Append(Utility.Escape(table.Owner, providerName)).Append('.');
         sb.Append(Utility.Escape(table.Name, providerName));
-
-        var connection = Utility.GetConnection(table.Database);
-        connection.Open();
-
-        var command = connection.CreateCommand();
-        command.CommandText = sb.ToString();
         
-        return command.ExecuteReader(CommandBehavior.CloseConnection);
+        return sb.ToString();
         
         bool ShouldNotSkip(Column c) => !(skipIdentity && c.IsIdentity ||
                                           skipRowVersion && c.ColumnType == ColumnType.RowVersion);
+    }
+
+    /// <summary>
+    /// Generates an SQL insert statement for the specified table based on the given provider.
+    /// </summary>
+    /// <param name="table">The table for which the insert statement is to be generated.</param>
+    /// <param name="providerName">The name of the database provider, used for escaping identifiers.</param>
+    /// <param name="skipIdentity">A boolean flag indicating whether identity columns should be skipped in the insert statement.</param>
+    /// <returns>A string containing the generated SQL insert statement.</returns>
+    public static string GenerateInsert(Table table, string providerName, bool skipIdentity)
+    {
+        StringBuilder sb = new("INSERT INTO ");
+        sb.Append(Utility.Escape(table.Name, providerName)).Append(" (");
+
+        foreach (var column in table.Columns.Where(ShouldNotSkip))
+            sb.Append(Utility.Escape(column.Name, providerName)).Append(", ");
+
+        sb.Length -= 2;
+        sb.Append(") VALUES (");
+
+        foreach (var column in table.Columns.Where(ShouldNotSkip))
+            sb.Append(Utility.ToParameterName(column.Name, providerName)).Append(", ");
+
+        sb.Length -= 2;
+        sb.Append(')');
+        
+        return sb.ToString();
+        
+        bool ShouldNotSkip(Column c) => !(skipIdentity && c.IsIdentity);
+    }
+
+    /// <summary>
+    /// Generates an SQL UPDATE statement for the specified table, based on the provided database provider name.
+    /// </summary>
+    /// <param name="table">The table for which the SQL UPDATE statement will be generated.</param>
+    /// <param name="providerName">The name of the database provider, used for escaping identifiers properly.</param>
+    /// <returns>A string containing the generated SQL UPDATE statement.</returns>
+    public static string GenerateUpdate(Table table, string providerName)
+    {
+        StringBuilder sb = new("UPDATE ");
+        sb.Append(Utility.Escape(table.Name, providerName)).Append(" SET ");
+
+        foreach (var columnName in table.Columns.Where(ShouldNotSkip).Select(c => c.Name))
+        {
+            sb.Append(Utility.Escape(columnName, providerName)).Append(" = ");
+            sb.Append(Utility.ToParameterName(columnName, providerName)).Append(", ");
+        }
+
+        sb.Length -= 2;
+        sb.Append(" WHERE ");
+
+        foreach (var columnName in table.PrimaryKey.Columns.Select(c => c.Name))
+        {
+            sb.Append(Utility.Escape(columnName, providerName)).Append(" = ");
+            sb.Append(Utility.ToParameterName(columnName, providerName)).Append(" AND ");
+        }
+
+        sb.Length -= 5;
+        
+        return sb.ToString();
+
+        bool ShouldNotSkip(Column c) => !(c.IsPKColumn || c.IsComputed);
+    }
+
+    /// <summary>
+    /// Generates a SQL DELETE statement for the specified table and provider.
+    /// </summary>
+    /// <param name="table">The table for which the DELETE statement will be generated.</param>
+    /// <param name="providerName">The name of the database provider to determine escaping and parameter conventions.</param>
+    /// <returns>A string containing the SQL DELETE statement.</returns>
+    public static string GenerateDelete(Table table, string providerName)
+    {
+        StringBuilder sb = new("DELETE FROM ");
+        sb.Append(Utility.Escape(table.Name, providerName));
+        sb.Append(" WHERE ");
+
+        foreach (var columnName in table.PrimaryKey.Columns.Select(c => c.Name))
+        {
+            sb.Append(Utility.Escape(columnName, providerName)).Append(" = ");
+            sb.Append(Utility.ToParameterName(columnName, providerName)).Append(" AND ");
+        }
+
+        sb.Length -= 5;
+        
+        return sb.ToString();
     }
 
     #endregion
@@ -546,6 +675,11 @@ public sealed class SqlHelper : IDisposable
         }
     }
 
+    /// <summary>
+    /// Populates the parameters of a given database command using the current row of the provided data reader.
+    /// </summary>
+    /// <param name="command">The database command whose parameters will be populated.</param>
+    /// <param name="dataReader">The data reader containing the source data for the command's parameters.</param>
     private static void FromDataReader(DbCommand command, DbDataReader dataReader)
     {
         foreach (DbParameter parameter in command.Parameters)
@@ -556,111 +690,146 @@ public sealed class SqlHelper : IDisposable
 
     #region Inner ParameterParser class
 
-    public static class ParameterParser
+    /// <summary>
+    /// Provides methods for parsing SQL queries and extracting parameter names.
+    /// This utility is used to identify and process parameter placeholders within a given SQL string
+    /// while handling edge cases such as string literals, quoted identifiers, and comments.
+    /// </summary>
+    private static class ParameterParser
     {
+        /// <summary>
+        /// Extracts parameter names from the specified SQL string by identifying and parsing parameter placeholders.
+        /// Handles SQL syntax rules such as skipping string literals, quoted identifiers, and comments.
+        /// </summary>
+        /// <param name="sql">The SQL string to parse for parameter placeholders.</param>
+        /// <returns>A read-only list of unique parameter names found in the SQL string.</returns>
         public static IReadOnlyList<string> Extract(string sql)
         {
             HashSet<string> paramNames = [];
-            int limit = sql.Length;
+            var limit = sql.Length;
 
-            for (int i = 0; i < limit; i++)
+            for (var i = 0; i < limit; ++i)
             {
-                char c = sql[i];
-
-                // skip string literals
-                if (c == '\'')
+                switch (sql[i])
                 {
-                    i = SkipSingleQuote(sql, i, limit);
-                    continue;
-                }
-
-                // skip quoted identifiers
-                if (c == '"')
-                {
-                    i = SkipDoubleQuote(sql, i, limit);
-                    continue;
-                }
-
-                // skip line comment
-                if (c == '-' && i + 1 < limit && sql[i + 1] == '-')
-                {
-                    i = SkipLineComment(sql, i, limit);
-                    continue;
-                }
-
-                // skip block comment
-                if (c == '/' && i + 1 < limit && sql[i + 1] == '*')
-                {
-                    i = SkipBlockComment(sql, i, limit);
-                    continue;
-                }
-
-                // parameter start
-                if (IsParamPrefix(c))
-                {
-                    int start = ++i;
-
-                    while (i < limit && IsParamChar(sql[i]))
-                        i++;
-
-                    string name = sql[start..i];
-                    paramNames.Add(name);
-
-                    i--;
+                    // skip string literals
+                    case '\'':
+                        i = SkipSingleQuote(sql, i, limit);
+                        continue;
+                    // skip quoted identifiers
+                    case '"':
+                        i = SkipDoubleQuote(sql, i, limit);
+                        continue;
+                    // skip line comment
+                    case '-' when i + 1 < limit && sql[i + 1] == '-':
+                        i = SkipLineComment(sql, i, limit);
+                        continue;
+                    // skip block comment
+                    case '/' when i + 1 < limit && sql[i + 1] == '*':
+                        i = SkipBlockComment(sql, i, limit);
+                        continue;
+                    // parameter start
+                    case var c when IsParamPrefix(c):
+                    {
+                        var start = ++i;
+                        while (i < limit && IsParamChar(sql[i])) ++i;
+                        var name = sql[start..(i--)];
+                        paramNames.Add(name);
+                        break;
+                    }
                 }
             }
 
             return [..paramNames];
         }
 
+        /// <summary>
+        /// Determines whether the specified character is a valid prefix for a SQL parameter.
+        /// </summary>
+        /// <param name="c">The character to evaluate as a potential parameter prefix.</param>
+        /// <returns>True if the character is a valid parameter prefix; otherwise, false.</returns>
         private static bool IsParamPrefix(char c) => c is '@' or ':' or '$' or '?';
 
+        /// <summary>
+        /// Determines whether the specified character is valid as part of a SQL parameter name.
+        /// </summary>
+        /// <param name="c">The character to evaluate.</param>
+        /// <returns>True if the character is a letter, digit, or underscore; otherwise, false.</returns>
         private static bool IsParamChar(char c) => char.IsLetterOrDigit(c) || c == '_';
 
+        /// <summary>
+        /// Skips over a single-quoted string literal in a SQL string, starting at the given index.
+        /// Handles escaped single quotes by advancing the index past them.
+        /// </summary>
+        /// <param name="sql">The SQL string being processed.</param>
+        /// <param name="i">The current index within the SQL string where the single quote starts.</param>
+        /// <param name="limit">The length of the SQL string, used as a boundary for the processing loop.</param>
+        /// <returns>The index immediately following the closing single quote, or the last index of the string if no matching quote is found.</returns>
         private static int SkipSingleQuote(string sql, int i, int limit)
         {
-            i++;
+            ++i;
 
             while (i < limit)
             {
                 if (sql[i] == '\'')
                 {
-                    if (i + 1 < limit && sql[i + 1] == '\'')
-                    {
-                        i += 2;
-                        continue;
-                    }
-
-                    return i;
+                    if (i + 1 >= limit || sql[i + 1] != '\'') return i;
+                    i += 2;
+                    continue;
                 }
 
-                i++;
+                ++i;
             }
 
             return limit - 1;
         }
 
+        /// <summary>
+        /// Skips over a quoted identifier in the SQL string, starting at the specified index.
+        /// Advances the index to the position after the closing double-quote or to the end of the string
+        /// if no closing double-quote is found.
+        /// </summary>
+        /// <param name="sql">The SQL string being parsed.</param>
+        /// <param name="i">The current position in the SQL string where the quoted identifier begins, including the opening double-quote.</param>
+        /// <param name="limit">The maximum index to evaluate within the SQL string.</param>
+        /// <returns>The index of the closing double-quote or the index of the last evaluable character if the closing double-quote is not found.</returns>
         private static int SkipDoubleQuote(string sql, int i, int limit)
         {
-            i++;
+            ++i;
 
             while (i < limit)
             {
                 if (sql[i] == '"') return i;
-                i++;
+                ++i;
             }
 
             return limit - 1;
         }
 
+        /// <summary>
+        /// Skips a line comment within the SQL string, advancing the index to the end of the comment.
+        /// Line comments are identified as sequences starting with "--" and ending at the next newline character or the end of the string.
+        /// </summary>
+        /// <param name="sql">The SQL string containing the line comment to skip.</param>
+        /// <param name="i">The current index in the SQL string, positioned at the start of the line comment.</param>
+        /// <param name="limit">The length of the SQL string to determine the upper bounds for processing.</param>
+        /// <returns>The updated index positioned at the end of the line comment or the end of the string, whichever comes first.</returns>
         private static int SkipLineComment(string sql, int i, int limit)
         {
             i += 2;
-            while (i < limit && sql[i] != '\n')
-                i++;
+            while (i < limit && sql[i] != '\n') ++i;
             return i;
         }
 
+        /// <summary>
+        /// Skips a block comment in the SQL string and returns the updated index after the block comment ends.
+        /// This method is called when a block comment is detected and ensures that parsing continues from
+        /// the correct position after the comment.
+        /// </summary>
+        /// <param name="sql">The SQL string being parsed.</param>
+        /// <param name="i">The current index in the SQL string where the block comment starts.</param>
+        /// <param name="limit">The length of the SQL string, used as the upper boundary for parsing.</param>
+        /// <returns>The index immediately after the end of the block comment, or the last index of the SQL string if the comment is unclosed.</returns>
         private static int SkipBlockComment(string sql, int i, int limit)
         {
             i += 2;
