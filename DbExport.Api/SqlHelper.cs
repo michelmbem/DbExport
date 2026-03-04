@@ -473,6 +473,12 @@ public sealed partial class SqlHelper : IDisposable
     
     #region Helper methods
 
+    /// <summary>
+    /// Prepares the specified database command by ensuring that all parameters
+    /// referenced in the command's text are added to its parameters collection
+    /// and are ready for use during execution.
+    /// </summary>
+    /// <param name="command">The database command to be prepared.</param>
     private static void PrepareCommand(DbCommand command)
     {
         var paramNames = ParameterRegex().Matches(command.CommandText)
