@@ -49,7 +49,7 @@ public sealed class SqlHelper : IDisposable
         this.connection = connection;
 
         var fullName = connection.GetType().FullName;
-        var lastDot = fullName.LastIndexOf('.');
+        var lastDot = fullName!.LastIndexOf('.');
         ProviderName = fullName[..lastDot];
     }
 
@@ -85,10 +85,8 @@ public sealed class SqlHelper : IDisposable
     #endregion
 
     #region IDisposable interface
-
-    /// <summary>
+    
     /// <inheritdoc/>
-    /// </summary>
     public void Dispose()
     {
         Dispose(true);
@@ -230,7 +228,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="skipIdentity">A boolean value indicating whether to skip identity columns in the SELECT query.</param>
     /// <param name="skipRowVersion">A boolean value indicating whether to skip row version columns in the SELECT query.</param>
     /// <returns>A RowSet object containing the database connection, command, and data reader for the executed SELECT query.</returns>
-    public static RowSet OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
+    public static DbDataReader OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
     {
         StringBuilder sb = new("SELECT ");
         var providerName = table.Database.ProviderName;
@@ -251,8 +249,7 @@ public sealed class SqlHelper : IDisposable
         var command = connection.CreateCommand();
         command.CommandText = sb.ToString();
         
-        var dataReader = command.ExecuteReader(CommandBehavior.CloseConnection);
-        return new RowSet(connection, command, dataReader);
+        return command.ExecuteReader(CommandBehavior.CloseConnection);
         
         bool ShouldNotSkip(Column c) => !(skipIdentity && c.IsIdentity ||
                                           skipRowVersion && c.ColumnType == ColumnType.RowVersion);

@@ -68,6 +68,45 @@ public static partial class Utility
     }
 
     /// <summary>
+    /// Creates and returns a database connection using the specified provider name and connection string.
+    /// </summary>
+    /// <remarks>
+    /// Ensure that the provider name is valid and that the connection string is correctly formatted for the provider being used.
+    /// </remarks>
+    /// <param name="providerName">
+    /// The name of the database provider to use for creating the connection. This must match a registered provider name.
+    /// </param>
+    /// <param name="connectionString">
+    /// The connection string used to establish the connection to the database. It must be a valid connection string for the specified provider.
+    /// </param>
+    /// <returns>A DbConnection object that represents the established connection to the database.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if a connection cannot be created for the specified provider name.</exception>
+    public static DbConnection GetConnection(string providerName, string connectionString)
+    {
+        var connection = DbProviderFactories.GetFactory(providerName).CreateConnection() ??
+            throw new InvalidOperationException($"Cannot create connection for provider '{providerName}'");
+
+        connection.ConnectionString = connectionString;
+
+        return connection;
+    }
+
+    /// <summary>
+    /// Creates and returns a database connection using the specified database configuration.
+    /// </summary>
+    /// <remarks>
+    /// The connection is created based on the provider name and connection string provided by the database object.
+    /// Ensure that the database object is properly configured before calling this method.
+    /// </remarks>
+    /// <param name="database">
+    /// The database object containing the provider name and connection string used to establish the connection.
+    /// Cannot be null.
+    /// </param>
+    /// <returns>A DbConnection instance representing the established connection to the database.</returns>
+    public static DbConnection GetConnection(Database database) =>
+        GetConnection(database.ProviderName, database.ConnectionString);
+
+    /// <summary>
     /// Parses a connection string into a dictionary of key-value pairs.
     /// </summary>
     /// <remarks>
@@ -129,43 +168,24 @@ public static partial class Utility
             PasswordRegex().IsMatch(key) ? new string('*', value.Length) : value);
 
     /// <summary>
-    /// Creates and returns a database connection using the specified provider name and connection string.
+    /// Escapes the specified identifier name according to the syntax conventions of the given database provider.
     /// </summary>
     /// <remarks>
-    /// Ensure that the provider name is valid and that the connection string is correctly formatted for the provider being used.
+    /// For ACCESS, SQLSERVER, and SQLITE providers, the identifier is enclosed in square brackets.
+    /// For MYSQL, it is enclosed in backticks. For any other provider, the identifier is enclosed in double quotes.
     /// </remarks>
-    /// <param name="providerName">
-    /// The name of the database provider to use for creating the connection. This must match a registered provider name.
-    /// </param>
-    /// <param name="connectionString">
-    /// The connection string used to establish the connection to the database. It must be a valid connection string for the specified provider.
-    /// </param>
-    /// <returns>A DbConnection object that represents the established connection to the database.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if a connection cannot be created for the specified provider name.</exception>
-    public static DbConnection GetConnection(string providerName, string connectionString)
-    {
-        var connection = DbProviderFactories.GetFactory(providerName).CreateConnection() ??
-            throw new InvalidOperationException($"Cannot create connection for provider '{providerName}'");
-
-        connection.ConnectionString = connectionString;
-
-        return connection;
-    }
-
-    /// <summary>
-    /// Creates and returns a database connection using the specified database configuration.
-    /// </summary>
-    /// <remarks>
-    /// The connection is created based on the provider name and connection string provided by the database object.
-    /// Ensure that the database object is properly configured before calling this method.
-    /// </remarks>
-    /// <param name="database">
-    /// The database object containing the provider name and connection string used to establish the connection.
-    /// Cannot be null.
-    /// </param>
-    /// <returns>A DbConnection instance representing the established connection to the database.</returns>
-    public static DbConnection GetConnection(Database database) =>
-        GetConnection(database.ProviderName, database.ConnectionString);
+    /// <param name="name">The identifier name to be escaped, such as a table or column name.</param>
+    /// <param name="providerName">The name of the database provider that determines the escaping format to use.</param>
+    /// <returns>
+    /// A string containing the escaped identifier, formatted according to the requirements of the specified database provider.
+    /// </returns>
+    public static string Escape(string name, string providerName) =>
+        providerName switch
+        {
+            ProviderNames.ACCESS or ProviderNames.SQLSERVER or ProviderNames.SQLITE => $"[{name}]",
+            ProviderNames.MYSQL => $"`{name}`",
+            _ => $"\"{name}\""
+        };
 
     #endregion
 
@@ -200,26 +220,6 @@ public static partial class Utility
     /// </returns>
     public static string[] Split(string input, char separator) =>
         input.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-    /// <summary>
-    /// Escapes the specified identifier name according to the syntax conventions of the given database provider.
-    /// </summary>
-    /// <remarks>
-    /// For ACCESS, SQLSERVER, and SQLITE providers, the identifier is enclosed in square brackets.
-    /// For MYSQL, it is enclosed in backticks. For any other provider, the identifier is enclosed in double quotes.
-    /// </remarks>
-    /// <param name="name">The identifier name to be escaped, such as a table or column name.</param>
-    /// <param name="providerName">The name of the database provider that determines the escaping format to use.</param>
-    /// <returns>
-    /// A string containing the escaped identifier, formatted according to the requirements of the specified database provider.
-    /// </returns>
-    public static string Escape(string name, string providerName) =>
-        providerName switch
-        {
-            ProviderNames.ACCESS or ProviderNames.SQLSERVER or ProviderNames.SQLITE => $"[{name}]",
-            ProviderNames.MYSQL => $"`{name}`",
-            _ => $"\"{name}\""
-        };
 
     /// <summary>
     /// Determines whether the specified object is considered empty.

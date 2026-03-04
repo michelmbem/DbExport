@@ -200,12 +200,12 @@ public abstract class CodeGenerator : IVisitor, IDisposable
             
             foreach (var table in database.Tables.Where(table => table.IsChecked))
             {
-                using var rowSet = SqlHelper.OpenTable(table, visitIdent, GeneratesRowVersion);
+                using var dataReader = SqlHelper.OpenTable(table, visitIdent, GeneratesRowVersion);
                 var rowsInserted = false;
 
-                while (rowSet.DataReader.Read())
+                while (dataReader.Read())
                 {
-                    WriteInsertDirective(table, rowSet.DataReader);
+                    WriteInsertDirective(table, dataReader);
                     rowsInserted = true;
                 }
                 
