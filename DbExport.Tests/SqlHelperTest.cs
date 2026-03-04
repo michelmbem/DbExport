@@ -3,11 +3,20 @@ using static DbExport.SqlHelper;
 
 namespace DbExport.Tests;
 
-public class TestItem
+public sealed class TestItem
 {
     public long Id { get; set; }
+
     public string? Name { get; set; }
+
     public decimal Price { get; set; }
+
+    public override bool Equals(object? obj) => obj is TestItem item &&
+        Equals(Id, item.Id) && Equals(Name, item.Name) && Equals(Price, item.Price);
+
+    public override int GetHashCode() => HashCode.Combine(Id, Name, Price);
+
+    public override string ToString() => $"TestItem {{ Id: {Id}, Name: {Name}, Price: {Price} }}";
 }
 
 public class SqlHelperTest
@@ -50,14 +59,20 @@ public class SqlHelperTest
             Assert.Equal(testItems[i].Price, fetchedItems[i].Price);
         }
 
-        var item2 = helper.Query("SELECT * FROM test_table WHERE id = :id", new { Id = 2 }, FromEntity, ToEntity<TestItem>);
-        Assert.NotNull(item2);
-        Assert.Equal(2, item2.Id);
+        var testItem = helper.Query("SELECT * FROM test_table WHERE id = :id", new { Id = 2 }, FromEntity, ToEntity<TestItem>);
+        Assert.NotNull(testItem);
+        Assert.Equal(2, testItem.Id);
 
-        item2.Name = "Modified Item";
-        item2.Price = 180M;
+        testItem.Name = "Modified Item";
+        testItem.Price = 180M;
 
-        int affected = helper.Execute("UPDATE test_table SET name = $name, price = $price WHERE id = $id", item2, FromEntity);
+        var affected = helper.Execute("UPDATE test_table SET name = $name, price = $price WHERE id = $id", testItem, FromEntity);
         Assert.Equal(1, affected);
+
+        affected = helper.ExecuteBatch("UPDATE test_table SET name = 'Item that costs $' || price WHERE name = @name", fetchedItems, FromEntity);
+        Assert.Equal(fetchedItems.Count - 1, affected);
+
+        fetchedItems = helper.Query("SELECT * FROM test_table WHERE name NOT LIKE 'Item that costs $%'", ToEntityList<TestItem>);
+        Assert.Equal(testItem, Assert.Single(fetchedItems));
     }
 }
