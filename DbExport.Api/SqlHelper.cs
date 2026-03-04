@@ -163,8 +163,7 @@ public sealed partial class SqlHelper : IDisposable
         string sql, TSource paramSource, Action<DbCommand, TSource> binder, Func<DbDataReader, TResult> extractor)
     {
         using var command = connection.CreateCommand();
-        command.CommandText = sql;
-        PrepareCommand(command);
+        PrepareCommand(command, sql);
         binder(command, paramSource);
 
         using var dataReader = command.ExecuteReader();
@@ -195,8 +194,7 @@ public sealed partial class SqlHelper : IDisposable
     public object QueryScalar<TSource>(string sql, TSource paramSource, Action<DbCommand, TSource> binder)
     {
         using var command = connection.CreateCommand();
-        command.CommandText = sql;
-        PrepareCommand(command);
+        PrepareCommand(command, sql);
         binder(command, paramSource);
         return command.ExecuteScalar();
     }
@@ -225,8 +223,7 @@ public sealed partial class SqlHelper : IDisposable
     public int Execute<TSource>(string sql, TSource paramSource, Action<DbCommand, TSource> binder)
     {
         using var command = connection.CreateCommand();
-        command.CommandText = sql;
-        PrepareCommand(command);
+        PrepareCommand(command, sql);
         binder(command, paramSource);
         return command.ExecuteNonQuery();
     }
@@ -246,8 +243,7 @@ public sealed partial class SqlHelper : IDisposable
         using var transaction = connection.BeginTransaction();
         using var command = connection.CreateCommand();
         command.Transaction = transaction;
-        command.CommandText = sql;
-        PrepareCommand(command);
+        PrepareCommand(command, sql);
 
         foreach (var paramSource in paramSources)
         {
@@ -522,12 +518,11 @@ public sealed partial class SqlHelper : IDisposable
     /// and are ready for use during execution.
     /// </summary>
     /// <param name="command">The database command to be prepared.</param>
-    private static void PrepareCommand(DbCommand command)
+    private static void PrepareCommand(DbCommand command, string sql)
     {
-        var paramNames = ParameterRegex().Matches(command.CommandText)
-                                         .Select(m => m.Groups[1].Value);
-        
-        foreach (var paramName in paramNames)
+        command.CommandText = sql;
+
+        foreach (var paramName in ParameterParser.Extract(sql))
         {
             if (command.Parameters.Contains(paramName)) continue;
             
@@ -539,8 +534,129 @@ public sealed partial class SqlHelper : IDisposable
         command.Prepare();
     }
 
-    [GeneratedRegex(@"[@:$](\w+)")]
-    private static partial Regex ParameterRegex();
-    
+    #endregion
+
+    #region Inner ParameterParser class
+
+    public static class ParameterParser
+    {
+        public static IReadOnlyList<string> Extract(string sql)
+        {
+            HashSet<string> paramNames = [];
+            int limit = sql.Length;
+
+            for (int i = 0; i < limit; i++)
+            {
+                char c = sql[i];
+
+                // skip string literals
+                if (c == '\'')
+                {
+                    i = SkipSingleQuote(sql, i, limit);
+                    continue;
+                }
+
+                // skip quoted identifiers
+                if (c == '"')
+                {
+                    i = SkipDoubleQuote(sql, i, limit);
+                    continue;
+                }
+
+                // skip line comment
+                if (c == '-' && i + 1 < limit && sql[i + 1] == '-')
+                {
+                    i = SkipLineComment(sql, i, limit);
+                    continue;
+                }
+
+                // skip block comment
+                if (c == '/' && i + 1 < limit && sql[i + 1] == '*')
+                {
+                    i = SkipBlockComment(sql, i, limit);
+                    continue;
+                }
+
+                // parameter start
+                if (IsParamPrefix(c))
+                {
+                    int start = ++i;
+
+                    while (i < limit && IsParamChar(sql[i]))
+                        i++;
+
+                    string name = sql[start..i];
+                    paramNames.Add(name);
+
+                    i--;
+                }
+            }
+
+            return [..paramNames];
+        }
+
+        private static bool IsParamPrefix(char c) => c is '@' or ':' or '$' or '?';
+
+        private static bool IsParamChar(char c) => char.IsLetterOrDigit(c) || c == '_';
+
+        private static int SkipSingleQuote(string sql, int i, int limit)
+        {
+            i++;
+
+            while (i < limit)
+            {
+                if (sql[i] == '\'')
+                {
+                    if (i + 1 < limit && sql[i + 1] == '\'')
+                    {
+                        i += 2;
+                        continue;
+                    }
+
+                    return i;
+                }
+
+                i++;
+            }
+
+            return limit - 1;
+        }
+
+        private static int SkipDoubleQuote(string sql, int i, int limit)
+        {
+            i++;
+
+            while (i < limit)
+            {
+                if (sql[i] == '"') return i;
+                i++;
+            }
+
+            return limit - 1;
+        }
+
+        private static int SkipLineComment(string sql, int i, int limit)
+        {
+            i += 2;
+            while (i < limit && sql[i] != '\n')
+                i++;
+            return i;
+        }
+
+        private static int SkipBlockComment(string sql, int i, int limit)
+        {
+            i += 2;
+
+            while (i + 1 < limit)
+            {
+                if (sql[i] == '*' && sql[i + 1] == '/')
+                    return i + 1;
+                i++;
+            }
+
+            return limit - 1;
+        }
+    }
+
     #endregion
 }
