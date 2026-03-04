@@ -251,6 +251,29 @@ public sealed class SqlHelper : IDisposable
         return affectedRows;
     }
 
+    /// <summary>
+    /// Prepares the specified database command by ensuring that all parameters
+    /// referenced in the command's text are added to its parameters collection
+    /// and are ready for use during execution.
+    /// </summary>
+    /// <param name="command">The database command to be prepared.</param>
+    /// <param name="sql">The command's text.</param>
+    private static void PrepareCommand(DbCommand command, string sql)
+    {
+        command.CommandText = sql;
+
+        foreach (var paramName in ParameterParser.Extract(sql))
+        {
+            if (command.Parameters.Contains(paramName)) continue;
+
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = paramName;
+            command.Parameters.Add(parameter);
+        }
+
+        command.Prepare();
+    }
+
     #endregion
 
     #region ExecuteScript method
@@ -501,32 +524,6 @@ public sealed class SqlHelper : IDisposable
             var value = entityType.InvokeMember(parameter.ParameterName, GET_PROPERTY_FLAGS, null, entity, null);
             parameter.Value = value;
         }
-    }
-
-    #endregion
-    
-    #region Helper methods
-
-    /// <summary>
-    /// Prepares the specified database command by ensuring that all parameters
-    /// referenced in the command's text are added to its parameters collection
-    /// and are ready for use during execution.
-    /// </summary>
-    /// <param name="command">The database command to be prepared.</param>
-    private static void PrepareCommand(DbCommand command, string sql)
-    {
-        command.CommandText = sql;
-
-        foreach (var paramName in ParameterParser.Extract(sql))
-        {
-            if (command.Parameters.Contains(paramName)) continue;
-            
-            var parameter = command.CreateParameter();
-            parameter.ParameterName = paramName;
-            command.Parameters.Add(parameter);
-        }
-        
-        command.Prepare();
     }
 
     #endregion
