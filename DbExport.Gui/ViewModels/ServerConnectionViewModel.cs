@@ -45,6 +45,7 @@ public partial class ServerConnectionViewModel : ConnectionViewModel
     private void ReloadCatalogs()
     {
         AllCatalogs.Clear();
+        AvailableSchemas.Clear();
 
         if (string.IsNullOrWhiteSpace(DataProvider?.DatabaseListQuery)) return;
         

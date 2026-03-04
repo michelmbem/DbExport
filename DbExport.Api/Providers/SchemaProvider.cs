@@ -62,25 +62,24 @@ public static class SchemaProvider
         var allPairs = provider.GetTableNames();
         var filteredPairs = string.IsNullOrWhiteSpace(schema) ? allPairs : Array.FindAll(allPairs, IsInSchema);
 
-        foreach (var (tableName, tableOwner) in filteredPairs)
+        foreach (var pair in filteredPairs)
         {
-            var table = GetTable(provider, database, tableName, tableOwner);
+            var table = GetTable(provider, database, pair.Name, pair.Owner);
             database.Tables.Add(table);
         }
 
         allPairs = provider.GetTypeNames();
         filteredPairs = string.IsNullOrWhiteSpace(schema) ? allPairs : Array.FindAll(allPairs, IsInSchema);
 
-        foreach (var (typeName, typeOwner) in filteredPairs)
+        foreach (var pair in filteredPairs)
         {
-            var dataType = GetDataType(provider, database, typeName, typeOwner);
+            var dataType = GetDataType(provider, database, pair.Name, pair.Owner);
             database.DataTypes.Add(dataType);
         }
 
         return database;
-        
-        bool IsInSchema(NameOwnerPair pair) =>
-            schema.Equals(pair.Owner, StringComparison.OrdinalIgnoreCase);
+
+        bool IsInSchema(NameOwnerPair pair) => schema.Equals(pair.Owner, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

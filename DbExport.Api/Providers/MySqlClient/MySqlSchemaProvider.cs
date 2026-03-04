@@ -51,13 +51,13 @@ public partial class MySqlSchemaProvider : ISchemaProvider
                                INFORMATION_SCHEMA.TABLES
                            WHERE
                                TABLE_TYPE = 'BASE TABLE' AND
-                               TABLE_SCHEMA = '{0}'
+                               TABLE_SCHEMA = @DatabaseName
                            ORDER BY
                                NAME
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        return [..helper.Query(string.Format(sql, DatabaseName), SqlHelper.ToEntityList<NameOwnerPair>)];
+        return [..helper.Query(sql, this, SqlHelper.FromEntity, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
     public string[] GetColumnNames(string tableName, string tableOwner)
@@ -339,13 +339,13 @@ public partial class MySqlSchemaProvider : ISchemaProvider
                                    AND C.TABLE_NAME = T.TABLE_NAME
                                    AND T.TABLE_TYPE = 'BASE TABLE'
                            WHERE
-                               C.DATA_TYPE IN('enum', 'set') AND C.TABLE_SCHEMA = '{0}'
+                               C.DATA_TYPE IN('enum', 'set') AND C.TABLE_SCHEMA = @DatabaseName
                            ORDER BY
                                NAME
                            """;
 
         using var helper = new SqlHelper(ProviderName, ConnectionString);
-        return [..helper.Query(string.Format(sql, DatabaseName), SqlHelper.ToEntityList<NameOwnerPair>)];
+        return [..helper.Query(sql, this, SqlHelper.FromEntity, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
     public MetaData GetTypeMeta(string typeName, string typeOwner)

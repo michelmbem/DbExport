@@ -18,17 +18,6 @@ public sealed class NameOwnerPair
     /// </summary>
     public string Owner { get; set; }
 
-    /// <summary>
-    /// Deconstructs the current <see cref="NameOwnerPair"/> instance into separate name and owner values.
-    /// </summary>
-    /// <param name="name">Outputs the name value of the current pair.</param>
-    /// <param name="owner">Outputs the owner value of the current pair.</param>
-    public void Deconstruct(out string name, out string owner)
-    {
-        name = Name;
-        owner = Owner;
-    }
-
     /// <inheritdoc/>
     public override bool Equals(object obj) =>
         obj is NameOwnerPair other && Name == other.Name && Owner == other.Owner;
