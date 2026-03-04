@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using DbExport.Providers;
 using DbExport.Providers.Firebird;
 using DbExport.Providers.MySqlClient;
@@ -20,21 +21,33 @@ namespace DbExport;
 /// and executing SQL scripts with support for different database providers.
 /// The class implements IDisposable to ensure proper disposal of database connections when necessary.
 /// </summary>
-public sealed class SqlHelper : IDisposable
+public sealed partial class SqlHelper : IDisposable
 {
-    #region Fields
+    #region Constants
 
     /// <summary>
-    /// Specifies the binding flags used for setting properties when invoking members on an object via reflection.
-    /// These flags include:
-    /// - `SetProperty`: Allows setting property values.
-    /// - `Instance`: Targets instance members.
-    /// - `Public`: Includes public members of the object.
-    /// - `IgnoreCase`: Allows case-insensitive member name matching.
-    /// This constant is primarily used within reflection-based utility methods, such as object mapping from database results.
+    /// Defines a set of binding flags used for property access within the SqlHelper class.
+    /// Includes flags for public, instance-level, and case-insensitive member access.
     /// </summary>
-    private const BindingFlags SET_PROPERTY_FLAGS = BindingFlags.SetProperty | BindingFlags.Instance |
-                                                    BindingFlags.Public | BindingFlags.IgnoreCase;
+    private const BindingFlags PROPERTY_FLAGS = BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
+
+    /// <summary>
+    /// Represents a combination of binding flags used to access and modify properties
+    /// within the SqlHelper class. Includes public, instance-level, case-insensitive
+    /// member access, and property-setting capabilities.
+    /// </summary>
+    private const BindingFlags GET_PROPERTY_FLAGS = PROPERTY_FLAGS | BindingFlags.GetProperty;
+
+    /// <summary>
+    /// Defines a combination of binding flags used to set property values on objects,
+    /// including public, instance-level, and case-insensitive member access.
+    /// Extends the base property flags by adding support for property value setting.
+    /// </summary>
+    private const BindingFlags SET_PROPERTY_FLAGS = PROPERTY_FLAGS | BindingFlags.SetProperty;
+    
+    #endregion
+    
+    #region Fields
 
     /// <summary>
     /// Indicates whether the SqlHelper instance is responsible for disposing of the database connection.
@@ -74,6 +87,7 @@ public sealed class SqlHelper : IDisposable
     public SqlHelper(string providerName, string connectionString) :
         this(Utility.GetConnection(providerName, connectionString))
     {
+        connection.Open();
         disposeConnection = true;
     }
 
@@ -83,6 +97,7 @@ public sealed class SqlHelper : IDisposable
     /// <param name="database">The Database object containing the provider name and connection string for the database connection.</param>
     public SqlHelper(Database database) : this(Utility.GetConnection(database))
     {
+        connection.Open();
         disposeConnection = true;
     }
 
@@ -128,24 +143,11 @@ public sealed class SqlHelper : IDisposable
     /// <returns>A result of type TResult obtained by processing the data reader with the extractor function.</returns>
     public TResult Query<TResult>(string sql, Func<DbDataReader, TResult> extractor)
     {
-        TResult result;
+        using var command = connection.CreateCommand();
+        command.CommandText = sql;
 
-        try
-        {
-            connection.Open();
-
-            using var command = connection.CreateCommand();
-            command.CommandText = sql;
-
-            using var dataReader = command.ExecuteReader();
-            result = extractor(dataReader);
-        }
-        finally
-        {
-            connection.Close();
-        }
-
-        return result;
+        using var dataReader = command.ExecuteReader();
+        return extractor(dataReader);
     }
 
     /// <summary>
@@ -155,22 +157,9 @@ public sealed class SqlHelper : IDisposable
     /// <returns>The value of the first column of the first row in the result set, or null if the result set is empty.</returns>
     public object QueryScalar(string sql)
     {
-        object result;
-
-        try
-        {
-            connection.Open();
-
-            using var command = connection.CreateCommand();
-            command.CommandText = sql;
-            result = command.ExecuteScalar();
-        }
-        finally
-        {
-            connection.Close();
-        }
-
-        return result;
+        using var command = connection.CreateCommand();
+        command.CommandText = sql;
+        return command.ExecuteScalar();
     }
 
 
@@ -181,19 +170,48 @@ public sealed class SqlHelper : IDisposable
     /// <returns>The number of rows affected by the command.</returns>
     public int Execute(string sql)
     {
-        int result;
+        using var command = connection.CreateCommand();
+        command.CommandText = sql;
+        return command.ExecuteNonQuery();
+    }
 
-        try
-        {
-            connection.Open();
+    /// <summary>
+    /// Executes a parameterized SQL command using the specified parameter source and binder.
+    /// </summary>
+    /// <param name="sql">The SQL command to execute.</param>
+    /// <param name="paramSource">The source object providing parameter values for the command.</param>
+    /// <param name="binder">The action to bind the parameter values from the source object to the command.</param>
+    /// <typeparam name="TSource">The type of the parameter source object.</typeparam>
+    /// <returns>The number of rows affected by the command execution.</returns>
+    public int Execute<TSource>(string sql, TSource paramSource, Action<DbCommand, TSource> binder)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = sql;
+        PrepareCommand(command);
+        binder(command, paramSource);
+        return command.ExecuteNonQuery();
+    }
 
-            using var command = connection.CreateCommand();
-            command.CommandText = sql;
-            result = command.ExecuteNonQuery();
-        }
-        finally
+    /// <summary>
+    /// Executes a batch of SQL commands using a provided SQL statement and a collection of parameters.
+    /// </summary>
+    /// <param name="sql">The SQL command to be executed for each item in the collection.</param>
+    /// <param name="paramSources">The collection of parameter sources, where each item represents the parameters for a single execution of the SQL command.</param>
+    /// <param name="binder">A delegate that binds the parameters from a parameter source to a database command.</param>
+    /// <typeparam name="TSource">The type of the parameter source used for binding.</typeparam>
+    /// <returns>The total number of rows affected by all executed commands in the batch.</returns>
+    public int ExecuteBatch<TSource>(string sql, IEnumerable<TSource> paramSources, Action<DbCommand, TSource> binder)
+    {
+        var result = 0;
+
+        using var command = connection.CreateCommand();
+        command.CommandText = sql;
+        PrepareCommand(command);
+
+        foreach (var paramSource in paramSources)
         {
-            connection.Close();
+            binder(command, paramSource);
+            result += command.ExecuteNonQuery();
         }
 
         return result;
@@ -407,5 +425,73 @@ public sealed class SqlHelper : IDisposable
         return result;
     }
 
+    #endregion
+    
+    #region Parameter binders
+
+    /// <summary>
+    /// Populates the parameters of a database command with the specified array of values.
+    /// </summary>
+    /// <param name="command">The database command whose parameters will be populated.</param>
+    /// <param name="values">An array of values to assign to the command's parameters.</param>
+    public static void FromArray(DbCommand command, object[] values)
+    {
+        for (var i = 0; i < values.Length; ++i)
+            command.Parameters[i].Value = values[i];
+    }
+
+    /// <summary>
+    /// Populates the parameters of a database command with values from the provided dictionary.
+    /// </summary>
+    /// <param name="command">The database command whose parameters will be populated.</param>
+    /// <param name="values">A dictionary containing parameter names as keys and their corresponding values.</param>
+    public static void FromDictionary(DbCommand command, Dictionary<string, object> values)
+    {
+        foreach (var (key, value) in values)
+            command.Parameters[key].Value = value;
+    }
+
+    /// <summary>
+    /// Sets the parameter values of the specified <see cref="DbCommand"/>
+    /// using the property values of the provided entity.
+    /// </summary>
+    /// <param name="command">The database command whose parameters will be updated.</param>
+    /// <param name="entity">The entity from which the parameter values are retrieved.</param>
+    /// <typeparam name="TEntity">The type of the entity, which must be a reference type.</typeparam>
+    public static void FromEntity<TEntity>(DbCommand command, TEntity entity) where TEntity : class
+    {
+        var entityType = typeof(TEntity);
+
+        foreach (DbParameter parameter in command.Parameters)
+        {
+            var value = entityType.InvokeMember(parameter.ParameterName, GET_PROPERTY_FLAGS, null, entity, null);
+            parameter.Value = value;
+        }
+    }
+
+    #endregion
+    
+    #region Helper methods
+
+    private static void PrepareCommand(DbCommand command)
+    {
+        var paramNames = ParameterRegex().Matches(command.CommandText)
+                                         .Select(m => m.Groups[1].Value);
+        
+        foreach (var paramName in paramNames)
+        {
+            if (command.Parameters.Contains(paramName)) continue;
+            
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = paramName;
+            command.Parameters.Add(parameter);
+        }
+        
+        command.Prepare();
+    }
+
+    [GeneratedRegex(@"[@:$](\w+)")]
+    private static partial Regex ParameterRegex();
+    
     #endregion
 }
