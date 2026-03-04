@@ -1,4 +1,5 @@
 using DbExport.Providers;
+using static DbExport.SqlHelper;
 
 namespace DbExport.Tests;
 
@@ -36,9 +37,9 @@ public class SqlHelperTest
         // Act
         using var helper = new SqlHelper(ProviderNames.SQLITE, "Data Source=:memory:");
         helper.Execute(sql);
-        helper.ExecuteBatch("INSERT INTO test_table (name, price) VALUES (@name, @price)", testItems, SqlHelper.FromEntity);
+        helper.ExecuteBatch("INSERT INTO test_table (name, price) VALUES (@name, @price)", testItems, FromEntity);
         
-        var fetchedItems = helper.Query("SELECT * FROM test_table", SqlHelper.ToEntityList<TestItem>);
+        var fetchedItems = helper.Query("SELECT * FROM test_table", ToEntityList<TestItem>);
 
         // Assert
         Assert.Equal(testItems.Count, fetchedItems.Count);
