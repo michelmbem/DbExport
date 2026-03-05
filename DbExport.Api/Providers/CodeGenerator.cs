@@ -197,10 +197,14 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         if (visitData)
         {
             WriteDataMigrationPrefix();
+
+            var queryOptions = QueryOptions.None;
+            if (visitIdent) queryOptions |= QueryOptions.SkipIdentity;
+            if (GeneratesRowVersion) queryOptions |= QueryOptions.SkipRowVersion;
             
             foreach (var table in database.Tables.Where(table => table.IsChecked))
             {
-                using var dataReader = SqlHelper.OpenTable(table, visitIdent, GeneratesRowVersion);
+                using var dataReader = SqlHelper.OpenTable(table, queryOptions);
                 var rowsInserted = false;
 
                 while (dataReader.Read())

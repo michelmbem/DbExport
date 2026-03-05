@@ -62,13 +62,17 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         }
 
         if (visitData)
+        {
+            var queryOptions = visitIdent ? QueryOptions.SkipIdentity : QueryOptions.None;
+            
             foreach (Table table in database.Tables.Where(t => t.IsChecked))
             {
-                using var dataReader = SqlHelper.OpenTable(table, visitIdent, false);
+                using var dataReader = SqlHelper.OpenTable(table, queryOptions);
 
                 while (dataReader.Read())
                     ImportRecord(table, dataReader);
             }
+        }
 
         if (!visitSchema || !visitFKs) return;
 

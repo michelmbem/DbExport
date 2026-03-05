@@ -14,6 +14,16 @@ using DbExport.Schema;
 
 namespace DbExport;
 
+[Flags]
+public enum QueryOptions
+{
+    None = 0,
+    SkipIdentity = 1,
+    SkipComputed = 2,
+    SkipRowVersion = 4,
+    SkipGenerated = SkipIdentity | SkipComputed | SkipRowVersion
+}
+
 /// <summary>
 /// A helper class for executing SQL queries and scripts against a database.
 /// It provides methods for querying data, executing non-query commands,
@@ -342,16 +352,15 @@ public sealed class SqlHelper : IDisposable
     /// Opens a database table for reading and returns a data reader for the resulting query.
     /// </summary>
     /// <param name="table">The table to be queried.</param>
-    /// <param name="skipIdentity">Specifies whether to exclude identity columns in the query.</param>
-    /// <param name="skipRowVersion">Specifies whether to exclude row version columns in the query.</param>
+    /// <param name="options">Specifies which columns to exclude from the query.</param>
     /// <returns>A data reader containing the results of the query.</returns>
-    public static DbDataReader OpenTable(Table table, bool skipIdentity, bool skipRowVersion)
+    public static DbDataReader OpenTable(Table table, QueryOptions options)
     {
         var connection = Utility.GetConnection(table.Database);
         connection.Open();
 
         var command = connection.CreateCommand();
-        command.CommandText = GenerateSelect(table, skipIdentity, skipRowVersion);
+        command.CommandText = GenerateSelect(table, options);
         
         return command.ExecuteReader(CommandBehavior.CloseConnection);
     }
@@ -364,34 +373,32 @@ public sealed class SqlHelper : IDisposable
     /// </remarks>
     /// <param name="targetConnection">The database connection where the table data will be inserted.</param>
     /// <param name="table">The source table containing the data to be copied.</param>
-    /// <param name="skipIdentity">A flag indicating whether to skip identity columns during the operation.</param>
-    /// <param name="skipRowVersion">A flag indicating whether to skip row version columns during the operation.</param>
-    public static void CopyTable(DbConnection targetConnection, Table table, bool skipIdentity, bool skipRowVersion)
+    /// <param name="options">Specifies which columns to exclude from the SELECT and INSERT queries.</param>
+    public static void CopyTable(DbConnection targetConnection, Table table, QueryOptions options)
     {
         using var helper = new SqlHelper(targetConnection);
-        using var sourceReader = OpenTable(table, skipIdentity, skipRowVersion);
-        var insertSql = GenerateInsert(table, helper.ProviderName, skipIdentity);
+        using var sourceReader = OpenTable(table, options);
+        var insertSql = GenerateInsert(table, helper.ProviderName, options);
         helper.ExecuteBatch(insertSql, sourceReader);
     }
 
     #endregion
-    
+
     #region SQL generation methods
 
     /// <summary>
     /// Generates a SQL SELECT statement for the specified table,
-    /// optionally skipping identity and row version columns.
+    /// optionally skipping identity, computed, and row version columns.
     /// </summary>
     /// <param name="table">The table for which the SELECT statement is generated.</param>
-    /// <param name="skipIdentity">Determines whether identity columns should be excluded from the SELECT statement.</param>
-    /// <param name="skipRowVersion">Determines whether row version columns should be excluded from the SELECT statement.</param>
+    /// <param name="options">Specifies which columns to exclude from the query.</param>
     /// <returns>A string representing the generated SQL SELECT statement.</returns>
-    public static string GenerateSelect(Table table, bool skipIdentity, bool skipRowVersion)
+    public static string GenerateSelect(Table table, QueryOptions options)
     {
         StringBuilder sb = new("SELECT ");
         var providerName = table.Database.ProviderName;
 
-        foreach (var column in table.Columns.Where(ShouldNotSkip))
+        foreach (var column in table.Columns.Where(c => ShouldNotSkip(c, options)))
             sb.Append(Utility.Escape(column.Name, providerName)).Append(", ");
 
         sb.Length -= 2;
@@ -402,9 +409,23 @@ public sealed class SqlHelper : IDisposable
         sb.Append(Utility.Escape(table.Name, providerName));
         
         return sb.ToString();
-        
-        bool ShouldNotSkip(Column c) => !(skipIdentity && c.IsIdentity ||
-                                          skipRowVersion && c.ColumnType == ColumnType.RowVersion);
+    }
+
+    /// <summary>
+    /// Generates a SQL SELECT statement for the specified table and key,
+    /// optionally skipping identity, computed, and row version columns.
+    /// </summary>
+    /// <param name="table">The table for which the SELECT statement is generated.</param
+    /// <param name="key">The key for which to filter the selected rows.</param>
+    /// <param name="options">Specifies which columns to exclude from the query.</param>
+    /// <returns>A string representing the generated SQL SELECT statement.</returns>
+    public static string GenerateSelect(Table table, Key key, QueryOptions options)
+    {
+        StringBuilder sb = new();
+        sb.Append(GenerateSelect(table, options));
+        GenerateFilter(key, table.Database.ProviderName, sb);
+
+        return sb.ToString();
     }
 
     /// <summary>
@@ -412,28 +433,26 @@ public sealed class SqlHelper : IDisposable
     /// </summary>
     /// <param name="table">The table for which the insert statement is to be generated.</param>
     /// <param name="providerName">The name of the database provider, used for escaping identifiers.</param>
-    /// <param name="skipIdentity">A boolean flag indicating whether identity columns should be skipped in the insert statement.</param>
+    /// <param name="options">Specifies which columns to exclude from the query.</param>
     /// <returns>A string containing the generated SQL insert statement.</returns>
-    public static string GenerateInsert(Table table, string providerName, bool skipIdentity)
+    public static string GenerateInsert(Table table, string providerName, QueryOptions options)
     {
         StringBuilder sb = new("INSERT INTO ");
         sb.Append(Utility.Escape(table.Name, providerName)).Append(" (");
 
-        foreach (var column in table.Columns.Where(ShouldNotSkip))
+        foreach (var column in table.Columns.Where(c => ShouldNotSkip(c, options)))
             sb.Append(Utility.Escape(column.Name, providerName)).Append(", ");
 
         sb.Length -= 2;
         sb.Append(") VALUES (");
 
-        foreach (var column in table.Columns.Where(ShouldNotSkip))
+        foreach (var column in table.Columns.Where(c => ShouldNotSkip(c, options)))
             sb.Append(Utility.ToParameterName(column.Name, providerName)).Append(", ");
 
         sb.Length -= 2;
         sb.Append(')');
         
         return sb.ToString();
-        
-        bool ShouldNotSkip(Column c) => !(skipIdentity && c.IsIdentity);
     }
 
     /// <summary>
@@ -441,32 +460,25 @@ public sealed class SqlHelper : IDisposable
     /// </summary>
     /// <param name="table">The table for which the SQL UPDATE statement will be generated.</param>
     /// <param name="providerName">The name of the database provider, used for escaping identifiers properly.</param>
+    /// <param name="options">Specifies which columns to exclude from the query.</param>
     /// <returns>A string containing the generated SQL UPDATE statement.</returns>
-    public static string GenerateUpdate(Table table, string providerName)
+    public static string GenerateUpdate(Table table, string providerName, QueryOptions options)
     {
         StringBuilder sb = new("UPDATE ");
         sb.Append(Utility.Escape(table.Name, providerName)).Append(" SET ");
 
-        foreach (var columnName in table.Columns.Where(ShouldNotSkip).Select(c => c.Name))
+        foreach (var columnName in table.Columns
+                                        .Where(c => ShouldNotSkip(c, options))
+                                        .Select(c => c.Name))
         {
             sb.Append(Utility.Escape(columnName, providerName)).Append(" = ");
             sb.Append(Utility.ToParameterName(columnName, providerName)).Append(", ");
         }
 
         sb.Length -= 2;
-        sb.Append(" WHERE ");
+        GenerateFilter(table.PrimaryKey, providerName, sb);
 
-        foreach (var columnName in table.PrimaryKey.Columns.Select(c => c.Name))
-        {
-            sb.Append(Utility.Escape(columnName, providerName)).Append(" = ");
-            sb.Append(Utility.ToParameterName(columnName, providerName)).Append(" AND ");
-        }
-
-        sb.Length -= 5;
-        
         return sb.ToString();
-
-        bool ShouldNotSkip(Column c) => !(c.IsPKColumn || c.IsComputed);
     }
 
     /// <summary>
@@ -479,18 +491,28 @@ public sealed class SqlHelper : IDisposable
     {
         StringBuilder sb = new("DELETE FROM ");
         sb.Append(Utility.Escape(table.Name, providerName));
+        GenerateFilter(table.PrimaryKey, providerName, sb);
+
+        return sb.ToString();
+    }
+
+    private static void GenerateFilter(Key key, string providerName, StringBuilder sb)
+    {
         sb.Append(" WHERE ");
 
-        foreach (var columnName in table.PrimaryKey.Columns.Select(c => c.Name))
+        foreach (var columnName in key.Columns.Select(c => c.Name))
         {
             sb.Append(Utility.Escape(columnName, providerName)).Append(" = ");
             sb.Append(Utility.ToParameterName(columnName, providerName)).Append(" AND ");
         }
 
         sb.Length -= 5;
-        
-        return sb.ToString();
     }
+
+    private static bool ShouldNotSkip(Column c, QueryOptions o) =>
+        !((o.HasFlag(QueryOptions.SkipIdentity) && c.IsIdentity) ||
+          (o.HasFlag(QueryOptions.SkipComputed) && c.IsComputed) ||
+          (o.HasFlag(QueryOptions.SkipRowVersion) && c.ColumnType == ColumnType.RowVersion));
 
     #endregion
 
