@@ -67,7 +67,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
             
             foreach (Table table in database.Tables.Where(t => t.IsChecked))
             {
-                using var dataReader = SqlHelper.OpenTable(table, queryOptions);
+                using var dataReader = table.OpenReader(queryOptions);
 
                 while (dataReader.Read())
                     ImportRecord(table, dataReader);

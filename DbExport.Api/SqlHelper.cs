@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using DbExport.Providers;
 using DbExport.Providers.Firebird;
 using DbExport.Providers.MySqlClient;
@@ -13,16 +11,6 @@ using DbExport.Providers.SqlClient;
 using DbExport.Schema;
 
 namespace DbExport;
-
-[Flags]
-public enum QueryOptions
-{
-    None = 0,
-    SkipIdentity = 1,
-    SkipComputed = 2,
-    SkipRowVersion = 4,
-    SkipGenerated = SkipIdentity | SkipComputed | SkipRowVersion
-}
 
 /// <summary>
 /// A helper class for executing SQL queries and scripts against a database.
@@ -343,176 +331,6 @@ public sealed class SqlHelper : IDisposable
             ProviderNames.ORACLE => new BatchScriptExecutor(providerName),
             _ => new SimpleScriptExecutor(providerName)
         };
-
-    #endregion
-
-    #region OpenTable and CopyTable methods
-
-    /// <summary>
-    /// Opens a database table for reading and returns a data reader for the resulting query.
-    /// </summary>
-    /// <param name="table">The table to be queried.</param>
-    /// <param name="options">Specifies which columns to exclude from the query.</param>
-    /// <returns>A data reader containing the results of the query.</returns>
-    public static DbDataReader OpenTable(Table table, QueryOptions options)
-    {
-        var connection = Utility.GetConnection(table.Database);
-        connection.Open();
-
-        var command = connection.CreateCommand();
-        command.CommandText = GenerateSelect(table, options);
-        
-        return command.ExecuteReader(CommandBehavior.CloseConnection);
-    }
-
-    /// <summary>
-    /// Copies the data from the specified source table to the target database connection.
-    /// </summary>
-    /// <remarks>
-    /// There should be a table with the same name and similar structure in the target database.
-    /// </remarks>
-    /// <param name="targetConnection">The database connection where the table data will be inserted.</param>
-    /// <param name="table">The source table containing the data to be copied.</param>
-    /// <param name="options">Specifies which columns to exclude from the SELECT and INSERT queries.</param>
-    public static void CopyTable(DbConnection targetConnection, Table table, QueryOptions options)
-    {
-        using var helper = new SqlHelper(targetConnection);
-        using var sourceReader = OpenTable(table, options);
-        var insertSql = GenerateInsert(table, helper.ProviderName, options);
-        helper.ExecuteBatch(insertSql, sourceReader);
-    }
-
-    #endregion
-
-    #region SQL generation methods
-
-    /// <summary>
-    /// Generates a SQL SELECT statement for the specified table,
-    /// optionally skipping identity, computed, and row version columns.
-    /// </summary>
-    /// <param name="table">The table for which the SELECT statement is generated.</param>
-    /// <param name="options">Specifies which columns to exclude from the query.</param>
-    /// <returns>A string representing the generated SQL SELECT statement.</returns>
-    public static string GenerateSelect(Table table, QueryOptions options)
-    {
-        StringBuilder sb = new("SELECT ");
-        var providerName = table.Database.ProviderName;
-
-        foreach (var column in table.Columns.Where(c => ShouldNotSkip(c, options)))
-            sb.Append(Utility.Escape(column.Name, providerName)).Append(", ");
-
-        sb.Length -= 2;
-        sb.Append(" FROM ");
-        
-        if (!string.IsNullOrEmpty(table.Owner))
-            sb.Append(Utility.Escape(table.Owner, providerName)).Append('.');
-        sb.Append(Utility.Escape(table.Name, providerName));
-        
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Generates a SQL SELECT statement for the specified table and key,
-    /// optionally skipping identity, computed, and row version columns.
-    /// </summary>
-    /// <param name="table">The table for which the SELECT statement is generated.</param
-    /// <param name="key">The key for which to filter the selected rows.</param>
-    /// <param name="options">Specifies which columns to exclude from the query.</param>
-    /// <returns>A string representing the generated SQL SELECT statement.</returns>
-    public static string GenerateSelect(Table table, Key key, QueryOptions options)
-    {
-        StringBuilder sb = new();
-        sb.Append(GenerateSelect(table, options));
-        GenerateFilter(key, table.Database.ProviderName, sb);
-
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Generates an SQL insert statement for the specified table based on the given provider.
-    /// </summary>
-    /// <param name="table">The table for which the insert statement is to be generated.</param>
-    /// <param name="providerName">The name of the database provider, used for escaping identifiers.</param>
-    /// <param name="options">Specifies which columns to exclude from the query.</param>
-    /// <returns>A string containing the generated SQL insert statement.</returns>
-    public static string GenerateInsert(Table table, string providerName, QueryOptions options)
-    {
-        StringBuilder sb = new("INSERT INTO ");
-        sb.Append(Utility.Escape(table.Name, providerName)).Append(" (");
-
-        foreach (var column in table.Columns.Where(c => ShouldNotSkip(c, options)))
-            sb.Append(Utility.Escape(column.Name, providerName)).Append(", ");
-
-        sb.Length -= 2;
-        sb.Append(") VALUES (");
-
-        foreach (var column in table.Columns.Where(c => ShouldNotSkip(c, options)))
-            sb.Append(Utility.ToParameterName(column.Name, providerName)).Append(", ");
-
-        sb.Length -= 2;
-        sb.Append(')');
-        
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Generates an SQL UPDATE statement for the specified table, based on the provided database provider name.
-    /// </summary>
-    /// <param name="table">The table for which the SQL UPDATE statement will be generated.</param>
-    /// <param name="providerName">The name of the database provider, used for escaping identifiers properly.</param>
-    /// <param name="options">Specifies which columns to exclude from the query.</param>
-    /// <returns>A string containing the generated SQL UPDATE statement.</returns>
-    public static string GenerateUpdate(Table table, string providerName, QueryOptions options)
-    {
-        StringBuilder sb = new("UPDATE ");
-        sb.Append(Utility.Escape(table.Name, providerName)).Append(" SET ");
-
-        foreach (var columnName in table.Columns
-                                        .Where(c => !c.IsPKColumn && ShouldNotSkip(c, options))
-                                        .Select(c => c.Name))
-        {
-            sb.Append(Utility.Escape(columnName, providerName)).Append(" = ");
-            sb.Append(Utility.ToParameterName(columnName, providerName)).Append(", ");
-        }
-
-        sb.Length -= 2;
-        GenerateFilter(table.PrimaryKey, providerName, sb);
-
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Generates a SQL DELETE statement for the specified table and provider.
-    /// </summary>
-    /// <param name="table">The table for which the DELETE statement will be generated.</param>
-    /// <param name="providerName">The name of the database provider to determine escaping and parameter conventions.</param>
-    /// <returns>A string containing the SQL DELETE statement.</returns>
-    public static string GenerateDelete(Table table, string providerName)
-    {
-        StringBuilder sb = new("DELETE FROM ");
-        sb.Append(Utility.Escape(table.Name, providerName));
-        GenerateFilter(table.PrimaryKey, providerName, sb);
-
-        return sb.ToString();
-    }
-
-    private static void GenerateFilter(Key key, string providerName, StringBuilder sb)
-    {
-        sb.Append(" WHERE ");
-
-        foreach (var columnName in key.Columns.Select(c => c.Name))
-        {
-            sb.Append(Utility.Escape(columnName, providerName)).Append(" = ");
-            sb.Append(Utility.ToParameterName(columnName, providerName)).Append(" AND ");
-        }
-
-        sb.Length -= 5;
-    }
-
-    private static bool ShouldNotSkip(Column c, QueryOptions o) =>
-        !((o.HasFlag(QueryOptions.SkipIdentity) && c.IsIdentity) ||
-          (o.HasFlag(QueryOptions.SkipComputed) && c.IsComputed) ||
-          (o.HasFlag(QueryOptions.SkipRowVersion) && c.ColumnType == ColumnType.RowVersion));
 
     #endregion
 
