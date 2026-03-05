@@ -18,12 +18,12 @@ public class TableExtensionsTest
                            DROP TABLE IF EXISTS categories;
                            CREATE TABLE categories
                            (
-                               id INTEGER PRIMARY KEY,
+                               id INTEGER PRIMARY KEY AUTOINCREMENT,
                                name TEXT NOT NULL
                            );
                            CREATE TABLE products
                            (
-                               id INTEGER PRIMARY KEY,
+                               id INTEGER PRIMARY KEY AUTOINCREMENT,
                                name TEXT NOT NULL,
                                price NUMERIC,
                                categoryid INTEGER NOT NULL,
@@ -33,7 +33,7 @@ public class TableExtensionsTest
 
         List<Category> categories = [];
         List<Product> products = [];
-        var k = 1;
+        var k = 1L;
 
         for (var i = 1; i <= 5; ++i)
         {
@@ -71,7 +71,7 @@ public class TableExtensionsTest
         for (var i = 0; i < fetchedProducts.Count; ++i)
             Assert.Equal(products[i], fetchedProducts[i]);
 
-        fetchedProducts = productTable.Select<Product>(productTable.ForeignKeys[0], 4);
+        fetchedProducts = productTable.Select<Product>(productTable.ForeignKeys[0], 4L);
         Assert.Equal(10, fetchedProducts.Count);
 
         for (var i = 0; i < fetchedProducts.Count; ++i)
@@ -80,7 +80,7 @@ public class TableExtensionsTest
             Assert.Equal(products[30 + i], fetchedProducts[i]); // products[3 * 10 + i]
         }
 
-        k = 1;
+        k = 1L;
         foreach (var product in fetchedProducts)
         {
             product.Name = $"Product #{k} of category #{product.CategoryId}";
@@ -91,15 +91,34 @@ public class TableExtensionsTest
 
         for (var i = 1; i <= 10; ++i)
         {
-            var product = Assert.Single(productTable.Select<Product>(productTable.PrimaryKey, 30 + i));
+            var product = Assert.Single(productTable.Select<Product>(productTable.PrimaryKey, 30L + i));
             Assert.Equal($"Product #{i} of category #4", product.Name);
         }
 
         Assert.True(productTable.DeleteBatch(fetchedProducts));
-        Assert.Empty(productTable.Select<Product>(productTable.ForeignKeys[0], 4));
+        Assert.Empty(productTable.Select<Product>(productTable.ForeignKeys[0], 4L));
 
         fetchedProducts = productTable.Select<Product>();
         Assert.Equal(products.Count - 10, fetchedProducts.Count);
+        Assert.DoesNotContain(fetchedProducts, p => p.CategoryId == 4L);
+
+        var newProduct = new Product { Name = "My fancy product", CategoryId = 4L };
+        Assert.True(productTable.Insert(newProduct));
+
+        newProduct = Assert.Single(productTable.Select<Product>(productTable.ForeignKeys[0], 4L));
+        Assert.NotEqual(0L, newProduct.Id);
+        Assert.Equal("My fancy product", newProduct.Name);
+
+        k = newProduct.Id;
+        newProduct.Name = "Updated fancy product";
+        Assert.True(productTable.Update(newProduct));
+
+        newProduct = Assert.Single(productTable.Select<Product>(productTable.PrimaryKey, k));
+        Assert.Equal("Updated fancy product", newProduct.Name);
+
+        Assert.True(productTable.Delete(newProduct));
+        Assert.Empty(productTable.Select<Product>(productTable.PrimaryKey, k));
+        Assert.False(productTable.Delete(k));
     }
 
     #region Inner types

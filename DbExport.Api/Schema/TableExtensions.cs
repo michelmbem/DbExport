@@ -6,7 +6,6 @@ namespace DbExport.Schema;
 
 public static class TableExtensions
 {
-
     #region Query methods
 
     public static TRowSet Select<TRowSet>(this Table table, Func<DbDataReader, TRowSet> extractor)
