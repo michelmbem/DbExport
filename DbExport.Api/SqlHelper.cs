@@ -468,7 +468,7 @@ public sealed class SqlHelper : IDisposable
         sb.Append(Utility.Escape(table.Name, providerName)).Append(" SET ");
 
         foreach (var columnName in table.Columns
-                                        .Where(c => ShouldNotSkip(c, options))
+                                        .Where(c => !c.IsPKColumn && ShouldNotSkip(c, options))
                                         .Select(c => c.Name))
         {
             sb.Append(Utility.Escape(columnName, providerName)).Append(" = ");

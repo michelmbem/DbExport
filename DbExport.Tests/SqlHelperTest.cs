@@ -3,33 +3,14 @@ using static DbExport.SqlHelper;
 
 namespace DbExport.Tests;
 
-public sealed class TestItem
-{
-    public long Id { get; set; }
-
-    public string? Name { get; set; }
-
-    public decimal Price { get; set; }
-
-    public override bool Equals(object? obj) => obj is TestItem item &&
-        Equals(Id, item.Id) && Equals(Name, item.Name) && Equals(Price, item.Price);
-
-    public override int GetHashCode() => HashCode.Combine(Id, Name, Price);
-
-    public override string ToString() => $"TestItem {{ Id: {Id}, Name: {Name}, Price: {Price} }}";
-}
-
 public class SqlHelperTest
 {
-    static SqlHelperTest()
-    {
-        Utility.RegisterDbProviderFactories();
-    }
-
     [Fact]
     public void GenericTest()
     {
         // Arrange
+        TestInitializer.EnsureInitialized();
+
         const string sql = """
                            CREATE TABLE test_table (
                                id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -75,4 +56,25 @@ public class SqlHelperTest
         fetchedItems = helper.Query("SELECT * FROM test_table WHERE name NOT LIKE 'Item that costs $%'", ToEntityList<TestItem>);
         Assert.Equal(testItem, Assert.Single(fetchedItems));
     }
+
+    #region Inner types
+
+    private sealed class TestItem
+    {
+        public long Id { get; set; }
+
+        public string? Name { get; set; }
+
+        public decimal Price { get; set; }
+
+        public override bool Equals(object? obj) => obj is TestItem item &&
+            Equals(Id, item.Id) && Equals(Name, item.Name) && Equals(Price, item.Price);
+
+        public override int GetHashCode() => HashCode.Combine(Id, Name, Price);
+
+        public override string ToString() =>
+            $"{nameof(TestItem)} {{ Id: {Id}, Name: {Name}, Price: {Price} }}";
+    }
+
+    #endregion
 }
