@@ -27,7 +27,8 @@
     "resource": [
       {
         "files": [
-          "docs/screenshots/**"
+          "docs/screenshots/**",
+          "styles/**"
         ]
       }
     ],

@@ -1,0 +1,11 @@
+/* Workaround for occasional stale bootstrap backdrop in DocFX default template. */
+.modal-backdrop {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.modal-open {
+  overflow: auto !important;
+  padding-right: 0 !important;
+}
