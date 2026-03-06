@@ -1,9 +1,9 @@
 # DbExport Documentation
 
-This site is generated with DocFX and published with GitHub Pages.
+This documentation covers DbExport usage and architecture, including setup guidance, provider-specific behavior, and complete API references for schema extraction, SQL generation, and script execution across supported databases.
 
 ## Sections
 
-- [README](README.md)
-- [API Overview (Markdown)](docs/DbExport.Api.md)
-- [API Reference (DocFX)](docs/api/toc.yml)
+- [Readme](README.md)
+- [API Overview](docs/DbExport.Api.md)
+- [API Reference](docs/api/toc.yml)
