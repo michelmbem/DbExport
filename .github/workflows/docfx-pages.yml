@@ -36,6 +36,11 @@ jobs:
       - name: Build API overview markdown
         run: ./scripts/generate-api-docs.sh
 
+      - name: Generate DocFX metadata
+        run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          docfx metadata docfx.json
+
       - name: Build DocFX site
         run: |
           export PATH="$PATH:$HOME/.dotnet/tools"

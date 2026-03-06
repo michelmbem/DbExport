@@ -117,3 +117,9 @@ appsettings.*.json
 ##################################
 .env
 .env.*
+
+##################################
+# Generated documentation files
+##################################
+_site/
+docs/api/

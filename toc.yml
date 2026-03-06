@@ -1,8 +1,8 @@
 - name: Home
   href: index.md
-- name: README
+- name: Readme
   href: README.md
 - name: API Overview (Markdown)
   href: docs/DbExport.Api.md
 - name: API Reference (DocFX)
-  href: api/toc.yml
+  href: docs/api/toc.yml

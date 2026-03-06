@@ -9,7 +9,7 @@
           ]
         }
       ],
-      "dest": "api"
+      "dest": "docs/api"
     }
   ],
   "build": {
@@ -18,9 +18,9 @@
         "files": [
           "index.md",
           "README.md",
+          "toc.yml",
           "docs/**/*.md",
-          "api/**.yml",
-          "toc.yml"
+          "docs/api/**.yml"
         ]
       }
     ],
@@ -34,7 +34,8 @@
     ],
     "dest": "_site",
     "template": [
-      "default"
+      "default",
+      "modern"
     ],
     "globalMetadata": {
       "_appTitle": "DbExport Documentation",
