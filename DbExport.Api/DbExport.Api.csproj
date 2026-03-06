@@ -4,6 +4,7 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <RootNamespace>DbExport</RootNamespace>
     <OutputPath>..\Bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
