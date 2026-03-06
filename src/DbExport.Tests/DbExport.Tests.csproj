@@ -23,6 +23,7 @@
 
   <ItemGroup>
 	<ProjectReference Include="..\DbExport.Api\DbExport.Api.csproj"/>
+	<ProjectReference Include="..\DbExport.Gui\DbExport.Gui.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
