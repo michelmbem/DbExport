@@ -154,22 +154,30 @@ Artifacts are emitted under `Bin/Release/`.
 -->
 
 ### 1. Source Database Setup
-Brief description of what this screen shows.
+Use this screen to configure the source database connection:
+server/host, port, username, and password.
+You can also choose the source schema to migrate.
+A similar screen is used to configure the target database.
 
 ![Source Database Setup](docs/screenshots/source-database-setup.png)
 
 ### 2. Migration Options
-Brief description of what this screen shows.
+Use this screen to choose the migration mode and options, including whether to include primary keys, foreign keys, defaults, indexes, and identity columns.
+You can export schema only, data only, or both.
+For some providers, additional provider-specific options are available.
 
 ![Migration Options](docs/screenshots/migration-options.png)
 
 ### 3. Items Selection
-Brief description of what this screen shows.
+On this screen, you can choose which tables, columns, keys, and indexes to include in the migration.
 
 ![Items Selection](docs/screenshots/items-selection.png)
 
 ### 4. Generated SQL Script
-Brief description of what this screen shows.
+The final screen displays the generated SQL script.
+Depending on the selected target provider, you can save the script to a file or execute it directly.
+To run it directly, the target connection must be correctly configured in the third step.
+For Oracle targets, create the destination schema manually before starting the migration.
 
 ![Generated SQL Script](docs/screenshots/generated-sql-script.png)
 
