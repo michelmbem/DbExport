@@ -20,7 +20,6 @@
           "README.md",
           "docs/**/*.md",
           "api/**.yml",
-          "api/index.md",
           "toc.yml"
         ]
       }

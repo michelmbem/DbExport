@@ -5,4 +5,4 @@
 - name: API Overview (Markdown)
   href: docs/DbExport.Api.md
 - name: API Reference (DocFX)
-  href: api/index.md
+  href: api/toc.yml
