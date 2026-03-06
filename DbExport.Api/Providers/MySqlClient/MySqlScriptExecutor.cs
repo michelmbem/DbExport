@@ -10,6 +10,7 @@ namespace DbExport.Providers.MySqlClient;
 /// </summary>
 public partial class MySqlScriptExecutor() : BatchScriptExecutor(ProviderNames.MYSQL)
 {
+    /// <inheritdoc/>
     public override void Execute(string connectionString, string script)
     {
         var createDbRegex = CreateDbRegex();

@@ -7,6 +7,12 @@ using DbExport.Schema;
 
 namespace DbExport.Providers.SqlClient;
 
+/// <summary>
+/// Provides schema-related metadata for a MS SQL Sever database,
+/// allowing access to table, column, index, foreign key, and type information.
+/// This class implements the <see cref="ISchemaProvider"/> interface and serves as
+/// a provider for MS SQL Sever database schemas.
+/// </summary>
 public partial class SqlSchemaProvider : ISchemaProvider
 {
     /// <summary>
@@ -29,12 +35,16 @@ public partial class SqlSchemaProvider : ISchemaProvider
 
     #region ISchemaProvider Members
 
+    /// <inheritdoc/>
     public string ProviderName => ProviderNames.SQLSERVER;
 
+    /// <inheritdoc/>
     public string ConnectionString { get; }
 
+    /// <inheritdoc/>
     public string DatabaseName { get; }
 
+    /// <inheritdoc/>
     public NameOwnerPair[] GetTableNames()
     {
         const string sql = """
@@ -56,6 +66,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return [..helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
+    /// <inheritdoc/>
     public string[] GetColumnNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -75,6 +86,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
+    /// <inheritdoc/>
     public string[] GetIndexNames(string tableName, string tableOwner)
     {
         using var helper = new SqlHelper(ProviderName, ConnectionString);
@@ -82,6 +94,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return [..list.Select(values => values[0].ToString())];
     }
 
+    /// <inheritdoc/>
     public string[] GetForeignKeyNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -100,6 +113,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
+    /// <inheritdoc/>
     public MetaData GetTableMeta(string tableName, string tableOwner)
     {
         const string sql = """
@@ -144,6 +158,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         const string sql1 = """
@@ -234,6 +249,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         using var helper = new SqlHelper(ProviderName, ConnectionString);
@@ -259,6 +275,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <inheritdoc/>
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         const string sql = """
@@ -320,6 +337,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <inheritdoc/>
     public NameOwnerPair[] GetTypeNames()
     {
         const string sql = """
@@ -335,6 +353,7 @@ public partial class SqlSchemaProvider : ISchemaProvider
         return [..helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
+    /// <inheritdoc/>
     public MetaData GetTypeMeta(string typeName, string typeOwner)
     {
         const string sql = """

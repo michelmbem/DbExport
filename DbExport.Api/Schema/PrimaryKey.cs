@@ -32,6 +32,7 @@ public class PrimaryKey : Key
     /// </summary>
     public bool IsIdentity => Columns.Count == 1 && Columns[0].IsIdentity;
 
+    /// <inheritdoc/>
     public override void AcceptVisitor(IVisitor visitor)
     {
         visitor.VisitPrimaryKey(this);

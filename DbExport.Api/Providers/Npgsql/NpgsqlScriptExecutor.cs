@@ -11,6 +11,7 @@ namespace DbExport.Providers.Npgsql;
 /// </summary>
 public partial class NpgsqlScriptExecutor() : BatchScriptExecutor(ProviderNames.POSTGRESQL)
 {
+    /// <inheritdoc/>
     public override void Execute(string connectionString, string script)
     {
         var createDbRegex = CreateDbRegex();

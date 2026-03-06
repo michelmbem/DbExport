@@ -37,9 +37,11 @@ public abstract class SchemaItem : IVisitorAcceptor
 
     #region Implementation of IVisitorAcceptor
 
+    /// <inheritdoc/>
     public abstract void AcceptVisitor(IVisitor visitor);
 
     #endregion
 
+    /// <inheritdoc/>
     public override string ToString() => $"{GetType().Name}[{FullName}]";
 }

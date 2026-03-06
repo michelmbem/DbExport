@@ -80,6 +80,7 @@ public class ForeignKey : Key
     /// <returns>The <see cref="Column"/> object corresponding to the specified index, or null if the related table or column is not found.</returns>
     public Column GetRelatedColumn(int i) => RelatedTable?.Columns[RelatedColumnNames[i]];
 
+    /// <inheritdoc/>
     public override void AcceptVisitor(IVisitor visitor)
     {
         visitor.VisitForeignKey(this);

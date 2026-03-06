@@ -35,12 +35,14 @@ public class NpgsqlCodeGenerator : CodeGenerator
 
     #region Overriden Properties
 
+    /// <inheritdoc/>
     public override string ProviderName => ProviderNames.POSTGRESQL;
 
     #endregion
 
     #region Overriden Methods
 
+    /// <inheritdoc/>
     public override void VisitDataType(DataType dataType)
     {
         if (dataType.PossibleValues.IsEmpty)
@@ -63,6 +65,7 @@ public class NpgsqlCodeGenerator : CodeGenerator
         WriteLine();
     }
 
+    /// <inheritdoc/>
     protected override string GetTypeName(Column column)
     {
         var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
@@ -79,6 +82,7 @@ public class NpgsqlCodeGenerator : CodeGenerator
         return base.GetTypeName(column);
     }
 
+    /// <inheritdoc/>
     protected override string GetTypeName(IDataItem item) =>
         item.ColumnType switch
         {
@@ -109,11 +113,13 @@ public class NpgsqlCodeGenerator : CodeGenerator
             _ => item.NativeType
         };
 
+    /// <inheritdoc/>
     protected override string GetTypeReference(DataType dataType) =>
         dataType.PossibleValues.IsEmpty || dataType.IsEnumerated
             ? $"public.{dataType.Name}"
             : $"public.{dataType.Name}[]";
 
+    /// <inheritdoc/>
     protected override string GetKeyName(Key key)
     {
         switch (key)
@@ -133,6 +139,7 @@ public class NpgsqlCodeGenerator : CodeGenerator
         }
     }
 
+    /// <inheritdoc/>
     protected override string Format(object value, ColumnType columnType)
     {
         if (value == null || value == DBNull.Value) return "NULL";
@@ -147,6 +154,7 @@ public class NpgsqlCodeGenerator : CodeGenerator
         };
     }
 
+    /// <inheritdoc/>
     protected override void WriteDbCreationDirective(Database database)
     {
         WriteLine($"CREATE DATABASE {database.Name};");
@@ -156,6 +164,11 @@ public class NpgsqlCodeGenerator : CodeGenerator
         WriteLine();
     }
 
+    /// <inheritdoc/>
+    /// <remarks>
+    /// PostgreSQL identifies columns with IDENTITY by their type name (smallserial, serial, bigserial).
+    /// So this overload actually does nothing.
+    /// </remarks>
     protected override void WriteIdentitySpecification(Column column)
     {
         // PostgreSQL identifies columns with IDENTITY by their type name (smallserial, serial, bigserial)

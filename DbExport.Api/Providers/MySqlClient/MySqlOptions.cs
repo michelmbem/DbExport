@@ -23,10 +23,13 @@ public sealed class CharacterSet(string name, string[] collations, string defaul
     /// </summary>
     public string DefaultCollation { get; } = defaultCollation;
 
+    /// <inheritdoc/>
     public override bool Equals(object obj) => obj is CharacterSet other && Name == other.Name;
 
+    /// <inheritdoc/>
     public override int GetHashCode() => Name.GetHashCode();
 
+    /// <inheritdoc/>
     public override string ToString() => Name;
 }
 

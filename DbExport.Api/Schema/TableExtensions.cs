@@ -305,7 +305,7 @@ public static class TableExtensions
     /// <typeparam name="TRow">The type of entity to which each row in the table will be mapped. Must be a class with a parameterless constructor.</typeparam>
     /// <returns>A list of entities of the specified type, representing the data from the table.</returns>
     public static List<TRow> Select<TRow>(this Table table) where TRow : class, new() =>
-        Select(table, SqlHelper.ToEntityList<TRow>);
+        table.Select(SqlHelper.ToEntityList<TRow>);
 
     /// <summary>
     /// Executes a SQL SELECT query for the specified table and key and maps the result set
@@ -339,7 +339,7 @@ public static class TableExtensions
     /// <returns>A list of entities of type <typeparamref name="TRow"/> representing the selected rows.</returns>
     public static List<TRow> Select<TRow>(this Table table, Key key, params object[] keyValues)
         where TRow : class, new() =>
-        Select(table, key, keyValues, SqlHelper.FromArray, SqlHelper.ToEntityList<TRow>);
+        table.Select(key, keyValues, SqlHelper.FromArray, SqlHelper.ToEntityList<TRow>);
 
     #endregion
 
@@ -368,7 +368,7 @@ public static class TableExtensions
     /// <param name="rowValue">The data for the row to be inserted.</param>
     /// <returns>A boolean indicating whether the row was successfully inserted.</returns>
     public static bool Insert<TRow>(this Table table, TRow rowValue) where TRow : class, new() =>
-        Insert(table, rowValue, SqlHelper.FromEntity);
+        table.Insert(rowValue, SqlHelper.FromEntity);
 
     /// <summary>
     /// Inserts a new row into the specified table using the provided values.
@@ -377,7 +377,7 @@ public static class TableExtensions
     /// <param name="rowValues">An array of values representing the data for the row to be inserted.</param>
     /// <returns>A boolean value indicating whether the insert operation was successful.</returns>
     public static bool Insert(this Table table, params object[] rowValues) =>
-        Insert(table, rowValues, SqlHelper.FromArray);
+        table.Insert(rowValues, SqlHelper.FromArray);
 
     /// <summary>
     /// Executes an update operation on the specified table using the given row value and a binding action to populate parameter values.
@@ -402,7 +402,7 @@ public static class TableExtensions
     /// <param name="rowValue">The object containing the data to update the table with.</param>
     /// <returns>A boolean indicating whether the update operation was successful.</returns>
     public static bool Update<TRow>(this Table table, TRow rowValue) where TRow : class, new() =>
-        Update(table, rowValue, SqlHelper.FromEntity);
+        table.Update(rowValue, SqlHelper.FromEntity);
 
     /// <summary>
     /// Deletes a record from the specified table based on the provided key value and binds the key using the given key binder.
@@ -427,7 +427,7 @@ public static class TableExtensions
     /// <param name="keyValue">The key value of the record to be deleted.</param>
     /// <returns>A boolean value indicating whether the deletion was successful.</returns>
     public static bool Delete<TKey>(this Table table, TKey keyValue) where TKey : class, new() =>
-        Delete(table, keyValue, SqlHelper.FromEntity);
+        table.Delete(keyValue, SqlHelper.FromEntity);
 
     /// <summary>
     /// Deletes a row from the specified table using the provided key values to identify the target row.
@@ -436,7 +436,7 @@ public static class TableExtensions
     /// <param name="keyValues">An array of key values used to locate the row to delete.</param>
     /// <returns>A boolean value indicating whether the deletion was successful.</returns>
     public static bool Delete(this Table table, params object[] keyValues) =>
-        Delete(table, keyValues, SqlHelper.FromArray);
+        table.Delete(keyValues, SqlHelper.FromArray);
 
     #endregion
 
@@ -466,7 +466,7 @@ public static class TableExtensions
     /// <param name="rowValues">The collection of row values to be inserted into the table.</param>
     /// <returns>True if the batch insert operation succeeds; otherwise, false.</returns>
     public static bool InsertBatch<TRow>(this Table table, IEnumerable<TRow> rowValues) where TRow : class, new() =>
-        InsertBatch(table, rowValues, SqlHelper.FromEntity);
+        table.InsertBatch(rowValues, SqlHelper.FromEntity);
 
     /// <summary>
     /// Updates a batch of rows in the specified table using the provided row values and a function to bind parameter values to the command.
@@ -492,7 +492,7 @@ public static class TableExtensions
     /// <param name="rowValues">The collection of row values to be updated in the table.</param>
     /// <returns>True if the batch update is successful; otherwise, false.</returns>
     public static bool UpdateBatch<TRow>(this Table table, IEnumerable<TRow> rowValues) where TRow : class, new() =>
-        UpdateBatch(table, rowValues, SqlHelper.FromEntity);
+        table.UpdateBatch(rowValues, SqlHelper.FromEntity);
 
     /// <summary>
     /// Executes a batch delete operation for the specified table based on a collection of key values.
@@ -520,7 +520,7 @@ public static class TableExtensions
     /// <param name="keyValues">A collection of key values identifying the records to be deleted.</param>
     /// <returns>A boolean indicating whether the operation was successful.</returns>
     public static bool DeleteBatch<TKey>(this Table table, IEnumerable<TKey> keyValues) where TKey : class, new() =>
-        DeleteBatch(table, keyValues, SqlHelper.FromEntity);
+        table.DeleteBatch(keyValues, SqlHelper.FromEntity);
 
     #endregion
 }

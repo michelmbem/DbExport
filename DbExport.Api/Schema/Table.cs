@@ -82,6 +82,7 @@ public class Table(Database db, string name, string owner) : ColumnSet(db, name)
     public TableCollection ReferencingTables =>
         [..Database.Tables.Where(table => table.GetReferencingKey(this) != null)];
 
+    /// <inheritdoc/>
     public override string FullName => string.IsNullOrEmpty(Owner) ? Name : $"{Owner}.{Name}";
 
     /// <summary>
@@ -113,6 +114,7 @@ public class Table(Database db, string name, string owner) : ColumnSet(db, name)
     public bool IsAssociationTable() =>
         ReferencedTables.Count > 1 && Columns.All(column => column.IsFKColumn || column.IsGenerated);
 
+    /// <inheritdoc/>
     public override void AcceptVisitor(IVisitor visitor)
     {
         visitor.VisitTable(this);

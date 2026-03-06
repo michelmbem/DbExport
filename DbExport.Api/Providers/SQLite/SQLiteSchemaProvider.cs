@@ -64,12 +64,16 @@ public class SQLiteSchemaProvider : ISchemaProvider
 
     #region ISchemaProvider Members
 
+    /// <inheritdoc/>
     public string ProviderName => ProviderNames.SQLITE;
 
+    /// <inheritdoc/>
     public string ConnectionString { get; }
 
+    /// <inheritdoc/>
     public string DatabaseName { get; }
 
+    /// <inheritdoc/>
     public NameOwnerPair[] GetTableNames()
     {
         const string sql1 = """
@@ -94,6 +98,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return [..list1];
     }
 
+    /// <inheritdoc/>
     public string[] GetColumnNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -109,6 +114,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return [..list.Select(item => item["name"].ToString())];
     }
 
+    /// <inheritdoc/>
     public string[] GetIndexNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -124,6 +130,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return [..list.Select(item => item["name"].ToString())];
     }
 
+    /// <inheritdoc/>
     public string[] GetForeignKeyNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -142,6 +149,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return [..list.Select(item => item["name"].ToString())];
     }
 
+    /// <inheritdoc/>
     public MetaData GetTableMeta(string tableName, string tableOwner)
     {
         MetaData metadata = new()
@@ -165,6 +173,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         var column = FindFirst(tableColumns, tableOwner, tableName, item => columnName.Equals(item["name"]));
@@ -200,6 +209,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         var index = FindFirst(tableIndexes, tableOwner, tableName, item => indexName.Equals(item["name"]));
@@ -225,6 +235,7 @@ public class SQLiteSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         var fk = FindFirst(tableForeignKeys, tableOwner, tableName, item => fkName.Equals(item["name"]));

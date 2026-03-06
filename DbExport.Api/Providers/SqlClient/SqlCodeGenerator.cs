@@ -44,16 +44,20 @@ public class SqlCodeGenerator : CodeGenerator
 
     #region Overriden Properties
 
+    /// <inheritdoc/>
     public override string ProviderName => ProviderNames.SQLSERVER;
 
+    /// <inheritdoc/>
     protected override bool SupportsDbCreation => !IsFileBased;
 
+    /// <inheritdoc/>
     protected override bool GeneratesRowVersion => true;
 
     #endregion
 
     #region Overriden Methods
 
+    /// <inheritdoc/>
     public override void VisitDataType(DataType dataType)
     {
         Write($"CREATE TYPE [dbo].{Escape(dataType.Name)} FROM {GetTypeName(dataType)}");
@@ -61,6 +65,7 @@ public class SqlCodeGenerator : CodeGenerator
         WriteLine();
     }
 
+    /// <inheritdoc/>
     protected override string GetTypeName(IDataItem item) =>
         item.ColumnType switch
         {
@@ -88,8 +93,10 @@ public class SqlCodeGenerator : CodeGenerator
             _ => item.NativeType
         };
 
+    /// <inheritdoc/>
     protected override string GetTypeReference(DataType dataType) => $"[dbo].{Escape(dataType.Name)}";
 
+    /// <inheritdoc/>
     protected override string Format(object value, ColumnType columnType)
     {
         if (value == null || value == DBNull.Value) return "NULL";
@@ -106,12 +113,14 @@ public class SqlCodeGenerator : CodeGenerator
         };
     }
 
+    /// <inheritdoc/>
     protected override void WriteDelimiter()
     {
         WriteLine();
         WriteLine("GO");
     }
 
+    /// <inheritdoc/>
     protected override void WriteDbCreationDirective(Database database)
     {
         Write("CREATE DATABASE {0}", Escape(database.Name));
@@ -132,6 +141,7 @@ public class SqlCodeGenerator : CodeGenerator
         WriteLine();
     }
 
+    /// <inheritdoc/>
     protected override void WriteIdentitySpecification(Column column)
     {
         Write(" IDENTITY({0}, {1}) NOT NULL", column.IdentitySeed, column.IdentityIncrement);

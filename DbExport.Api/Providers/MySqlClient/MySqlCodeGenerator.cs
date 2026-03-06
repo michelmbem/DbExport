@@ -41,14 +41,17 @@ public class MySqlCodeGenerator : CodeGenerator
 
     #region Overriden Properties
 
+    /// <inheritdoc/>
     public override string ProviderName => ProviderNames.MYSQL;
 
+    /// <inheritdoc/>
     protected override bool GeneratesRowVersion => true;
 
     #endregion
 
     #region Overriden Methods
 
+    /// <inheritdoc/>
     protected override string GetTypeName(IDataItem item) =>
         item.ColumnType switch
         {
@@ -81,6 +84,7 @@ public class MySqlCodeGenerator : CodeGenerator
             _ => item.NativeType
         };
 
+    /// <inheritdoc/>
     protected override string GetTypeReference(DataType dataType)
     {
         if (dataType.PossibleValues.IsEmpty) return base.GetTypeReference(dataType);
@@ -91,6 +95,7 @@ public class MySqlCodeGenerator : CodeGenerator
         return $"{(dataType.IsEnumerated ? "enum" : "set")}({string.Join(", ", members)})";
     }
 
+    /// <inheritdoc/>
     protected override string Format(object value, ColumnType columnType) =>
         columnType switch
         {
@@ -99,11 +104,13 @@ public class MySqlCodeGenerator : CodeGenerator
             _ => base.Format(value, columnType)
         };
 
+    /// <inheritdoc/>
     protected override void WriteIdentitySpecification(Column column)
     {
         Write($" NOT NULL AUTO_INCREMENT, AUTO_INCREMENT={column.IdentitySeed}");
     }
 
+    /// <inheritdoc/>
     protected override void WriteTableCreationSuffix(Table table)
     {
         var engine = MySqlOptions?.StorageEngine;

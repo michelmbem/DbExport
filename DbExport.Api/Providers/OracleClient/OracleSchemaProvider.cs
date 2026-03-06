@@ -31,12 +31,16 @@ public class OracleSchemaProvider : ISchemaProvider
 
     #region ISchemaProvider Members
 
+    /// <inheritdoc/>
     public string ProviderName => ProviderNames.ORACLE;
 
+    /// <inheritdoc/>
     public string ConnectionString { get; }
 
+    /// <inheritdoc/>
     public string DatabaseName { get; }
 
+    /// <inheritdoc/>
     public NameOwnerPair[] GetTableNames()
     {
         const string sql = """
@@ -64,6 +68,7 @@ public class OracleSchemaProvider : ISchemaProvider
         return [..helper.Query(sql, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
+    /// <inheritdoc/>
     public string[] GetColumnNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -81,6 +86,7 @@ public class OracleSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
+    /// <inheritdoc/>
     public string[] GetIndexNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -98,6 +104,7 @@ public class OracleSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
+    /// <inheritdoc/>
     public string[] GetForeignKeyNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -116,6 +123,7 @@ public class OracleSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
+    /// <inheritdoc/>
     public MetaData GetTableMeta(string tableName, string tableOwner)
     {
         const string sql = """
@@ -162,6 +170,7 @@ public class OracleSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         const string sql = """
@@ -205,6 +214,7 @@ public class OracleSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         const string sql1 = """
@@ -258,6 +268,7 @@ public class OracleSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <inheritdoc/>
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         const string sql = """

@@ -35,6 +35,7 @@ public class Database(string name, string providerName, string connectionString)
     /// </summary>
     public TableCollection Tables { get; } = [];
 
+    /// <inheritdoc/>
     public override void AcceptVisitor(IVisitor visitor)
     {
         visitor.VisitDatabase(this);

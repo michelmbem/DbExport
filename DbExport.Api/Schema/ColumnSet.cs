@@ -14,6 +14,7 @@ public abstract class ColumnSet(SchemaItem parent, string name) :
     /// </summary>
     public ColumnCollection Columns { get; } = [];
 
+    /// <inheritdoc/>
     public bool IsChecked { get; set; }
 
     /// <summary>

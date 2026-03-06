@@ -18,6 +18,7 @@ namespace DbExport.Providers.SqlClient;
 /// </example>
 public partial class SqlScripExecutor : IScriptExecutor
 {
+    /// <inheritdoc/>
     public void Execute(string connectionString, string script)
     {
         using var conn = new SqlConnection(connectionString);

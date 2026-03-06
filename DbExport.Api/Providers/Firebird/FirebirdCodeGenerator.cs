@@ -45,12 +45,14 @@ public class FirebirdCodeGenerator : CodeGenerator
 
     #region Overriden Properties
 
+    /// <inheritdoc/>
     public override string ProviderName => ProviderNames.FIREBIRD;
 
     #endregion
 
     #region Overriden Methods
 
+    /// <inheritdoc/>
     public override void VisitDataType(DataType dataType)
     {
         Write($"CREATE DOMAIN {Escape(dataType.Name)} AS {GetTypeName(dataType)}");
@@ -65,6 +67,7 @@ public class FirebirdCodeGenerator : CodeGenerator
         WriteLine();
     }
 
+    /// <inheritdoc/>
     protected override string GetTypeName(IDataItem item) =>
         item.ColumnType switch
         {
@@ -92,8 +95,10 @@ public class FirebirdCodeGenerator : CodeGenerator
             _ => item.NativeType ?? "VARCHAR(255)"
         };
 
+    /// <inheritdoc/>
     protected override string GetTypeReference(DataType dataType) => Escape(dataType.Name);
 
+    /// <inheritdoc/>
     protected override string GetKeyName(Key key)
     {
         switch (key)
@@ -113,6 +118,7 @@ public class FirebirdCodeGenerator : CodeGenerator
         }
     }
 
+    /// <inheritdoc/>
     protected override string Format(object value, ColumnType columnType)
     {
         if (value == null || value == DBNull.Value) return "NULL";
@@ -131,6 +137,7 @@ public class FirebirdCodeGenerator : CodeGenerator
         };
     }
 
+    /// <inheritdoc/>
     protected override void WriteDbCreationDirective(Database database)
     {
         var dbName = Path.Combine(FirebirdOptions.DataDirectory, database.Name);
@@ -139,11 +146,13 @@ public class FirebirdCodeGenerator : CodeGenerator
         WriteLine();
     }
 
+    /// <inheritdoc/>
     protected override void WriteUpdateRule(ForeignKeyRule updateRule)
     {
         // Firebird does NOT support ON UPDATE
     }
 
+    /// <inheritdoc/>
     protected override void WriteDeleteRule(ForeignKeyRule deleteRule)
     {
         if (deleteRule != ForeignKeyRule.None &&

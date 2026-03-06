@@ -36,12 +36,16 @@ public partial class MySqlSchemaProvider : ISchemaProvider
 
     #region ISchemaProvider Members
 
+    /// <inheritdoc/>
     public string ProviderName => ProviderNames.MYSQL;
 
+    /// <inheritdoc/>
     public string ConnectionString { get; }
 
+    /// <inheritdoc/>
     public string DatabaseName { get; }
 
+    /// <inheritdoc/>
     public NameOwnerPair[] GetTableNames()
     {
         const string sql = """
@@ -60,6 +64,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         return [..helper.Query(sql, this, SqlHelper.FromEntity, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
+    /// <inheritdoc/>
     public string[] GetColumnNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -79,6 +84,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
+    /// <inheritdoc/>
     public string[] GetIndexNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -98,6 +104,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
+    /// <inheritdoc/>
     public string[] GetForeignKeyNames(string tableName, string tableOwner)
     {
         const string sql = """
@@ -117,6 +124,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         return [..list.Select(item => item.ToString())];
     }
 
+    /// <inheritdoc/>
     public MetaData GetTableMeta(string tableName, string tableOwner)
     {
         const string sql = """
@@ -164,6 +172,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         const string sql = """
@@ -230,6 +239,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         const string sql = """
@@ -273,6 +283,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <inheritdoc/>
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         const string sql = """
@@ -327,6 +338,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <inheritdoc/>
     public NameOwnerPair[] GetTypeNames()
     {
         const string sql = """
@@ -348,6 +360,7 @@ public partial class MySqlSchemaProvider : ISchemaProvider
         return [..helper.Query(sql, this, SqlHelper.FromEntity, SqlHelper.ToEntityList<NameOwnerPair>)];
     }
 
+    /// <inheritdoc/>
     public MetaData GetTypeMeta(string typeName, string typeOwner)
     {
         const string sql = """

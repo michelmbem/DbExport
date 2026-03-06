@@ -15,6 +15,7 @@ namespace DbExport.Providers.Firebird;
 /// </remarks>
 public partial class FirebirdScriptExecutor : IScriptExecutor
 {
+    /// <inheritdoc/>
     public void Execute(string connectionString, string script)
     {
         var createDbRegex = CreateDbRegex();

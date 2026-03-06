@@ -37,12 +37,16 @@ public class AccessSchemaProvider : ISchemaProvider
 
     #region ISchemaProvider Members
 
+    /// <inheritdoc/>
     public string ProviderName => ProviderNames.ACCESS;
 
+    /// <inheritdoc/>
     public string ConnectionString { get; }
 
+    /// <inheritdoc/>
     public string DatabaseName { get; }
 
+    /// <inheritdoc/>
     public NameOwnerPair[] GetTableNames()
     {
         List<NameOwnerPair> tablePairs = [];
@@ -56,6 +60,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return [..tablePairs];
     }
 
+    /// <inheritdoc/>
     public string[] GetColumnNames(string tableName, string tableOwner)
     {
         List<string> columnNames = [];
@@ -67,6 +72,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return [..columnNames];
     }
 
+    /// <inheritdoc/>
     public string[] GetIndexNames(string tableName, string tableOwner)
     {
         List<string> indexNames = [];
@@ -78,6 +84,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return [..indexNames];
     }
 
+    /// <inheritdoc/>
     public string[] GetForeignKeyNames(string tableName, string tableOwner)
     {
         List<string> fkNames = [];
@@ -92,6 +99,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return [..fkNames];
     }
 
+    /// <inheritdoc/>
     public MetaData GetTableMeta(string tableName, string tableOwner)
     {
         var table = catalog.Tables[tableName];
@@ -117,6 +125,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetColumnMeta(string tableName, string tableOwner, string columnName)
     {
         var table = catalog.Tables[tableName];
@@ -161,6 +170,7 @@ public class AccessSchemaProvider : ISchemaProvider
         return metadata;
     }
 
+    /// <inheritdoc/>
     public MetaData GetIndexMeta(string tableName, string tableOwner, string indexName)
     {
         var table = catalog.Tables[tableName];
@@ -179,6 +189,7 @@ public class AccessSchemaProvider : ISchemaProvider
         };
     }
 
+    /// <inheritdoc/>
     public MetaData GetForeignKeyMeta(string tableName, string tableOwner, string fkName)
     {
         var table = catalog.Tables[tableName];

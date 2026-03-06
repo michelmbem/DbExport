@@ -98,10 +98,13 @@ public class DataType(
     /// </summary>
     public bool IsRequired => !IsNullable;
 
+    /// <inheritdoc/>
     public bool IsChecked { get; set; }
-    
+
+    /// <inheritdoc/>
     public override string FullName => string.IsNullOrEmpty(Owner) ? Name : $"{Owner}.{Name}";
 
+    /// <inheritdoc/>
     public override void AcceptVisitor(IVisitor visitor)
     {
         visitor.VisitDataType(this);

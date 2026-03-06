@@ -23,6 +23,7 @@ public interface IScriptExecutor
 /// <param name="providerName">The name of the database provider used to establish the connection.</param>
 public class SimpleScriptExecutor(string providerName) : IScriptExecutor
 {
+    /// <inheritdoc/>
     public void Execute(string connectionString, string script)
     {
         using var helper = new SqlHelper(providerName, connectionString);
@@ -42,6 +43,7 @@ public class SimpleScriptExecutor(string providerName) : IScriptExecutor
 /// <param name="providerName">The name of the database provider used to establish the connection.</param>
 public partial class BatchScriptExecutor(string providerName) : IScriptExecutor
 {
+    /// <inheritdoc/>
     public virtual void Execute(string connectionString, string script)
     {
         using var conn = Utility.GetConnection(providerName, connectionString);

@@ -180,6 +180,7 @@ public class Column(
     /// </summary>
     public bool IsBinary => Attributes.HasFlag(ColumnAttributes.Binary);
 
+    /// <inheritdoc/>
     public bool IsChecked { get; set; }
 
     /// <summary>
@@ -203,6 +204,7 @@ public class Column(
         IdentityIncrement = increment;
     }
 
+    /// <inheritdoc/>
     public override void AcceptVisitor(IVisitor visitor)
     {
         visitor.VisitColumn(this);

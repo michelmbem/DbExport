@@ -38,6 +38,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
     #region IVisitor Members
 
+    /// <inheritdoc/>
     public void VisitDatabase(Database database)
     {
         var visitSchema = ExportOptions?.ExportSchema == true;
@@ -83,6 +84,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         }
     }
 
+    /// <inheritdoc/>
     public void VisitTable(Table table)
     {
         var visitPKs = ExportOptions?.HasFlag(ExportFlags.ExportPrimaryKeys) == true;
@@ -116,6 +118,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         }
     }
 
+    /// <inheritdoc/>
     public void VisitColumn(Column column)
     {
         var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
@@ -128,6 +131,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
             Write(" DEFAULT {0}", Format(column.DefaultValue, column.ColumnType));
     }
 
+    /// <inheritdoc/>
     public void VisitPrimaryKey(PrimaryKey primaryKey)
     {
         Write("PRIMARY KEY (");
@@ -141,6 +145,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         Write(")");
     }
 
+    /// <inheritdoc/>
     public void VisitIndex(Index index)
     {
         Write("CREATE");
@@ -157,6 +162,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         ExecuteQuery();
     }
 
+    /// <inheritdoc/>
     public void VisitForeignKey(ForeignKey foreignKey)
     {
         Write("ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY (",

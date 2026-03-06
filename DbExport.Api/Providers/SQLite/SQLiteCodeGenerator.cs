@@ -37,16 +37,20 @@ public class SQLiteCodeGenerator : CodeGenerator
 
     #region Overriden Properties
 
+    /// <inheritdoc/>
     public override string ProviderName => ProviderNames.SQLITE;
 
+    /// <inheritdoc/>
     protected override bool SupportsDbCreation => false;
 
+    /// <inheritdoc/>
     protected override bool RequireInlineConstraints => true;
 
     #endregion
 
     #region Overriden Methods
 
+    /// <inheritdoc/>
     public override void VisitColumn(Column column)
     {
         var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
@@ -57,12 +61,14 @@ public class SQLiteCodeGenerator : CodeGenerator
             base.VisitColumn(column);
     }
 
+    /// <inheritdoc/>
     public override void VisitPrimaryKey(PrimaryKey primaryKey)
     {
         if (primaryKey.IsIdentity) return;
         base.VisitPrimaryKey(primaryKey);
     }
 
+    /// <inheritdoc/>
     public override void VisitForeignKey(ForeignKey foreignKey)
     {
         WriteLine(",");
@@ -93,6 +99,7 @@ public class SQLiteCodeGenerator : CodeGenerator
             WriteDeleteRule(foreignKey.DeleteRule);
     }
 
+    /// <inheritdoc/>
     protected override string GetTypeName(IDataItem item) =>
         item.ColumnType switch
         {
@@ -114,6 +121,7 @@ public class SQLiteCodeGenerator : CodeGenerator
             _ => "text"
         };
 
+    /// <inheritdoc/>
     protected override string Format(object value, ColumnType columnType)
     {
         if (value == null || value == DBNull.Value) return "NULL";
@@ -126,6 +134,7 @@ public class SQLiteCodeGenerator : CodeGenerator
         };
     }
 
+    /// <inheritdoc/>
     protected override string GetKeyName(Key key)
     {
         var joinedColumnNames = string.Join('_', key.Columns.Select(c => c.Name));
@@ -137,12 +146,14 @@ public class SQLiteCodeGenerator : CodeGenerator
         };
     }
 
+    /// <inheritdoc/>
     protected override void WriteDataMigrationPrefix()
     {
         WriteLine("PRAGMA foreign_keys = OFF;");
         WriteLine();
     }
 
+    /// <inheritdoc/>
     protected override void WriteDataMigrationSuffix()
     {
         WriteLine("PRAGMA foreign_keys = ON;");

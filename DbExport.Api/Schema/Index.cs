@@ -59,6 +59,7 @@ public class Index : Key
     /// </summary>
     public bool MatchesKey => MatchesPrimaryKey || MatchesForeignKey;
 
+    /// <inheritdoc/>
     public override void AcceptVisitor(IVisitor visitor)
     {
         visitor.VisitIndex(this);

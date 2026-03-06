@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,14 +10,15 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription("A relational database migration wizard")]
 [assembly: AssemblyCompany("Addy")]
 [assembly: AssemblyCopyright("Copyright \u00A9 Addy 2014-2026")]
-[assembly: AssemblyVersion("3.0.0")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: AssemblyVersion("3.1.0")]
+[assembly: AssemblyFileVersion("3.1.0.0")]
 [assembly: AssemblyMetadata("GitHubRepoUrl", "https://github.com/michelmbem/DbExport")]
 
 namespace DbExport.Gui.Utilities;
 
 public static class AssemblyInfo
 {
+    [UnconditionalSuppressMessage("SingleFile", "IL3000:Avoid accessing Assembly file path when publishing as a single file")]
     public static string Title => GetAssemblyAttribute<AssemblyTitleAttribute>()?.Title ??
                                   Path.GetFileNameWithoutExtension(ExecutingAssembly.Location);
 
