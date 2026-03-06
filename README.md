@@ -137,21 +137,24 @@ dotnet test
 ```
 
 ## Publishing
+Depending on the target platform, you can publish the app as a single executable
+or a self-contained .NET 10 app using one of the following commands:
 
 ```bash
-dotnet publish -c Release -r win-x64
-dotnet publish -c Release -r linux-x64
-dotnet publish -c Release -r osx-arm64
+dotnet publish DbExport.Gui/DbExport.Gui.csproj -c Release -r win-x64
+dotnet publish DbExport.Gui/DbExport.Gui.csproj -c Release -r win-arm64
+dotnet publish DbExport.Gui/DbExport.Gui.csproj -c Release -r linux-x64
+dotnet publish DbExport.Gui/DbExport.Gui.csproj -c Release -r linux-arm64
+dotnet publish DbExport.Gui/DbExport.Gui.csproj -c Release -r osx-arm64
 ```
 
-Artifacts are emitted under `Bin/Release/`.
+**Notes:**
+- Artifacts are emitted under `Bin/Release/`.
+- You can ommit the `DbExport.Gui/DbExport.Gui.csproj` part if you run the command from the GUI project directory.
+- Each of the above commands is suitable foe a specific OS and architecture, and will create a self-contained app with the specified runtime.
+- You can use the `--self-contained=false` option to create a portable app that can be run on any OS and architecture. But this will require the user to install .NET 10 runtime on their machine.
 
 ## Screenshots
-
-<!--
-  Replace titles, descriptions, and image paths below.
-  Suggested location for images: docs/screenshots/
--->
 
 ### 1. Source Database Setup
 Use this screen to configure the source database connection:
