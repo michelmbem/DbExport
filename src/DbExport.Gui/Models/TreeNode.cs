@@ -130,17 +130,17 @@ public partial class TreeNode : ObservableObject
         if (cascadingCheckState) return;
         
         cascadingCheckState = true;
-        CascadeCheckStateForward(value.Value);
+        CascadeCheckStateForward();
         CascadeCheckStateBackward(Parent);
         cascadingCheckState = false;
     }
 
-    private void CascadeCheckStateForward(bool checkState)
+    private void CascadeCheckStateForward()
     {
         foreach (var child in Children)
         {
-            child.IsChecked = checkState;
-            child.CascadeCheckStateForward(checkState);
+            child.IsChecked = IsChecked;
+            child.CascadeCheckStateForward();
         }
     }
 
