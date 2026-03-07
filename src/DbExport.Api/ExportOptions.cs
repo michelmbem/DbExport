@@ -12,42 +12,42 @@ public enum ExportFlags
     /// Represents no export operation. When this flag is set, no database schema or data will be exported.
     /// Typically used for scenarios where export functionality is disabled or not required.
     /// </summary>
-    ExportNothing = 0,
+    None = 0,
 
     /// <summary>
     /// Represents the export operation for primary key definitions. When this flag is set,
     /// the primary keys of database tables will be included in the export output.
     /// Commonly used to ensure that table structures retain their unique key constraints.
     /// </summary>
-    ExportPrimaryKeys = 1,
+    IncludePrimaryKeys = 1,
 
     /// <summary>
     /// Specifies that foreign key constraints should be included during the export operation.
     /// When this flag is set, all relationships defined by foreign keys in the database schema will be exported.
     /// This is useful for preserving data integrity and enforcing referential rules in the exported schema.
     /// </summary>
-    ExportForeignKeys = 2,
+    IncludeForeignKeys = 2,
 
     /// <summary>
     /// Represents an operation to export database indexes. When this flag is set,
     /// all defined indexes in the database schema will be included in the export process.
     /// This is typically used to preserve and recreate index structures in the target environment.
     /// </summary>
-    ExportIndexes = 4,
+    IncludeIndexes = 4,
 
     /// <summary>
     /// Specifies that default values for database objects, such as columns or data types,
     /// should be included in the export operation. When this flag is enabled, default
     /// constraints or definitions are generated as part of the database schema.
     /// </summary>
-    ExportDefaults = 8,
+    IncludeDefaultValues = 8,
 
     /// <summary>
     /// Represents the export of identity columns from the database schema. When this flag is set, identity columns
     /// (columns with auto-increment or similar behavior) are included during the export process.
     /// Useful for scenarios where retaining identity column definitions is necessary for database migration or replication.
     /// </summary>
-    ExportIdentities = 16
+    IncludeIdentityColumns = 16
 }
 
 /// <summary>

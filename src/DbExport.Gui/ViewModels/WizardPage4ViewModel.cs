@@ -53,12 +53,12 @@ public partial class WizardPage4ViewModel : WizardPageViewModel
     {
         get
         {
-            var flags = ExportFlags.ExportNothing;
-            if (ExportPrimaryKeys) flags |= ExportFlags.ExportPrimaryKeys;
-            if (ExportForeignKeys) flags |= ExportFlags.ExportForeignKeys;
-            if (ExportIndexes) flags |= ExportFlags.ExportIndexes;
-            if (ExportDefaults) flags |= ExportFlags.ExportDefaults;
-            if (ExportIdentities) flags |= ExportFlags.ExportIdentities;
+            var flags = ExportFlags.None;
+            if (ExportPrimaryKeys) flags |= ExportFlags.IncludePrimaryKeys;
+            if (ExportForeignKeys) flags |= ExportFlags.IncludeForeignKeys;
+            if (ExportIndexes) flags |= ExportFlags.IncludeIndexes;
+            if (ExportDefaults) flags |= ExportFlags.IncludeDefaultValues;
+            if (ExportIdentities) flags |= ExportFlags.IncludeIdentityColumns;
             
             return new ExportOptions
             {

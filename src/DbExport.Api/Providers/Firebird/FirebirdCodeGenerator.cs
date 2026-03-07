@@ -57,7 +57,7 @@ public class FirebirdCodeGenerator : CodeGenerator
     {
         Write($"CREATE DOMAIN {Escape(dataType.Name)} AS {GetTypeName(dataType)}");
 
-        var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
+        var visitDefaults = ExportOptions?.HasFlag(ExportFlags.IncludeDefaultValues) == true;
         if (visitDefaults && !Utility.IsEmpty(dataType.DefaultValue))
             Write(" DEFAULT {0}", Format(dataType.DefaultValue, dataType.ColumnType));
 

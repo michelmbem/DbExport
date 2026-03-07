@@ -170,8 +170,8 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     {
         var visitSchema = ExportOptions?.ExportSchema == true;
         var visitData = ExportOptions?.ExportData == true;
-        var visitFKs = ExportOptions?.HasFlag(ExportFlags.ExportForeignKeys) == true;
-        var visitIdent = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
+        var visitFKs = ExportOptions?.HasFlag(ExportFlags.IncludeForeignKeys) == true;
+        var visitIdent = ExportOptions?.HasFlag(ExportFlags.IncludeIdentityColumns) == true;
 
         WriteComment("Database: {0}", database.Name);
         WriteComment("Generated on: {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -238,9 +238,9 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     /// <inheritdoc />
     public virtual void VisitTable(Table table)
     {
-        var visitPKs = ExportOptions?.HasFlag(ExportFlags.ExportPrimaryKeys) == true;
-        var visitIndexes = ExportOptions?.HasFlag(ExportFlags.ExportIndexes) == true;
-        var visitFKs = ExportOptions?.HasFlag(ExportFlags.ExportForeignKeys) == true;
+        var visitPKs = ExportOptions?.HasFlag(ExportFlags.IncludePrimaryKeys) == true;
+        var visitIndexes = ExportOptions?.HasFlag(ExportFlags.IncludeIndexes) == true;
+        var visitFKs = ExportOptions?.HasFlag(ExportFlags.IncludeForeignKeys) == true;
 
         WriteLine("CREATE TABLE {0} (", Escape(table.Name));
         Indent();
@@ -286,8 +286,8 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     /// <inheritdoc />
     public virtual void VisitColumn(Column column)
     {
-        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true; 
-        var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
+        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.IncludeIdentityColumns) == true; 
+        var visitDefaults = ExportOptions?.HasFlag(ExportFlags.IncludeDefaultValues) == true;
             
         Write("{0} {1}", Escape(column.Name), GetTypeName(column));
 
@@ -585,7 +585,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
     /// and ensuring that the generated SQL correctly represents the data for insertion into the target database.</param>
     protected virtual void WriteInsertDirective(Table table, DbDataReader dr)
     {
-        var skipIdentity = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
+        var skipIdentity = ExportOptions?.HasFlag(ExportFlags.IncludeIdentityColumns) == true;
         var insertableColumns = table.Columns.Where(IsSelected).ToImmutableList();
         
         Write("INSERT INTO {0} (", Escape(table.Name));

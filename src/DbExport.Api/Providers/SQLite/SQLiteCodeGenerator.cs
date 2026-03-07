@@ -53,7 +53,7 @@ public class SQLiteCodeGenerator : CodeGenerator
     /// <inheritdoc/>
     public override void VisitColumn(Column column)
     {
-        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
+        var visitIdentities = ExportOptions?.HasFlag(ExportFlags.IncludeIdentityColumns) == true;
 
         if (visitIdentities && column.IsIdentity)
             Write("{0} integer PRIMARY KEY AUTOINCREMENT", Escape(column.Name));

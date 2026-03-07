@@ -33,11 +33,11 @@
 |----------|---------|
 | Tables structure | @(Bool2Str(Model.ExportOptions.ExportSchema)) |
 | Tables contents | @(Bool2Str(Model.ExportOptions.ExportData)) |
-| Primary keys | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.ExportPrimaryKeys))) |
-| Foreign keys | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.ExportForeignKeys))) |
-| Indexes | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.ExportIndexes))) |
-| Default values | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.ExportDefaults))) |
-| Serial numbers | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.ExportIdentities))) |
+| Primary keys | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.IncludePrimaryKeys))) |
+| Foreign keys | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.IncludeForeignKeys))) |
+| Indexes | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.IncludeIndexes))) |
+| Default values | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.IncludeDefaultValues))) |
+| Serial numbers | @(Bool2Str(Model.ExportOptions.Flags.HasFlag(ExportFlags.IncludeIdentityColumns))) |
 
 @if (Model.ExportOptions.ProviderSpecific != null)
 {
