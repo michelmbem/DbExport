@@ -2,7 +2,5 @@
   href: index.md
 - name: Readme
   href: ../README.md
-- name: API Overview
-  href: DbExport.Api.md
 - name: API Reference
   href: api/toc.yml
