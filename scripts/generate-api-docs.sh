@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROJECT_FILE="$ROOT_DIR/DbExport.Api/DbExport.Api.csproj"
+PROJECT_FILE="$ROOT_DIR/src/DbExport.Api/DbExport.Api.csproj"
 OUT_DIR="$ROOT_DIR/docs"
 OUT_FILE="$OUT_DIR/DbExport.Api.md"
 
@@ -15,6 +15,8 @@ cleanup() {
 trap cleanup EXIT
 
 XML_FILE="$TMP_DIR/DbExport.Api.xml"
+ALLOWLIST_FILE="$TMP_DIR/DbExport.Api.allowlist.txt"
+FILTER_PROJECT_DIR="$TMP_DIR/allowlist-gen"
 
 dotnet build "$PROJECT_FILE" \
   -nologo \
@@ -28,7 +30,198 @@ if [[ ! -f "$XML_FILE" ]]; then
   exit 1
 fi
 
-awk -v out_file="$OUT_FILE" '
+PROJECT_DIR="$(cd "$(dirname "$PROJECT_FILE")" && pwd)"
+SEARCH_DIRS=()
+if [[ -d "$PROJECT_DIR/bin" ]]; then
+  SEARCH_DIRS+=("$PROJECT_DIR/bin")
+fi
+if [[ -d "$ROOT_DIR/bin" ]]; then
+  SEARCH_DIRS+=("$ROOT_DIR/bin")
+fi
+
+ASSEMBLY_FILE=""
+if [[ ${#SEARCH_DIRS[@]} -gt 0 ]]; then
+  ASSEMBLY_FILE="$(find "${SEARCH_DIRS[@]}" -type f -name 'DbExport.Api.dll' ! -path '*/ref/*' | head -n 1)"
+fi
+if [[ -z "${ASSEMBLY_FILE:-}" || ! -f "$ASSEMBLY_FILE" ]]; then
+  echo "Failed to locate built assembly for reflection filtering." >&2
+  exit 1
+fi
+
+mkdir -p "$FILTER_PROJECT_DIR"
+
+cat > "$FILTER_PROJECT_DIR/AllowlistGen.csproj" <<'XML'
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+</Project>
+XML
+
+cat > "$FILTER_PROJECT_DIR/Program.cs" <<'CS'
+using System.Reflection;
+
+if (args.Length < 2)
+{
+    Console.Error.WriteLine("Expected: <assemblyPath> <outputPath>");
+    return 1;
+}
+
+var assemblyPath = args[0];
+var outputPath = args[1];
+var asm = Assembly.LoadFrom(assemblyPath);
+var ids = new HashSet<string>(StringComparer.Ordinal);
+
+const BindingFlags allDeclared = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+
+foreach (var type in asm.GetTypes())
+{
+    if (IsExcludedNamespace(type.Namespace) || type.IsNestedPrivate || type.Name.StartsWith("<", StringComparison.Ordinal))
+    {
+        continue;
+    }
+
+    ids.Add("T:" + TypeDefinitionId(type));
+
+    foreach (var field in type.GetFields(allDeclared))
+    {
+        if (field.IsPrivate || field.Name.StartsWith("<", StringComparison.Ordinal))
+        {
+            continue;
+        }
+        ids.Add("F:" + TypeDefinitionId(type) + "." + field.Name);
+    }
+
+    foreach (var prop in type.GetProperties(allDeclared))
+    {
+        var accessor = prop.GetMethod ?? prop.SetMethod;
+        if (accessor == null || accessor.IsPrivate || prop.Name.StartsWith("<", StringComparison.Ordinal))
+        {
+            continue;
+        }
+        var indexer = BuildParameterList(prop.GetIndexParameters().Select(p => p.ParameterType));
+        ids.Add("P:" + TypeDefinitionId(type) + "." + prop.Name + indexer);
+    }
+
+    foreach (var ev in type.GetEvents(allDeclared))
+    {
+        var accessor = ev.AddMethod ?? ev.RemoveMethod ?? ev.RaiseMethod;
+        if (accessor == null || accessor.IsPrivate || ev.Name.StartsWith("<", StringComparison.Ordinal))
+        {
+            continue;
+        }
+        ids.Add("E:" + TypeDefinitionId(type) + "." + ev.Name);
+    }
+
+    foreach (var ctor in type.GetConstructors(allDeclared))
+    {
+        if (ctor.IsPrivate)
+        {
+            continue;
+        }
+        ids.Add("M:" + TypeDefinitionId(type) + ".#ctor" + BuildParameterList(ctor.GetParameters().Select(p => p.ParameterType)));
+    }
+
+    foreach (var method in type.GetMethods(allDeclared))
+    {
+        if (method.IsPrivate || method.IsSpecialName || method.Name.StartsWith("<", StringComparison.Ordinal))
+        {
+            continue;
+        }
+
+        var methodName = method.Name;
+        if (method.IsGenericMethodDefinition)
+        {
+            methodName += "``" + method.GetGenericArguments().Length;
+        }
+
+        ids.Add("M:" + TypeDefinitionId(type) + "." + methodName + BuildParameterList(method.GetParameters().Select(p => p.ParameterType)));
+    }
+}
+
+File.WriteAllLines(outputPath, ids.OrderBy(x => x, StringComparer.Ordinal));
+return 0;
+
+static bool IsExcludedNamespace(string ns) => ns != null && ns.StartsWith("System.", StringComparison.Ordinal);
+
+static string BuildParameterList(IEnumerable<Type> parameterTypes)
+{
+    var parts = parameterTypes.Select(TypeReferenceId).ToArray();
+    return parts.Length == 0 ? string.Empty : "(" + string.Join(",", parts) + ")";
+}
+
+static string TypeDefinitionId(Type type)
+{
+    var segments = new Stack<string>();
+    var current = type;
+    while (current != null)
+    {
+        segments.Push(current.Name);
+        current = current.DeclaringType;
+    }
+
+    var ns = type.Namespace;
+    return (string.IsNullOrEmpty(ns) ? string.Empty : ns + ".") + string.Join(".", segments);
+}
+
+static string TypeReferenceId(Type type)
+{
+    if (type.IsGenericParameter)
+    {
+        return type.DeclaringMethod != null ? "``" + type.GenericParameterPosition : "`" + type.GenericParameterPosition;
+    }
+
+    if (type.IsByRef)
+    {
+        return TypeReferenceId(type.GetElementType()) + "@";
+    }
+
+    if (type.IsPointer)
+    {
+        return TypeReferenceId(type.GetElementType()) + "*";
+    }
+
+    if (type.IsArray)
+    {
+        var rank = type.GetArrayRank();
+        var suffix = rank == 1 ? "[]" : "[" + new string(',', rank - 1) + "]";
+        return TypeReferenceId(type.GetElementType()) + suffix;
+    }
+
+    if (type.IsGenericType && !type.IsGenericTypeDefinition)
+    {
+        var genericDef = type.GetGenericTypeDefinition();
+        var baseName = TypeNameWithoutArity(genericDef);
+        var args = type.GetGenericArguments().Select(TypeReferenceId);
+        return baseName + "{" + string.Join(",", args) + "}";
+    }
+
+    return TypeDefinitionId(type);
+}
+
+static string TypeNameWithoutArity(Type type)
+{
+    var segments = new Stack<string>();
+    var current = type;
+    while (current != null)
+    {
+        var name = current.Name;
+        var tick = name.IndexOf('`');
+        segments.Push(tick >= 0 ? name.Substring(0, tick) : name);
+        current = current.DeclaringType;
+    }
+
+    var ns = type.Namespace;
+    return (string.IsNullOrEmpty(ns) ? string.Empty : ns + ".") + string.Join(".", segments);
+}
+CS
+
+dotnet run --project "$FILTER_PROJECT_DIR/AllowlistGen.csproj" -- "$ASSEMBLY_FILE" "$ALLOWLIST_FILE" >/dev/null
+
+awk -v out_file="$OUT_FILE" -v allow_file="$ALLOWLIST_FILE" '
   function trim(s) {
     gsub(/^[[:space:]]+|[[:space:]]+$/, "", s)
     return s
@@ -426,9 +619,27 @@ awk -v out_file="$OUT_FILE" '
     return a
   }
 
+  function display_type_name(s,    n) {
+    n = s
+    gsub(/`/, "", n)
+    return n
+  }
+
+  function is_excluded_namespace(ns) {
+    return (ns ~ /^System\./)
+  }
+
   BEGIN {
-    RS = "</member>"
     reset_doc_state()
+    while ((getline line < allow_file) > 0) {
+      sub(/\r$/, "", line)
+      line = trim(line)
+      if (length(line) > 0) {
+        allow[line] = 1
+      }
+    }
+    close(allow_file)
+    RS = "</member>"
   }
 
   /<member[[:space:]]+name="[^"]+"/ {
@@ -441,6 +652,8 @@ awk -v out_file="$OUT_FILE" '
     full_name = header
     sub(/^.*name="/, "", full_name)
     sub(/"$/, "", full_name)
+
+    if (!(full_name in allow)) next
 
     prefix = substr(full_name, 1, 1)
     item_name = substr(full_name, 3)
@@ -456,6 +669,7 @@ awk -v out_file="$OUT_FILE" '
       split_type(item_name)
       ns = split_ns
       if (length(ns) == 0) ns = "(global)"
+      if (is_excluded_namespace(ns)) next
       add_namespace(ns)
 
       kind = "type"
@@ -477,10 +691,12 @@ awk -v out_file="$OUT_FILE" '
     decl_type = get_declaring_type(item_name)
     if (length(decl_type) == 0) next
 
+    split_type(decl_type)
+    ns = split_ns
+    if (length(ns) == 0) ns = "(global)"
+    if (is_excluded_namespace(ns)) next
+
     if (!(decl_type in type_to_ns)) {
-      split_type(decl_type)
-      ns = split_ns
-      if (length(ns) == 0) ns = "(global)"
       add_namespace(ns)
       add_type(ns, decl_type, split_type_short, "type", "")
       type_to_ns[decl_type] = ns
@@ -489,10 +705,14 @@ awk -v out_file="$OUT_FILE" '
     simple_name = get_member_simple_name(item_name)
     param_sig = get_param_sig(item_name)
 
+    if (simple_name ~ /^</) next
+
     if (prefix == "F") {
+      if (simple_name !~ /^[A-Z]/) next
       category = "fields"
       signature = simple_name
     } else if (prefix == "P") {
+      if (simple_name !~ /^[A-Z]/) next
       category = "properties"
       signature = simple_name param_sig
     } else if (prefix == "M") {
@@ -501,6 +721,7 @@ awk -v out_file="$OUT_FILE" '
         split_type(decl_type)
         signature = split_type_short param_sig
       } else {
+        if (simple_name !~ /^[A-Z]/) next
         category = "methods"
         signature = simple_name param_sig
       }
@@ -513,9 +734,9 @@ awk -v out_file="$OUT_FILE" '
   }
 
   END {
-    print "# DbExport.Api Documentation" > out_file
+    print "# DbExport.Api Overview" > out_file
     print "" >> out_file
-    print "Auto-generated from XML documentation comments in the DbExport.Api module." >> out_file
+    print "A quick navigable guide for the DbExport API module." >> out_file
     print "" >> out_file
 
     print "## Index" >> out_file
@@ -525,14 +746,15 @@ awk -v out_file="$OUT_FILE" '
       for (ti = 1; ti <= type_count; ti++) {
         tkey = type_order[ti]
         if (type_ns[tkey] != ns) continue
-        tlabel = type_short_name[tkey]
-        print "- [`" tlabel "`](#" anchor("type " type_full_name[tkey]) ")" >> out_file
+        tlabel = display_type_name(type_short_name[tkey])
+        print "  - [`" tlabel "`](#" anchor("type " type_full_name[tkey]) ")" >> out_file
       }
     }
     print "" >> out_file
 
     for (nsi = 1; nsi <= namespace_count; nsi++) {
       ns = namespace_order[nsi]
+      print "<a id=\"" anchor("namespace " ns) "\"></a>" >> out_file
       print "## Namespace `" ns "`" >> out_file
       print "" >> out_file
 
@@ -543,7 +765,8 @@ awk -v out_file="$OUT_FILE" '
         has_types = 1
 
         kind = type_kind[tkey]
-        print "### Type `" type_short_name[tkey] "` (" kind ")" >> out_file
+        print "<a id=\"" anchor("type " type_full_name[tkey]) "\"></a>" >> out_file
+        print "### Type `" display_type_name(type_short_name[tkey]) "` (" kind ")" >> out_file
         print "" >> out_file
 
         tsum = type_summary[tkey]

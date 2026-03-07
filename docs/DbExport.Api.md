@@ -1,146 +1,79 @@
-# DbExport.Api Documentation
+# DbExport.Api Overview
 
-Auto-generated from XML documentation comments in the DbExport.Api module.
+A quick navigable guide for the DbExport API module.
 
 ## Index
 - [Namespace `DbExport`](#namespace-dbexport)
-- [`ExportFlags`](#type-dbexport-exportflags)
-- [`ExportOptions`](#type-dbexport-exportoptions)
-- [`IVisitor`](#type-dbexport-ivisitor)
-- [`IVisitorAcceptor`](#type-dbexport-ivisitoracceptor)
-- [`SqlHelper`](#type-dbexport-sqlhelper)
-- [`Utility`](#type-dbexport-utility)
+  - [`ExportFlags`](#type-dbexport-exportflags)
+  - [`ExportOptions`](#type-dbexport-exportoptions)
+  - [`IVisitor`](#type-dbexport-ivisitor)
+  - [`IVisitorAcceptor`](#type-dbexport-ivisitoracceptor)
+  - [`SqlHelper`](#type-dbexport-sqlhelper)
+  - [`Utility`](#type-dbexport-utility)
 - [Namespace `DbExport.Providers`](#namespace-dbexport-providers)
-- [`CodeGenerator`](#type-dbexport-providers-codegenerator)
-- [`ISchemaProvider`](#type-dbexport-providers-ischemaprovider)
-- [`IScriptExecutor`](#type-dbexport-providers-iscriptexecutor)
-- [`SimpleScriptExecutor`](#type-dbexport-providers-simplescriptexecutor)
-- [`BatchScriptExecutor`](#type-dbexport-providers-batchscriptexecutor)
-- [`MetaData`](#type-dbexport-providers-metadata)
-- [`NameOwnerPair`](#type-dbexport-providers-nameownerpair)
-- [`ProviderNames`](#type-dbexport-providers-providernames)
-- [`SchemaProvider`](#type-dbexport-providers-schemaprovider)
+  - [`CodeGenerator`](#type-dbexport-providers-codegenerator)
+  - [`ISchemaProvider`](#type-dbexport-providers-ischemaprovider)
+  - [`IScriptExecutor`](#type-dbexport-providers-iscriptexecutor)
+  - [`SimpleScriptExecutor`](#type-dbexport-providers-simplescriptexecutor)
+  - [`BatchScriptExecutor`](#type-dbexport-providers-batchscriptexecutor)
+  - [`MetaData`](#type-dbexport-providers-metadata)
+  - [`NameOwnerPair`](#type-dbexport-providers-nameownerpair)
+  - [`ProviderNames`](#type-dbexport-providers-providernames)
+  - [`SchemaProvider`](#type-dbexport-providers-schemaprovider)
 - [Namespace `DbExport.Providers.Firebird`](#namespace-dbexport-providers-firebird)
-- [`FirebirdCodeGenerator`](#type-dbexport-providers-firebird-firebirdcodegenerator)
-- [`FirebirdOptions`](#type-dbexport-providers-firebird-firebirdoptions)
-- [`FirebirdSchemaProvider`](#type-dbexport-providers-firebird-firebirdschemaprovider)
-- [`FirebirdScriptExecutor`](#type-dbexport-providers-firebird-firebirdscriptexecutor)
+  - [`FirebirdCodeGenerator`](#type-dbexport-providers-firebird-firebirdcodegenerator)
+  - [`FirebirdOptions`](#type-dbexport-providers-firebird-firebirdoptions)
+  - [`FirebirdSchemaProvider`](#type-dbexport-providers-firebird-firebirdschemaprovider)
+  - [`FirebirdScriptExecutor`](#type-dbexport-providers-firebird-firebirdscriptexecutor)
 - [Namespace `DbExport.Providers.MySqlClient`](#namespace-dbexport-providers-mysqlclient)
-- [`MySqlCodeGenerator`](#type-dbexport-providers-mysqlclient-mysqlcodegenerator)
-- [`CharacterSet`](#type-dbexport-providers-mysqlclient-characterset)
-- [`MySqlOptions`](#type-dbexport-providers-mysqlclient-mysqloptions)
-- [`MySqlSchemaProvider`](#type-dbexport-providers-mysqlclient-mysqlschemaprovider)
-- [`MySqlScriptExecutor`](#type-dbexport-providers-mysqlclient-mysqlscriptexecutor)
+  - [`MySqlCodeGenerator`](#type-dbexport-providers-mysqlclient-mysqlcodegenerator)
+  - [`CharacterSet`](#type-dbexport-providers-mysqlclient-characterset)
+  - [`MySqlOptions`](#type-dbexport-providers-mysqlclient-mysqloptions)
+  - [`MySqlSchemaProvider`](#type-dbexport-providers-mysqlclient-mysqlschemaprovider)
+  - [`MySqlScriptExecutor`](#type-dbexport-providers-mysqlclient-mysqlscriptexecutor)
 - [Namespace `DbExport.Providers.Npgsql`](#namespace-dbexport-providers-npgsql)
-- [`NpgsqlCodeGenerator`](#type-dbexport-providers-npgsql-npgsqlcodegenerator)
-- [`NpgsqlSchemaProvider`](#type-dbexport-providers-npgsql-npgsqlschemaprovider)
-- [`NpgsqlScriptExecutor`](#type-dbexport-providers-npgsql-npgsqlscriptexecutor)
+  - [`NpgsqlCodeGenerator`](#type-dbexport-providers-npgsql-npgsqlcodegenerator)
+  - [`NpgsqlSchemaProvider`](#type-dbexport-providers-npgsql-npgsqlschemaprovider)
+  - [`NpgsqlScriptExecutor`](#type-dbexport-providers-npgsql-npgsqlscriptexecutor)
 - [Namespace `DbExport.Providers.OracleClient`](#namespace-dbexport-providers-oracleclient)
-- [`OracleCodeGenerator`](#type-dbexport-providers-oracleclient-oraclecodegenerator)
-- [`OracleSchemaProvider`](#type-dbexport-providers-oracleclient-oracleschemaprovider)
+  - [`OracleCodeGenerator`](#type-dbexport-providers-oracleclient-oraclecodegenerator)
+  - [`OracleSchemaProvider`](#type-dbexport-providers-oracleclient-oracleschemaprovider)
 - [Namespace `DbExport.Providers.SqlClient`](#namespace-dbexport-providers-sqlclient)
-- [`SqlCodeGenerator`](#type-dbexport-providers-sqlclient-sqlcodegenerator)
-- [`SqlSchemaProvider`](#type-dbexport-providers-sqlclient-sqlschemaprovider)
-- [`SqlScripExecutor`](#type-dbexport-providers-sqlclient-sqlscripexecutor)
+  - [`SqlCodeGenerator`](#type-dbexport-providers-sqlclient-sqlcodegenerator)
+  - [`SqlSchemaProvider`](#type-dbexport-providers-sqlclient-sqlschemaprovider)
+  - [`SqlScripExecutor`](#type-dbexport-providers-sqlclient-sqlscripexecutor)
 - [Namespace `DbExport.Providers.SQLite`](#namespace-dbexport-providers-sqlite)
-- [`SQLiteCodeGenerator`](#type-dbexport-providers-sqlite-sqlitecodegenerator)
-- [`SQLiteSchemaProvider`](#type-dbexport-providers-sqlite-sqliteschemaprovider)
+  - [`SQLiteCodeGenerator`](#type-dbexport-providers-sqlite-sqlitecodegenerator)
+  - [`SQLiteSchemaProvider`](#type-dbexport-providers-sqlite-sqliteschemaprovider)
 - [Namespace `DbExport.Schema`](#namespace-dbexport-schema)
-- [`Column`](#type-dbexport-schema-column)
-- [`ColumnAttributes`](#type-dbexport-schema-columnattributes)
-- [`ColumnCollection`](#type-dbexport-schema-columncollection)
-- [`ColumnSet`](#type-dbexport-schema-columnset)
-- [`ColumnType`](#type-dbexport-schema-columntype)
-- [`Database`](#type-dbexport-schema-database)
-- [`DataType`](#type-dbexport-schema-datatype)
-- [`DataTypeCollection`](#type-dbexport-schema-datatypecollection)
-- [`ForeignKey`](#type-dbexport-schema-foreignkey)
-- [`ForeignKeyCollection`](#type-dbexport-schema-foreignkeycollection)
-- [`ForeignKeyRule`](#type-dbexport-schema-foreignkeyrule)
-- [`ICheckable`](#type-dbexport-schema-icheckable)
-- [`IDataItem`](#type-dbexport-schema-idataitem)
-- [`Index`](#type-dbexport-schema-index)
-- [`IndexCollection`](#type-dbexport-schema-indexcollection)
-- [`Key`](#type-dbexport-schema-key)
-- [`PrimaryKey`](#type-dbexport-schema-primarykey)
-- [`SchemaItem`](#type-dbexport-schema-schemaitem)
-- [`SchemaItemCollection`1`](#type-dbexport-schema-schemaitemcollection-1)
-- [`Table`](#type-dbexport-schema-table)
-- [`TableCollection`](#type-dbexport-schema-tablecollection)
-- [`QueryOptions`](#type-dbexport-schema-queryoptions)
-- [`TableExtensions`](#type-dbexport-schema-tableextensions)
-- [Namespace `DbExport.SqlHelper`](#namespace-dbexport-sqlhelper)
-- [`ParameterParser`](#type-dbexport-sqlhelper-parameterparser)
-- [Namespace `System.Text.RegularExpressions.Generated`](#namespace-system-text-regularexpressions-generated)
-- [`CreateDbRegex_0`](#type-system-text-regularexpressions-generated-createdbregex-0)
-- [`DelimiterRegex_1`](#type-system-text-regularexpressions-generated-delimiterregex-1)
-- [`UserTypeRegex_2`](#type-system-text-regularexpressions-generated-usertyperegex-2)
-- [`Utf8Regex_3`](#type-system-text-regularexpressions-generated-utf8regex-3)
-- [`CreateDbRegex_4`](#type-system-text-regularexpressions-generated-createdbregex-4)
-- [`CommaRegex_5`](#type-system-text-regularexpressions-generated-commaregex-5)
-- [`CreateDbRegex_6`](#type-system-text-regularexpressions-generated-createdbregex-6)
-- [`UniqueRegex_7`](#type-system-text-regularexpressions-generated-uniqueregex-7)
-- [`PrimaryKeyRegex_8`](#type-system-text-regularexpressions-generated-primarykeyregex-8)
-- [`DelimiterRegex_9`](#type-system-text-regularexpressions-generated-delimiterregex-9)
-- [`CreateDbRegex_10`](#type-system-text-regularexpressions-generated-createdbregex-10)
-- [`CreateTypeRegex_11`](#type-system-text-regularexpressions-generated-createtyperegex-11)
-- [`PasswordRegex_12`](#type-system-text-regularexpressions-generated-passwordregex-12)
-- [`Utilities`](#type-system-text-regularexpressions-generated-utilities)
-- [Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_0`](#namespace-system-text-regularexpressions-generated-createdbregex-0)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-createdbregex-0-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_0.RunnerFactory`](#namespace-system-text-regularexpressions-generated-createdbregex-0-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-createdbregex-0-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.DelimiterRegex_1`](#namespace-system-text-regularexpressions-generated-delimiterregex-1)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-delimiterregex-1-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.DelimiterRegex_1.RunnerFactory`](#namespace-system-text-regularexpressions-generated-delimiterregex-1-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-delimiterregex-1-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.UserTypeRegex_2`](#namespace-system-text-regularexpressions-generated-usertyperegex-2)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-usertyperegex-2-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.UserTypeRegex_2.RunnerFactory`](#namespace-system-text-regularexpressions-generated-usertyperegex-2-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-usertyperegex-2-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.Utf8Regex_3`](#namespace-system-text-regularexpressions-generated-utf8regex-3)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-utf8regex-3-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.Utf8Regex_3.RunnerFactory`](#namespace-system-text-regularexpressions-generated-utf8regex-3-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-utf8regex-3-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_4`](#namespace-system-text-regularexpressions-generated-createdbregex-4)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-createdbregex-4-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_4.RunnerFactory`](#namespace-system-text-regularexpressions-generated-createdbregex-4-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-createdbregex-4-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.CommaRegex_5`](#namespace-system-text-regularexpressions-generated-commaregex-5)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-commaregex-5-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.CommaRegex_5.RunnerFactory`](#namespace-system-text-regularexpressions-generated-commaregex-5-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-commaregex-5-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_6`](#namespace-system-text-regularexpressions-generated-createdbregex-6)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-createdbregex-6-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_6.RunnerFactory`](#namespace-system-text-regularexpressions-generated-createdbregex-6-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-createdbregex-6-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.UniqueRegex_7`](#namespace-system-text-regularexpressions-generated-uniqueregex-7)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-uniqueregex-7-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.UniqueRegex_7.RunnerFactory`](#namespace-system-text-regularexpressions-generated-uniqueregex-7-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-uniqueregex-7-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.PrimaryKeyRegex_8`](#namespace-system-text-regularexpressions-generated-primarykeyregex-8)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-primarykeyregex-8-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.PrimaryKeyRegex_8.RunnerFactory`](#namespace-system-text-regularexpressions-generated-primarykeyregex-8-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-primarykeyregex-8-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.DelimiterRegex_9`](#namespace-system-text-regularexpressions-generated-delimiterregex-9)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-delimiterregex-9-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.DelimiterRegex_9.RunnerFactory`](#namespace-system-text-regularexpressions-generated-delimiterregex-9-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-delimiterregex-9-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_10`](#namespace-system-text-regularexpressions-generated-createdbregex-10)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-createdbregex-10-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_10.RunnerFactory`](#namespace-system-text-regularexpressions-generated-createdbregex-10-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-createdbregex-10-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.CreateTypeRegex_11`](#namespace-system-text-regularexpressions-generated-createtyperegex-11)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-createtyperegex-11-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.CreateTypeRegex_11.RunnerFactory`](#namespace-system-text-regularexpressions-generated-createtyperegex-11-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-createtyperegex-11-runnerfactory-runner)
-- [Namespace `System.Text.RegularExpressions.Generated.PasswordRegex_12`](#namespace-system-text-regularexpressions-generated-passwordregex-12)
-- [`RunnerFactory`](#type-system-text-regularexpressions-generated-passwordregex-12-runnerfactory)
-- [Namespace `System.Text.RegularExpressions.Generated.PasswordRegex_12.RunnerFactory`](#namespace-system-text-regularexpressions-generated-passwordregex-12-runnerfactory)
-- [`Runner`](#type-system-text-regularexpressions-generated-passwordregex-12-runnerfactory-runner)
+  - [`Column`](#type-dbexport-schema-column)
+  - [`ColumnAttributes`](#type-dbexport-schema-columnattributes)
+  - [`ColumnCollection`](#type-dbexport-schema-columncollection)
+  - [`ColumnSet`](#type-dbexport-schema-columnset)
+  - [`ColumnType`](#type-dbexport-schema-columntype)
+  - [`Database`](#type-dbexport-schema-database)
+  - [`DataType`](#type-dbexport-schema-datatype)
+  - [`DataTypeCollection`](#type-dbexport-schema-datatypecollection)
+  - [`ForeignKey`](#type-dbexport-schema-foreignkey)
+  - [`ForeignKeyCollection`](#type-dbexport-schema-foreignkeycollection)
+  - [`ForeignKeyRule`](#type-dbexport-schema-foreignkeyrule)
+  - [`ICheckable`](#type-dbexport-schema-icheckable)
+  - [`IDataItem`](#type-dbexport-schema-idataitem)
+  - [`Index`](#type-dbexport-schema-index)
+  - [`IndexCollection`](#type-dbexport-schema-indexcollection)
+  - [`Key`](#type-dbexport-schema-key)
+  - [`PrimaryKey`](#type-dbexport-schema-primarykey)
+  - [`SchemaItem`](#type-dbexport-schema-schemaitem)
+  - [`SchemaItemCollection1`](#type-dbexport-schema-schemaitemcollection-1)
+  - [`Table`](#type-dbexport-schema-table)
+  - [`TableCollection`](#type-dbexport-schema-tablecollection)
+  - [`QueryOptions`](#type-dbexport-schema-queryoptions)
+  - [`TableExtensions`](#type-dbexport-schema-tableextensions)
 
+<a id="namespace-dbexport"></a>
 ## Namespace `DbExport`
 
+<a id="type-dbexport-exportflags"></a>
 ### Type `ExportFlags` (type)
 
 Flags to specify what aspects of the database to export. These can be combined using bitwise operations.
@@ -171,6 +104,7 @@ Flags to specify what aspects of the database to export. These can be combined u
 
   Represents the export of identity columns from the database schema. When this flag is set, identity columns (columns with auto-increment or similar behavior) are included during the export process. Useful for scenarios where retaining identity column definitions is necessary for database migration or replication.
 
+<a id="type-dbexport-exportoptions"></a>
 ### Type `ExportOptions` (type)
 
 Options for exporting a database, including what to export and any provider-specific settings.
@@ -212,6 +146,7 @@ Options for exporting a database, including what to export and any provider-spec
 
   Returns: A boolean value indicating whether the specified flag is set. Returns true if the flag is set; otherwise, false.
 
+<a id="type-dbexport-ivisitor"></a>
 ### Type `IVisitor` (type)
 
 Defines the Visitor pattern for traversing the database schema. Each method corresponds to a specific schema element, allowing for operations to be performed on databases, tables, columns, keys, and indexes without modifying their classes. This design promotes separation of concerns and makes it easier to add new operations on the schema elements without changing their structure.
@@ -267,6 +202,7 @@ Defines the Visitor pattern for traversing the database schema. Each method corr
   Parameters:
   - `dataType`: The DataType object to be visited.
 
+<a id="type-dbexport-ivisitoracceptor"></a>
 ### Type `IVisitorAcceptor` (type)
 
 Defines an interface for accepting visitors, allowing external operations to be performed on implementing classes without modifying their structure. This is a key component of the Visitor design pattern, enabling separation of concerns and enhancing flexibility in extending functionality.
@@ -280,31 +216,10 @@ Defines an interface for accepting visitors, allowing external operations to be 
   Parameters:
   - `visitor`: The visitor instance that will perform operations on the implementing class.
 
+<a id="type-dbexport-sqlhelper"></a>
 ### Type `SqlHelper` (type)
 
 A helper class for executing SQL queries and scripts against a database. It provides methods for querying data, executing non-query commands, and executing SQL scripts with support for different database providers. The class implements IDisposable to ensure proper disposal of database connections when necessary.
-
-#### Fields
-
-- `PROPERTY_FLAGS`
-
-  Defines a set of binding flags used for property access within the SqlHelper class. Includes flags for public, instance-level, and case-insensitive member access.
-
-- `GET_PROPERTY_FLAGS`
-
-  Represents a combination of binding flags used to access and modify properties within the SqlHelper class. Includes public, instance-level, case-insensitive member access, and property-setting capabilities.
-
-- `SET_PROPERTY_FLAGS`
-
-  Defines a combination of binding flags used to set property values on objects, including public, instance-level, and case-insensitive member access. Extends the base property flags by adding support for property value setting.
-
-- `connection`
-
-  Represents the database connection used by the SqlHelper instance to communicate with the database. This connection is essential for executing queries, commands, and scripts. The connection must be properly initialized and associated with a compatible database provider.
-
-- `disposeConnection`
-
-  Indicates whether the SqlHelper instance is responsible for disposing of the database connection. When set to true, the connection will be disposed upon disposing the SqlHelper instance.
 
 #### Properties
 
@@ -341,13 +256,6 @@ A helper class for executing SQL queries and scripts against a database. It prov
 - `Dispose`
 
   No XML summary provided.
-
-- `Dispose(System.Boolean)`
-
-  Releases the unmanaged resources used by the SqlHelper instance and optionally releases the managed resources.
-
-  Parameters:
-  - `disposing`: No XML description provided.
 
 - `Query``1(System.String,System.Func{System.Data.Common.DbDataReader,``0})`
 
@@ -447,14 +355,6 @@ A helper class for executing SQL queries and scripts against a database. It prov
   - `dataReader`: The data reader containing the rows of data to be processed in the batch.
 
   Returns: The total number of rows affected by executing the batch.
-
-- `PrepareCommand(System.Data.Common.DbCommand,System.String)`
-
-  Configures the specified System.Data.Common.DbCommand with the provided SQL statement, sets its command text, and prepares parameters for execution.
-
-  Parameters:
-  - `command`: The System.Data.Common.DbCommand to be configured.
-  - `sql`: The SQL query or command text to be assigned to the command.
 
 - `ExecuteScript(System.String,System.String,System.String)`
 
@@ -570,23 +470,10 @@ A helper class for executing SQL queries and scripts against a database. It prov
   - `command`: The database command whose parameters will be updated.
   - `entity`: The entity from which the parameter values are retrieved.
 
-- `FromDataReader(System.Data.Common.DbCommand,System.Data.Common.DbDataReader)`
-
-  Populates the parameters of a given database command using the current row of the provided data reader.
-
-  Parameters:
-  - `command`: The database command whose parameters will be populated.
-  - `dataReader`: The data reader containing the source data for the command's parameters.
-
+<a id="type-dbexport-utility"></a>
 ### Type `Utility` (type)
 
 A collection of helper methods and properties for database operations, string manipulation, and type conversion within the application.
-
-#### Fields
-
-- `CI`
-
-  The default System.Globalization.CultureInfo instance used throughout the utility for culture-specific operations such as string comparisons, parsing, and formatting. This is set to System.Globalization.CultureInfo.InvariantCulture to ensure consistent behavior across different cultures and locales.
 
 #### Properties
 
@@ -812,47 +699,13 @@ A collection of helper methods and properties for database operations, string ma
 
   Returns: A byte value corresponding to the input string interpreted as a number in the specified base. Returns 0 if the input string is empty or invalid.
 
-- `Digit2Char(System.Int32)`
-
-  Converts a numeric digit or hexadecimal value to its corresponding character representation.
-
-  Parameters:
-  - `i`: The integer value to convert. Must be in the range 0 to 15, where values from 0 to 9 are mapped to '0'–'9', and values from 10 to 15 are mapped to 'A'–'F'.
-
-  Returns: A character representing the digit or hexadecimal value corresponding to the input integer.
-
-- `Char2Digit(System.Char)`
-
-  Converts a character representing a digit or hexadecimal value back to its numeric integer representation.
-
-  Parameters:
-  - `c`: The character to convert. Valid inputs are '0'–'9' for values 0 to 9, and 'A'–'F' (case-insensitive) for values 10 to 15. Any character outside these ranges will be processed based on its ASCII value, which may lead to undefined behavior.
-
-  Returns: An integer representing the numeric value of the input character. For '0'–'9', returns 0 to 9; for 'A'–'F', returns 10 to 15; for other characters, returns a value based on their ASCII code.
-
-- `PasswordRegex`
-
-  No XML summary provided.
-
+<a id="namespace-dbexport-providers"></a>
 ## Namespace `DbExport.Providers`
 
+<a id="type-dbexport-providers-codegenerator"></a>
 ### Type `CodeGenerator` (type)
 
 Base class for code generators that produce SQL scripts for database schema and data export. This class implements the visitor pattern to traverse the database schema and generate appropriate SQL statements. Derived classes should override the visit methods to provide provider-specific SQL generation logic. The class also manages output writing and supports options for controlling the export process, such as whether to include schema, data, foreign keys, etc. The class implements IDisposable to allow for proper resource management of the output stream, especially when writing to files.
-
-#### Fields
-
-- `closeOutput`
-
-  Indicates whether the output stream should be closed when the CodeGenerator instance is disposed. This ensures proper resource management, especially when the output stream is created internally and not supplied by the caller.
-
-- `indentation`
-
-  Represents the current indentation level used for formatting output. This value determines the number of tab characters written before each line to maintain proper hierarchical formatting in the generated code or text output.
-
-- `textColumn`
-
-  Tracks the current horizontal position (column) of the text being written to the output stream. Used to manage indentation and formatting during code generation, ensuring proper alignment and structured output.
 
 #### Properties
 
@@ -1130,33 +983,7 @@ Base class for code generators that produce SQL scripts for database schema and 
   - `format`: The composite format string. Cannot be null or empty.
   - `values`: An array of objects to format using the specified format string. Can be null if no formatting is required.
 
-- `BytesToHexString(System.Object)`
-
-  Converts a byte array into a hexadecimal string representation prefixed with "0x".
-
-  Parameters:
-  - `value`: The input value, expected to be an object containing a byte array.
-
-  Returns: A string representing the hexadecimal representation of the byte array, prefixed with "0x", or "''" if the array is empty.
-
-- `IsSelected(DbExport.Schema.Index)`
-
-  Determines whether the specified index is selected based on specific criteria, including whether it is checked, does not match a key, has at least one column, and all of its columns are checked.
-
-  Parameters:
-  - `index`: The index to evaluate for selection. Must not be null.
-
-  Returns: Returns true if the index is checked, does not match a primary or foreign key, has columns, and all the columns are checked; otherwise, returns false.
-
-- `IsSelected(DbExport.Schema.ForeignKey)`
-
-  Determines whether the specified foreign key is selected for processing based on its properties and related table state.
-
-  Parameters:
-  - `fk`: The foreign key to evaluate. Must not be null.
-
-  Returns: Returns `true` if the foreign key is checked, all its columns are checked, and its related table is also checked; otherwise, returns `false`.
-
+<a id="type-dbexport-providers-ischemaprovider"></a>
 ### Type `ISchemaProvider` (type)
 
 A common interface for schema providers, which are responsible for retrieving database schema information such as table names, column names, index names, foreign key names, and their associated metadata. This interface abstracts the underlying database provider implementation, allowing for flexibility and extensibility in supporting different database systems.
@@ -1272,6 +1099,7 @@ A common interface for schema providers, which are responsible for retrieving da
 
   Returns: A DbExport.Providers.MetaData object containing the metadata for the specified type and owner. If the database does not support types or if this method is not implemented, it may return an empty DbExport.Providers.MetaData object.
 
+<a id="type-dbexport-providers-iscriptexecutor"></a>
 ### Type `IScriptExecutor` (type)
 
 Defines an abstraction for executing SQL scripts against a database connection.
@@ -1286,6 +1114,7 @@ Defines an abstraction for executing SQL scripts against a database connection.
   - `connectionString`: The connection string used to connect to the database.
   - `script`: The SQL script to be executed.
 
+<a id="type-dbexport-providers-simplescriptexecutor"></a>
 ### Type `SimpleScriptExecutor` (type)
 
 Provides a simple implementation of the DbExport.Providers.IScriptExecutor interface that executes SQL scripts against a database connection using the DbExport.SqlHelper class.
@@ -1299,6 +1128,13 @@ Provides a simple implementation of the DbExport.Providers.IScriptExecutor inter
   Parameters:
   - `providerName`: The name of the database provider used to establish the connection.
 
+#### Methods
+
+- `Execute(System.String,System.String)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-batchscriptexecutor"></a>
 ### Type `BatchScriptExecutor` (type)
 
 An implementation of the DbExport.Providers.IScriptExecutor interface that executes SQL scripts using batch processing when supported by the database provider.
@@ -1314,10 +1150,11 @@ An implementation of the DbExport.Providers.IScriptExecutor interface that execu
 
 #### Methods
 
-- `DelimiterRegex`
+- `Execute(System.String,System.String)`
 
   No XML summary provided.
 
+<a id="type-dbexport-providers-metadata"></a>
 ### Type `MetaData` (type)
 
 Represents a collection of metadata key-value pairs. This class is used to store additional information about the database schema items such as tables, table columns and/or keys. The keys are case-insensitive, allowing for flexible access to the metadata values.
@@ -1328,6 +1165,7 @@ Represents a collection of metadata key-value pairs. This class is used to store
 
   Initializes a new instance of the DbExport.Providers.MetaData class.
 
+<a id="type-dbexport-providers-nameownerpair"></a>
 ### Type `NameOwnerPair` (type)
 
 Represents a pair consisting of a name and an optional owner, commonly used to define database objects such as tables or types along with their associated schema or owner information.
@@ -1356,6 +1194,7 @@ Represents a pair consisting of a name and an optional owner, commonly used to d
 
   No XML summary provided.
 
+<a id="type-dbexport-providers-providernames"></a>
 ### Type `ProviderNames` (type)
 
 A static class that contains constant string values representing the names of supported database providers. These names are typically used to identify the specific database provider when configuring database connections or performing database operations.
@@ -1390,6 +1229,7 @@ A static class that contains constant string values representing the names of su
 
   A constant string representing the database provider name for SQLite.
 
+<a id="type-dbexport-providers-schemaprovider"></a>
 ### Type `SchemaProvider` (type)
 
 A factory class that provides methods to create schema providers and retrieve database schemas based on the specified provider name, connection string, and optional schema filter.
@@ -1430,65 +1270,10 @@ A factory class that provides methods to create schema providers and retrieve da
 
   Returns: A Database object representing the schema of the database as retrieved by the provider.
 
-- `GetTable(DbExport.Providers.ISchemaProvider,DbExport.Schema.Database,System.String,System.String)`
-
-  Extracts the schema information for a specific table using the provided ISchemaProvider and constructs a Table object representing the table schema, including its columns, indexes, and foreign keys. The method retrieves metadata for the table and its components, and populates the Table object accordingly. If the table has a primary key, it generates the primary key using the metadata information.
-
-  Parameters:
-  - `provider`: The ISchemaProvider instance to retrieve schema information from the database.
-  - `database`: The Database object to which the Table will belong.
-  - `tableName`: The name of the table for which to retrieve schema information.
-  - `tableOwner`: A string representing the owner of the table (e.g., schema name). This may be used to filter tables in databases that support multiple schemas.
-
-  Returns: A Table object representing the schema of the specified table, including its columns, indexes, and foreign keys.
-
-- `GetColumn(DbExport.Providers.ISchemaProvider,DbExport.Schema.Table,System.String)`
-
-  Extracts the schema information for a specific column using the provided ISchemaProvider and constructs a Column object representing the column schema, including its data type, attributes, default value, and other properties. The method retrieves metadata for the column and populates the Column object accordingly. If the column is an identity column, it sets the identity properties based on the metadata information.
-
-  Parameters:
-  - `provider`: The ISchemaProvider instance to retrieve schema information from the database.
-  - `table`: The Table object to which the Column will belong. This is used to establish the relationship between the column and its parent table.
-  - `columnName`: The name of the column for which to retrieve schema information.
-
-  Returns: A Column object representing the schema of the specified column, including its data type, attributes, default value, and other properties.
-
-- `GetIndex(DbExport.Providers.ISchemaProvider,DbExport.Schema.Table,System.String)`
-
-  Extracts the schema information for a specific index using the provided ISchemaProvider and constructs an Index object representing the index schema, including its columns, uniqueness, and whether it is a primary key. The method retrieves metadata for the index and populates the Index object accordingly. If the index is a primary key, it sets the primary key properties based on the metadata information.
-
-  Parameters:
-  - `provider`: The ISchemaProvider instance to retrieve schema information from the database.
-  - `table`: The Table object to which the Index will belong. This is used to establish the relationship between the index and its parent table.
-  - `indexName`: The name of the index for which to retrieve schema information.
-
-  Returns: An Index object representing the schema of the specified index, including its columns, uniqueness, and whether it is a primary key.
-
-- `GetForeignKey(DbExport.Providers.ISchemaProvider,DbExport.Schema.Table,System.String)`
-
-  Extracts the schema information for a specific foreign key using the provided ISchemaProvider and constructs a ForeignKey object representing the foreign key schema, including its related table, related columns, and update/delete rules. The method retrieves metadata for the foreign key and populates the ForeignKey object accordingly. The related table and columns are determined based on the metadata information, and the update/delete rules are set based on the foreign key rule values retrieved from the metadata.
-
-  Parameters:
-  - `provider`: The ISchemaProvider instance to retrieve schema information from the database.
-  - `table`: The Table object to which the ForeignKey will belong. This is used to establish the relationship between the foreign key and its parent table.
-  - `fkName`: The name of the foreign key for which to retrieve schema information.
-
-  Returns: A ForeignKey object representing the schema of the specified foreign key, including its related table, related columns, and update/delete rules.
-
-- `GetDataType(DbExport.Providers.ISchemaProvider,DbExport.Schema.Database,System.String,System.String)`
-
-  Extracts the schema information for a specific data type using the provided ISchemaProvider and constructs a DataType object representing the data type schema, including its column type, native type, size, precision, scale, nullability, enumerated status, default value, and possible values. The method retrieves metadata for the data type and populates the DataType object accordingly.
-
-  Parameters:
-  - `provider`: The ISchemaProvider instance to retrieve schema information from the database.
-  - `database`: The Database object to which the DataType will belong. This is used to establish the relationship between the data type and its parent database.
-  - `typeName`: The name of the data type for which to retrieve schema information.
-  - `typeOwner`: The owner of the data type (e.g., schema name). This may be used to filter data types in databases that support multiple schemas.
-
-  Returns: A DataType object representing the schema of the specified data type, including its column type, native type, character length, decimal precision and scale, nullability, enumerated status, default value, and possible values (for an enumerated type).
-
+<a id="namespace-dbexport-providers-firebird"></a>
 ## Namespace `DbExport.Providers.Firebird`
 
+<a id="type-dbexport-providers-firebird-firebirdcodegenerator"></a>
 ### Type `FirebirdCodeGenerator` (type)
 
 Generates SQL code specific to the Firebird database system. This class provides methods to process various database objects and options, translating them into Firebird-compatible SQL scripts.
@@ -1498,6 +1283,10 @@ Generates SQL code specific to the Firebird database system. This class provides
 - `FirebirdOptions`
 
   Represents configuration options specific to Firebird database generation.
+
+- `ProviderName`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -1521,15 +1310,39 @@ Generates SQL code specific to the Firebird database system. This class provides
 
 #### Methods
 
-- `FormatText(System.String)`
+- `VisitDataType(DbExport.Schema.DataType)`
 
-  Formats the given text input by splitting it into UTF-8 encoded chunks and escaping single quotes.
+  No XML summary provided.
 
-  Parameters:
-  - `input`: The text input to be formatted.
+- `GetTypeName(DbExport.Schema.IDataItem)`
 
-  Returns: The formatted text as a single concatenated string of UTF-8 encoded chunks.
+  No XML summary provided.
 
+- `GetTypeReference(DbExport.Schema.DataType)`
+
+  No XML summary provided.
+
+- `GetKeyName(DbExport.Schema.Key)`
+
+  No XML summary provided.
+
+- `Format(System.Object,DbExport.Schema.ColumnType)`
+
+  No XML summary provided.
+
+- `WriteDbCreationDirective(DbExport.Schema.Database)`
+
+  No XML summary provided.
+
+- `WriteUpdateRule(DbExport.Schema.ForeignKeyRule)`
+
+  No XML summary provided.
+
+- `WriteDeleteRule(DbExport.Schema.ForeignKeyRule)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-firebird-firebirdoptions"></a>
 ### Type `FirebirdOptions` (type)
 
 Represents configuration options for Firebird database operations.
@@ -1568,9 +1381,24 @@ Represents configuration options for Firebird database operations.
 
   Returns: A string containing a Markdown-formatted table with the FirebirdOptions properties and their values.
 
+<a id="type-dbexport-providers-firebird-firebirdschemaprovider"></a>
 ### Type `FirebirdSchemaProvider` (type)
 
 Provides schema-related operations for Firebird databases, including retrieval of table names, column names, index names, foreign key names, and metadata. Implements the DbExport.Providers.ISchemaProvider interface to support interaction with Firebird database schemas.
+
+#### Properties
+
+- `ProviderName`
+
+  No XML summary provided.
+
+- `ConnectionString`
+
+  No XML summary provided.
+
+- `DatabaseName`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -1583,49 +1411,61 @@ Provides schema-related operations for Firebird databases, including retrieval o
 
 #### Methods
 
-- `ResolveColumnType(System.Int32,System.Nullable{System.Int32},System.Int32)`
+- `GetTableNames`
 
-  Resolves the column type based on the Firebird field type, subtype, and scale.
+  No XML summary provided.
 
-  Parameters:
-  - `fbType`: The Firebird field type identifier.
-  - `subType`: The Firebird field subtype identifier, if applicable.
-  - `scale`: The scale value associated with the field.
+- `GetColumnNames(System.String,System.String)`
 
-  Returns: The resolved DbExport.Schema.ColumnType corresponding to the specified parameters.
+  No XML summary provided.
 
-- `GetNativeTypeName(System.Int32,System.Nullable{System.Int32},System.Byte)`
+- `GetIndexNames(System.String,System.String)`
 
-  Resolves the native Firebird type name based on the specified field type, subtype, and scale.
+  No XML summary provided.
 
-  Parameters:
-  - `fbType`: The Firebird field type identifier.
-  - `subType`: The Firebird field subtype identifier, or null if not applicable.
-  - `scale`: The scale of the field, indicating decimal places for numeric types.
+- `GetForeignKeyNames(System.String,System.String)`
 
-  Returns: A string representing the native Firebird type name that corresponds to the provided type, subtype, and scale.
+  No XML summary provided.
 
-- `GetFKRule(System.String)`
+- `GetTableMeta(System.String,System.String)`
 
-  Converts the provided foreign key rule string into a corresponding DbExport.Schema.ForeignKeyRule enumeration value.
+  No XML summary provided.
 
-  Parameters:
-  - `rule`: The foreign key rule as a string, typically provided by the database.
+- `GetColumnMeta(System.String,System.String,System.String)`
 
-  Returns: A DbExport.Schema.ForeignKeyRule value that corresponds to the input rule. If the rule is null or does not match any known values, the method returns DbExport.Schema.ForeignKeyRule.None.
+  No XML summary provided.
 
+- `GetIndexMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetForeignKeyMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetTypeNames`
+
+  No XML summary provided.
+
+- `GetTypeMeta(System.String,System.String)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-firebird-firebirdscriptexecutor"></a>
 ### Type `FirebirdScriptExecutor` (type)
 
 Provides functionality to execute Firebird SQL scripts against a Firebird database.
 
 #### Methods
 
-- `CreateDbRegex`
+- `Execute(System.String,System.String)`
 
   No XML summary provided.
 
+<a id="namespace-dbexport-providers-mysqlclient"></a>
 ## Namespace `DbExport.Providers.MySqlClient`
 
+<a id="type-dbexport-providers-mysqlclient-mysqlcodegenerator"></a>
 ### Type `MySqlCodeGenerator` (type)
 
 A code generator responsible for producing SQL scripts for MySQL databases.
@@ -1635,6 +1475,14 @@ A code generator responsible for producing SQL scripts for MySQL databases.
 - `MySqlOptions`
 
   Represents configuration options specific to MySQL database generation.
+
+- `ProviderName`
+
+  No XML summary provided.
+
+- `GeneratesRowVersion`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -1656,6 +1504,29 @@ A code generator responsible for producing SQL scripts for MySQL databases.
   Parameters:
   - `path`: The file path where the generated SQL will be written. Must not be null or empty.
 
+#### Methods
+
+- `GetTypeName(DbExport.Schema.IDataItem)`
+
+  No XML summary provided.
+
+- `GetTypeReference(DbExport.Schema.DataType)`
+
+  No XML summary provided.
+
+- `Format(System.Object,DbExport.Schema.ColumnType)`
+
+  No XML summary provided.
+
+- `WriteIdentitySpecification(DbExport.Schema.Column)`
+
+  No XML summary provided.
+
+- `WriteTableCreationSuffix(DbExport.Schema.Table)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-mysqlclient-characterset"></a>
 ### Type `CharacterSet` (type)
 
 Represents a MySQL character set, including its name, supported collations, and default collation.
@@ -1685,6 +1556,21 @@ Represents a MySQL character set, including its name, supported collations, and 
   - `collations`: An array of supported collations for the character set.
   - `defaultCollation`: The default collation for the character set.
 
+#### Methods
+
+- `Equals(System.Object)`
+
+  No XML summary provided.
+
+- `GetHashCode`
+
+  No XML summary provided.
+
+- `ToString`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-mysqlclient-mysqloptions"></a>
 ### Type `MySqlOptions` (type)
 
 Represents options specific to MySQL database generation.
@@ -1723,9 +1609,24 @@ Represents options specific to MySQL database generation.
 
   Returns: A string representation of the MySqlOptions instance in Markdown table format. The table includes details such as Storage Engine, Character Set, Collation, and the optimization flag for MariaDB.
 
+<a id="type-dbexport-providers-mysqlclient-mysqlschemaprovider"></a>
 ### Type `MySqlSchemaProvider` (type)
 
 Provides functionality to extract schema information from a MySQL database.
+
+#### Properties
+
+- `ProviderName`
+
+  No XML summary provided.
+
+- `ConnectionString`
+
+  No XML summary provided.
+
+- `DatabaseName`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -1738,42 +1639,47 @@ Provides functionality to extract schema information from a MySQL database.
 
 #### Methods
 
-- `GetColumnType(System.String)`
-
-  Determines the corresponding DbExport.Schema.ColumnType for the given MySQL data type. Maps MySQL-specific type definitions to standard column type enumerations.
-
-  Parameters:
-  - `mysqlType`: The MySQL data type as a string.
-
-  Returns: The mapped DbExport.Schema.ColumnType that corresponds to the given MySQL data type.
-
-- `Parse(System.String,DbExport.Schema.ColumnType)`
-
-  Parses a string value into an appropriate object based on the specified column type. Handles different data types such as numeric types, date/time types, and string types. Returns System.DBNull.Value if the value is empty, null, or invalid for the specified type.
-
-  Parameters:
-  - `value`: The string value to parse.
-  - `columnType`: The column type that determines how the value should be parsed.
-
-  Returns: The parsed object corresponding to the specified column type, or System.DBNull.Value if the value cannot be converted.
-
-- `GetFKRule(System.String)`
-
-  Maps a string representation of a foreign key constraint rule to its corresponding DbExport.Schema.ForeignKeyRule enum value. Used to interpret foreign key rules such as "CASCADE" or "SET NULL", as retrieved from the database metadata.
-
-  Parameters:
-  - `rule`: A string representing the foreign key rule from the database metadata.
-
-  Returns: A DbExport.Schema.ForeignKeyRule enum value corresponding to the provided string representation. If no match is found, returns DbExport.Schema.ForeignKeyRule.None.
-
-- `UserTypeRegex`
+- `GetTableNames`
 
   No XML summary provided.
 
-- `Utf8Regex`
+- `GetColumnNames(System.String,System.String)`
 
   No XML summary provided.
 
+- `GetIndexNames(System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetForeignKeyNames(System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetTableMeta(System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetColumnMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetIndexMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetForeignKeyMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetTypeNames`
+
+  No XML summary provided.
+
+- `GetTypeMeta(System.String,System.String)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-mysqlclient-mysqlscriptexecutor"></a>
 ### Type `MySqlScriptExecutor` (type)
 
 Provides functionality for executing MySQL scripts, including management of database creation commands and connection string updates for the target database. Extends the functionality of the BatchScriptExecutor class for MySQL-specific use cases.
@@ -1786,24 +1692,23 @@ Provides functionality for executing MySQL scripts, including management of data
 
 #### Methods
 
-- `Unescape(System.String)`
-
-  Removes enclosing backticks from a database or table name if present.
-
-  Parameters:
-  - `name`: The name of the database or table, which may be enclosed in backticks.
-
-  Returns: The unescaped name without backticks, or the original name if backticks are not present.
-
-- `CreateDbRegex`
+- `Execute(System.String,System.String)`
 
   No XML summary provided.
 
+<a id="namespace-dbexport-providers-npgsql"></a>
 ## Namespace `DbExport.Providers.Npgsql`
 
+<a id="type-dbexport-providers-npgsql-npgsqlcodegenerator"></a>
 ### Type `NpgsqlCodeGenerator` (type)
 
 Provides functionality for generating database-specific code targeting Npgsql (PostgreSQL). This class extends the DbExport.Providers.CodeGenerator base class and overrides certain methods to tailor code generation to the PostgreSQL database platform.
+
+#### Properties
+
+- `ProviderName`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -1825,9 +1730,58 @@ Provides functionality for generating database-specific code targeting Npgsql (P
   Parameters:
   - `path`: The file path where the generated SQL will be written. Must not be null or empty.
 
+#### Methods
+
+- `VisitDataType(DbExport.Schema.DataType)`
+
+  No XML summary provided.
+
+- `GetTypeName(DbExport.Schema.Column)`
+
+  No XML summary provided.
+
+- `GetTypeName(DbExport.Schema.IDataItem)`
+
+  No XML summary provided.
+
+- `GetTypeReference(DbExport.Schema.DataType)`
+
+  No XML summary provided.
+
+- `GetKeyName(DbExport.Schema.Key)`
+
+  No XML summary provided.
+
+- `Format(System.Object,DbExport.Schema.ColumnType)`
+
+  No XML summary provided.
+
+- `WriteDbCreationDirective(DbExport.Schema.Database)`
+
+  No XML summary provided.
+
+- `WriteIdentitySpecification(DbExport.Schema.Column)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-npgsql-npgsqlschemaprovider"></a>
 ### Type `NpgsqlSchemaProvider` (type)
 
 Provides schema-related metadata for a Npgsql (PostgreSQL) database, allowing access to table, column, index, foreign key, and type information. This class implements the DbExport.Providers.ISchemaProvider interface and serves as a provider for PostgreSQL database schemas.
+
+#### Properties
+
+- `ProviderName`
+
+  No XML summary provided.
+
+- `ConnectionString`
+
+  No XML summary provided.
+
+- `DatabaseName`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -1840,42 +1794,47 @@ Provides schema-related metadata for a Npgsql (PostgreSQL) database, allowing ac
 
 #### Methods
 
-- `GetColumnType(System.String)`
-
-  Maps a PostgreSQL native data type to the corresponding DbExport.Schema.ColumnType enumeration value.
-
-  Parameters:
-  - `npgsqlType`: The native PostgreSQL type as a string.
-
-  Returns: The corresponding DbExport.Schema.ColumnType for the specified PostgreSQL type.
-
-- `Parse(System.String,DbExport.Schema.ColumnType)`
-
-  Parses a string value into an object of the appropriate type based on the specified column type.
-
-  Parameters:
-  - `value`: The string representation of the value to parse.
-  - `columnType`: The target column type used to determine the type of the parsed value.
-
-  Returns: Returns the parsed value as an object of the respective type, or System.DBNull.Value if parsing fails or the value is null or "NULL".
-
-- `GetFKRule(System.String)`
-
-  Converts a string representation of a foreign key rule into its corresponding DbExport.Schema.ForeignKeyRule enum value.
-
-  Parameters:
-  - `rule`: The string representation of the foreign key rule. Possible values include "RESTRICT", "CASCADE", "SET DEFAULT", "SET NULL", or other values.
-
-  Returns: The corresponding DbExport.Schema.ForeignKeyRule enum value. If the input does not match any predefined rules, DbExport.Schema.ForeignKeyRule.None is returned.
-
-- `CommaRegex`
+- `GetTableNames`
 
   No XML summary provided.
 
-- `Utf8Regex`
+- `GetColumnNames(System.String,System.String)`
 
   No XML summary provided.
 
+- `GetIndexNames(System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetForeignKeyNames(System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetTableMeta(System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetColumnMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetIndexMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetForeignKeyMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetTypeNames`
+
+  No XML summary provided.
+
+- `GetTypeMeta(System.String,System.String)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-npgsql-npgsqlscriptexecutor"></a>
 ### Type `NpgsqlScriptExecutor` (type)
 
 Represents a script executor specifically designed for executing Npgsql (PostgreSQL) database scripts. This class extends the DbExport.Providers.BatchScriptExecutor and overrides its behavior to handle PostgreSQL-specific use cases, such as 'CREATE DATABASE' commands and connection string adjustments for the target database.
@@ -1888,15 +1847,27 @@ Represents a script executor specifically designed for executing Npgsql (Postgre
 
 #### Methods
 
-- `CreateDbRegex`
+- `Execute(System.String,System.String)`
 
   No XML summary provided.
 
+<a id="namespace-dbexport-providers-oracleclient"></a>
 ## Namespace `DbExport.Providers.OracleClient`
 
+<a id="type-dbexport-providers-oracleclient-oraclecodegenerator"></a>
 ### Type `OracleCodeGenerator` (type)
 
 Generates Oracle-specific SQL code for database schema objects and related functionality.
+
+#### Properties
+
+- `ProviderName`
+
+  No XML summary provided.
+
+- `SupportsDbCreation`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -1918,9 +1889,50 @@ Generates Oracle-specific SQL code for database schema objects and related funct
   Parameters:
   - `path`: The file path where the generated SQL will be written. Must not be null or empty.
 
+#### Methods
+
+- `GetTypeName(DbExport.Schema.IDataItem)`
+
+  No XML summary provided.
+
+- `GetKeyName(DbExport.Schema.Key)`
+
+  No XML summary provided.
+
+- `Format(System.Object,DbExport.Schema.ColumnType)`
+
+  No XML summary provided.
+
+- `WriteIdentitySpecification(DbExport.Schema.Column)`
+
+  No XML summary provided.
+
+- `WriteUpdateRule(DbExport.Schema.ForeignKeyRule)`
+
+  No XML summary provided.
+
+- `WriteDeleteRule(DbExport.Schema.ForeignKeyRule)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-oracleclient-oracleschemaprovider"></a>
 ### Type `OracleSchemaProvider` (type)
 
 Provides schema metadata for Oracle databases by implementing the ISchemaProvider interface. This class allows retrieval of database objects such as tables, columns, indexes, and foreign keys, as well as their associated metadata.
+
+#### Properties
+
+- `ProviderName`
+
+  No XML summary provided.
+
+- `ConnectionString`
+
+  No XML summary provided.
+
+- `DatabaseName`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -1933,29 +1945,42 @@ Provides schema metadata for Oracle databases by implementing the ISchemaProvide
 
 #### Methods
 
-- `GetColumnType(System.String,System.Byte,System.Byte)`
+- `GetTableNames`
 
-  Determines the corresponding DbExport.Schema.ColumnType for the provided Oracle database type based on its type name, precision, and scale.
+  No XML summary provided.
 
-  Parameters:
-  - `oracleType`: The name of the Oracle database type (e.g., "NUMBER", "CHAR").
-  - `precision`: The precision of the Oracle type, used for numeric types.
-  - `scale`: The scale of the Oracle type, used for numeric types.
+- `GetColumnNames(System.String,System.String)`
 
-  Returns: The DbExport.Schema.ColumnType representing the equivalent column type for the specified Oracle type.
+  No XML summary provided.
 
-- `Parse(System.String,DbExport.Schema.ColumnType)`
+- `GetIndexNames(System.String,System.String)`
 
-  Parses a specified string value into an object of the specified database column type.
+  No XML summary provided.
 
-  Parameters:
-  - `value`: The string value to parse.
-  - `columnType`: The column type that determines the target data type of the parsed value.
+- `GetForeignKeyNames(System.String,System.String)`
 
-  Returns: The parsed object of the requested column type, or System.DBNull.Value if the value is null, empty, or cannot be converted to the specified column type.
+  No XML summary provided.
 
+- `GetTableMeta(System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetColumnMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetIndexMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetForeignKeyMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+<a id="namespace-dbexport-providers-sqlclient"></a>
 ## Namespace `DbExport.Providers.SqlClient`
 
+<a id="type-dbexport-providers-sqlclient-sqlcodegenerator"></a>
 ### Type `SqlCodeGenerator` (type)
 
 Represents a code generator specifically designed for generating SQL Server-compatible scripts. Extends the DbExport.Providers.CodeGenerator class to provide SQL Server-specific implementation details for database schema export and related functionality.
@@ -1965,6 +1990,18 @@ Represents a code generator specifically designed for generating SQL Server-comp
 - `IsFileBased`
 
   Gets or sets a value indicating whether the SQL Server database is file-based. This is typically the case when using SQL Server Express LocalDB.
+
+- `ProviderName`
+
+  No XML summary provided.
+
+- `SupportsDbCreation`
+
+  No XML summary provided.
+
+- `GeneratesRowVersion`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -1986,9 +2023,54 @@ Represents a code generator specifically designed for generating SQL Server-comp
   Parameters:
   - `path`: The file path where the generated SQL will be written. Must not be null or empty.
 
+#### Methods
+
+- `VisitDataType(DbExport.Schema.DataType)`
+
+  No XML summary provided.
+
+- `GetTypeName(DbExport.Schema.IDataItem)`
+
+  No XML summary provided.
+
+- `GetTypeReference(DbExport.Schema.DataType)`
+
+  No XML summary provided.
+
+- `Format(System.Object,DbExport.Schema.ColumnType)`
+
+  No XML summary provided.
+
+- `WriteDelimiter`
+
+  No XML summary provided.
+
+- `WriteDbCreationDirective(DbExport.Schema.Database)`
+
+  No XML summary provided.
+
+- `WriteIdentitySpecification(DbExport.Schema.Column)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-sqlclient-sqlschemaprovider"></a>
 ### Type `SqlSchemaProvider` (type)
 
-No XML summary provided.
+Provides schema-related metadata for a MS SQL Sever database, allowing access to table, column, index, foreign key, and type information. This class implements the DbExport.Providers.ISchemaProvider interface and serves as a provider for MS SQL Sever database schemas.
+
+#### Properties
+
+- `ProviderName`
+
+  No XML summary provided.
+
+- `ConnectionString`
+
+  No XML summary provided.
+
+- `DatabaseName`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -2001,78 +2083,78 @@ No XML summary provided.
 
 #### Methods
 
-- `GetColumnType(System.String)`
-
-  Converts a given SQL type name to its equivalent DbExport.Schema.ColumnType enumeration value.
-
-  Parameters:
-  - `sqlType`: The name of the SQL type to be converted.
-
-  Returns: A DbExport.Schema.ColumnType value that corresponds to the given SQL type.
-
-- `Parse(System.String,DbExport.Schema.ColumnType)`
-
-  Parses a given string value into the appropriate object type based on the specified column type.
-
-  Parameters:
-  - `value`: The string value to be parsed.
-  - `columnType`: The column type that determines how the value is interpreted.
-
-  Returns: An object representing the parsed value. Returns System.DBNull.Value if the value is invalid or cannot be parsed for the specified column type.
-
-- `GetFKRule(System.String)`
-
-  Determines the DbExport.Schema.ForeignKeyRule based on the provided rule string.
-
-  Parameters:
-  - `rule`: The string representing the foreign key rule (e.g., "CASCADE").
-
-  Returns: A DbExport.Schema.ForeignKeyRule enumeration value corresponding to the input rule.
-
-- `UniqueRegex`
+- `GetTableNames`
 
   No XML summary provided.
 
-- `PrimaryKeyRegex`
+- `GetColumnNames(System.String,System.String)`
 
   No XML summary provided.
 
-- `CommaRegex`
+- `GetIndexNames(System.String,System.String)`
 
   No XML summary provided.
 
+- `GetForeignKeyNames(System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetTableMeta(System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetColumnMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetIndexMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetForeignKeyMeta(System.String,System.String,System.String)`
+
+  No XML summary provided.
+
+- `GetTypeNames`
+
+  No XML summary provided.
+
+- `GetTypeMeta(System.String,System.String)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-sqlclient-sqlscripexecutor"></a>
 ### Type `SqlScripExecutor` (type)
 
 Represents an implementation of the DbExport.Providers.IScriptExecutor interface for executing SQL scripts against a SQL Server database using a given connection string.
 
 #### Methods
 
-- `Unescape(System.String)`
-
-  Removes surrounding square brackets from the input string if they exist.
-
-  Parameters:
-  - `name`: The string to unescape, potentially surrounded by square brackets.
-
-  Returns: The input string without surrounding square brackets, or the original string if no brackets are present.
-
-- `DelimiterRegex`
+- `Execute(System.String,System.String)`
 
   No XML summary provided.
 
-- `CreateDbRegex`
-
-  No XML summary provided.
-
-- `CreateTypeRegex`
-
-  No XML summary provided.
-
+<a id="namespace-dbexport-providers-sqlite"></a>
 ## Namespace `DbExport.Providers.SQLite`
 
+<a id="type-dbexport-providers-sqlite-sqlitecodegenerator"></a>
 ### Type `SQLiteCodeGenerator` (type)
 
 Generates SQLite-specific SQL scripts for database schema and data migrations. This class is designed to provide a SQLite-compatible implementation of the base DbExport.Providers.CodeGenerator functionalities. It facilitates the generation of database schema definitions, constraints, and data migration scripts tailored for SQLite databases.
+
+#### Properties
+
+- `ProviderName`
+
+  No XML summary provided.
+
+- `SupportsDbCreation`
+
+  No XML summary provided.
+
+- `RequireInlineConstraints`
+
+  No XML summary provided.
 
 #### Constructors
 
@@ -2094,27 +2176,58 @@ Generates SQLite-specific SQL scripts for database schema and data migrations. T
   Parameters:
   - `path`: The file path where the generated SQL will be written. Must not be null or empty.
 
+#### Methods
+
+- `VisitColumn(DbExport.Schema.Column)`
+
+  No XML summary provided.
+
+- `VisitPrimaryKey(DbExport.Schema.PrimaryKey)`
+
+  No XML summary provided.
+
+- `VisitForeignKey(DbExport.Schema.ForeignKey)`
+
+  No XML summary provided.
+
+- `GetTypeName(DbExport.Schema.IDataItem)`
+
+  No XML summary provided.
+
+- `Format(System.Object,DbExport.Schema.ColumnType)`
+
+  No XML summary provided.
+
+- `GetKeyName(DbExport.Schema.Key)`
+
+  No XML summary provided.
+
+- `WriteDataMigrationPrefix`
+
+  No XML summary provided.
+
+- `WriteDataMigrationSuffix`
+
+  No XML summary provided.
+
+<a id="type-dbexport-providers-sqlite-sqliteschemaprovider"></a>
 ### Type `SQLiteSchemaProvider` (type)
 
 Provides schema information for SQLite databases. This class implements the ISchemaProvider interface, enabling retrieval of database schema metadata such as table names, column names, foreign key names, and associated metadata.
 
-#### Fields
+#### Properties
 
-- `tableColumns`
+- `ProviderName`
 
-  Represents a data structure that holds information about the columns of database tables in the current schema context. This variable acts as a cache for table column metadata and is utilized to simplify metadata retrievals and avoid redundant database queries.
+  No XML summary provided.
 
-- `tableIndexes`
+- `ConnectionString`
 
-  Represents a data structure that caches metadata related to the indexes of database tables within the current schema context. This variable is used to store and retrieve index information such as uniqueness and origin, optimizing metadata queries and reducing redundant database calls.
+  No XML summary provided.
 
-- `tableForeignKeys`
+- `DatabaseName`
 
-  Serves as a data structure to store information about the foreign keys of database tables within the current schema context. This variable is used to cache foreign key metadata, enabling efficient retrieval and minimizing redundant queries to the database.
-
-- `tableHasAutoIncrement`
-
-  Stores a mapping of table names to a boolean value indicating whether each table has an auto-increment column. This variable is used to cache the auto-increment metadata for tables, optimizing performance by reducing the need for repetitive queries to the database.
+  No XML summary provided.
 
 #### Constructors
 
@@ -2127,80 +2240,42 @@ Provides schema information for SQLite databases. This class implements the ISch
 
 #### Methods
 
-- `Combine(System.String,System.String)`
+- `GetTableNames`
 
-  Combines the table owner and table name into a single string, separated by a period.
+  No XML summary provided.
 
-  Parameters:
-  - `tableOwner`: The owner of the table, usually representing the schema or database user.
-  - `tableName`: The name of the table for which the owner is being combined.
+- `GetColumnNames(System.String,System.String)`
 
-  Returns: A string that combines the table owner and table name in the format "tableOwner.tableName".
+  No XML summary provided.
 
-- `RegisterList(DbExport.Providers.MetaData,System.String,System.String,System.Collections.Generic.List{System.Collections.Generic.Dictionary{System.String,System.Object}})`
+- `GetIndexNames(System.String,System.String)`
 
-  Registers a list of metadata associated with a specific table in the given collection.
+  No XML summary provided.
 
-  Parameters:
-  - `collection`: The metadata collection where the table information will be registered.
-  - `tableOwner`: The owner of the table for which metadata is being registered.
-  - `tableName`: The name of the table for which metadata is being registered.
-  - `list`: The list of metadata entries to be registered, represented as dictionaries of key-value pairs.
+- `GetForeignKeyNames(System.String,System.String)`
 
-- `FindFirst(DbExport.Providers.MetaData,System.String,System.String,System.Predicate{System.Collections.Generic.Dictionary{System.String,System.Object}})`
+  No XML summary provided.
 
-  Finds the first item in the specified collection that matches the given predicate for a specific table.
+- `GetTableMeta(System.String,System.String)`
 
-  Parameters:
-  - `collection`: The metadata collection containing table-related data.
-  - `tableOwner`: The owner of the table whose data is being queried.
-  - `tableName`: The name of the table whose data is being queried.
-  - `predicate`: The condition to match items in the collection.
+  No XML summary provided.
 
-  Returns: A dictionary representing the first item in the collection that matches the predicate, or null if no match is found.
+- `GetColumnMeta(System.String,System.String,System.String)`
 
-- `ResolveColumnType(System.String,DbExport.Schema.ColumnType@,System.String@,System.Int16@,System.Byte@,System.Byte@)`
+  No XML summary provided.
 
-  Resolves the column type based on the provided SQL type string. Determines the corresponding DbExport.Schema.ColumnType, native database type, size, precision, and scale of the column.
+- `GetIndexMeta(System.String,System.String,System.String)`
 
-  Parameters:
-  - `sqlType`: The SQL type string to be analyzed.
-  - `columnType`: Outputs the resolved DbExport.Schema.ColumnType enumeration value.
-  - `nativeType`: Outputs the native SQL type associated with the column.
-  - `size`: Outputs the size of the column, if applicable.
-  - `precision`: Outputs the precision of the column, if applicable.
-  - `scale`: Outputs the scale of the column, if applicable.
+  No XML summary provided.
 
-- `GetColumnType(System.String)`
+- `GetForeignKeyMeta(System.String,System.String,System.String)`
 
-  Determines the corresponding DbExport.Schema.ColumnType for a given SQLite data type.
+  No XML summary provided.
 
-  Parameters:
-  - `sqliteType`: The SQLite data type as a string.
-
-  Returns: The DbExport.Schema.ColumnType that corresponds to the specified SQLite data type.
-
-- `ParseValue(System.Object,DbExport.Schema.ColumnType)`
-
-  Parses the input value into a strongly typed object based on the specified column type.
-
-  Parameters:
-  - `value`: The value to be parsed, which can be any object or null.
-  - `columnType`: The type of column to determine the parsing logic for the value.
-
-  Returns: An object representing the parsed value, or System.DBNull.Value if parsing fails or the value is null.
-
-- `ParseForeignKeyRule(System.String)`
-
-  Converts a SQLite foreign key rule string into a corresponding DbExport.Schema.ForeignKeyRule enumeration value.
-
-  Parameters:
-  - `sqlFkRule`: The foreign key rule as represented in the SQLite metadata (e.g., "NO ACTION", "CASCADE").
-
-  Returns: A DbExport.Schema.ForeignKeyRule enumeration value that corresponds to the specified SQLite foreign key rule.
-
+<a id="namespace-dbexport-schema"></a>
 ## Namespace `DbExport.Schema`
 
+<a id="type-dbexport-schema-column"></a>
 ### Type `Column` (type)
 
 Represents a column in a database table with metadata and attributes that provide detailed information about its configuration and behavior within the schema.
@@ -2323,6 +2398,10 @@ Represents a column in a database table with metadata and attributes that provid
 
   Gets a value indicating whether the column is of a binary type.
 
+- `IsChecked`
+
+  No XML summary provided.
+
 #### Constructors
 
 - `Column(DbExport.Schema.Table,System.String,DbExport.Schema.ColumnType,System.String,System.Int16,System.Byte,System.Byte,DbExport.Schema.ColumnAttributes,System.Object,System.String)`
@@ -2358,15 +2437,11 @@ Represents a column in a database table with metadata and attributes that provid
   - `seed`: The initial value of the identity column.
   - `increment`: The step value used to increment the identity column.
 
-- `GetAttributesFromType(DbExport.Schema.ColumnType)`
+- `AcceptVisitor(DbExport.IVisitor)`
 
-  Retrieves the attributes associated with the specified column type.
+  No XML summary provided.
 
-  Parameters:
-  - `type`: The type of the column for which attributes are being retrieved.
-
-  Returns: The attributes derived from the specified column type.
-
+<a id="type-dbexport-schema-columnattributes"></a>
 ### Type `ColumnAttributes` (type)
 
 Specifies a set of attributes that can be associated with a database column.
@@ -2429,6 +2504,7 @@ Specifies a set of attributes that can be associated with a database column.
 
   Indicates that the column stores binary data.
 
+<a id="type-dbexport-schema-columncollection"></a>
 ### Type `ColumnCollection` (type)
 
 Represents a collection of database columns.
@@ -2453,6 +2529,7 @@ Represents a collection of database columns.
   Parameters:
   - `columns`: The collection of items to initialize the collection with.
 
+<a id="type-dbexport-schema-columnset"></a>
 ### Type `ColumnSet` (type)
 
 Represents an abstract base class for a set of related columns within a database schema. Provides functionality to manage the state of column checks and evaluate check conditions.
@@ -2462,6 +2539,10 @@ Represents an abstract base class for a set of related columns within a database
 - `Columns`
 
   Gets a collection of columns associated with the column set.
+
+- `IsChecked`
+
+  No XML summary provided.
 
 - `AllColumnsAreChecked`
 
@@ -2485,6 +2566,7 @@ Represents an abstract base class for a set of related columns within a database
 
   Represents an abstract base class for a set of related columns within a database schema. Provides functionality to manage the state of column checks and evaluate check conditions.
 
+<a id="type-dbexport-schema-columntype"></a>
 ### Type `ColumnType` (type)
 
 Represents the types of columns that can be used in a database schema. This enumeration provides a comprehensive list of supported data types including numeric, textual, date/time, binary, and user-defined types.
@@ -2623,6 +2705,7 @@ Represents the types of columns that can be used in a database schema. This enum
 
   Represents a user-defined column data type. This value is used when the column type is specified explicitly by the user, often for custom or database-specific data types that are not covered by standard types.
 
+<a id="type-dbexport-schema-database"></a>
 ### Type `Database` (type)
 
 Represents a database within the schema, containing metadata about its provider, connection information, data types, and tables. It serves as the root schema item for database-related operations.
@@ -2656,6 +2739,13 @@ Represents a database within the schema, containing metadata about its provider,
   - `providerName`: The name of the database provider used to connect to the database.
   - `connectionString`: The connection string used to connect to the database.
 
+#### Methods
+
+- `AcceptVisitor(DbExport.IVisitor)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-schema-datatype"></a>
 ### Type `DataType` (type)
 
 Represents a user-defined database data type with associated metadata such as size, precision, scale, and other characteristics.
@@ -2710,6 +2800,14 @@ Represents a user-defined database data type with associated metadata such as si
 
   Gets a value indicating whether the data type is required.
 
+- `IsChecked`
+
+  No XML summary provided.
+
+- `FullName`
+
+  No XML summary provided.
+
 #### Constructors
 
 - `DataType(DbExport.Schema.Database,System.String,System.String,DbExport.Schema.ColumnType,System.String,System.Int16,System.Byte,System.Byte,System.Boolean,System.Boolean,System.Object,System.Collections.Generic.IEnumerable{System.Object})`
@@ -2730,6 +2828,13 @@ Represents a user-defined database data type with associated metadata such as si
   - `defaultValue`: The default value of the data type, if any.
   - `possibleValues`: A collection of possible values for the data type, if it is enumerated.
 
+#### Methods
+
+- `AcceptVisitor(DbExport.IVisitor)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-schema-datatypecollection"></a>
 ### Type `DataTypeCollection` (type)
 
 Represents a collection of database data types.
@@ -2754,6 +2859,7 @@ Represents a collection of database data types.
   Parameters:
   - `dataTypes`: The collection of items to initialize the collection with.
 
+<a id="type-dbexport-schema-foreignkey"></a>
 ### Type `ForeignKey` (type)
 
 Represents a foreign key constraint in a database schema. This class provides details about the referenced table, the columns involved, and the actions to take on update or delete.
@@ -2815,6 +2921,11 @@ Represents a foreign key constraint in a database schema. This class provides de
 
   Returns: The DbExport.Schema.Column object corresponding to the specified index, or null if the related table or column is not found.
 
+- `AcceptVisitor(DbExport.IVisitor)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-schema-foreignkeycollection"></a>
 ### Type `ForeignKeyCollection` (type)
 
 Represents a collection of database foreign keys.
@@ -2839,6 +2950,7 @@ Represents a collection of database foreign keys.
   Parameters:
   - `foreignKeys`: The collection of items to initialize the collection with.
 
+<a id="type-dbexport-schema-foreignkeyrule"></a>
 ### Type `ForeignKeyRule` (type)
 
 Defines the actions to be taken when a foreign key constraint is violated or when referenced data is modified or deleted.
@@ -2865,6 +2977,7 @@ Defines the actions to be taken when a foreign key constraint is violated or whe
 
   Specifies that the action is set default, meaning that the foreign key column value will be set to the default value of the referenced column.
 
+<a id="type-dbexport-schema-icheckable"></a>
 ### Type `ICheckable` (type)
 
 Represents an item that can be checked or unchecked.
@@ -2875,6 +2988,7 @@ Represents an item that can be checked or unchecked.
 
   Gets or sets a value indicating whether the item is checked.
 
+<a id="type-dbexport-schema-idataitem"></a>
 ### Type `IDataItem` (type)
 
 Represents a data item that encapsulates schema-related properties and metadata for a database column or type definition.
@@ -2921,6 +3035,7 @@ Represents a data item that encapsulates schema-related properties and metadata 
 
   Returns: The full type name, including size, precision, and scale if applicable.
 
+<a id="type-dbexport-schema-index"></a>
 ### Type `Index` (type)
 
 Represents a database index associated with a table. An index is used to enhance the performance of database queries by providing quick access to rows in a table based on the values of one or more columns.
@@ -2960,6 +3075,13 @@ Represents a database index associated with a table. An index is used to enhance
   - `unique`: Whether the index is unique.
   - `primaryKey`: Whether the index is a primary key.
 
+#### Methods
+
+- `AcceptVisitor(DbExport.IVisitor)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-schema-indexcollection"></a>
 ### Type `IndexCollection` (type)
 
 Represents a collection of database indexes.
@@ -2984,6 +3106,7 @@ Represents a collection of database indexes.
   Parameters:
   - `indexes`: The collection of items to initialize the collection with.
 
+<a id="type-dbexport-schema-key"></a>
 ### Type `Key` (type)
 
 Represents an abstract base class for database keys, such as primary keys, foreign keys, and indexes. Provides functionality to manage columns associated with the key and to compare key signatures.
@@ -3016,6 +3139,7 @@ Represents an abstract base class for database keys, such as primary keys, forei
 
   Returns: `true` if the current key matches the signature of the specified key; otherwise, `false`.
 
+<a id="type-dbexport-schema-primarykey"></a>
 ### Type `PrimaryKey` (type)
 
 Represents the primary key of a database table. A primary key uniquely identifies each record in the table and enforces entity integrity within the database schema.
@@ -3041,6 +3165,13 @@ Represents the primary key of a database table. A primary key uniquely identifie
   - `name`: The name of the primary key constraint.
   - `columnNames`: The names of the columns that make up the primary key.
 
+#### Methods
+
+- `AcceptVisitor(DbExport.IVisitor)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-schema-schemaitem"></a>
 ### Type `SchemaItem` (type)
 
 Represents a base class for all schema items.
@@ -3069,18 +3200,23 @@ Represents a base class for all schema items.
   - `parent`: A reference to the parent schema item.
   - `name`: The name of the schema item. Should not be null or whitespace.
 
-### Type `SchemaItemCollection`1` (type)
+#### Methods
+
+- `AcceptVisitor(DbExport.IVisitor)`
+
+  No XML summary provided.
+
+- `ToString`
+
+  No XML summary provided.
+
+<a id="type-dbexport-schema-schemaitemcollection-1"></a>
+### Type `SchemaItemCollection1` (type)
 
 Represents a collection of strongly typed schema items, providing functionality for indexing, addition, removal, and lookup based on item names. This collection is intended to manage schema items that inherit from the DbExport.Schema.SchemaItem class.
 
 Type Parameters:
 - `TItem`: The specific type of schema items contained in the collection.
-
-#### Fields
-
-- `dictionary`
-
-  Represents a private dictionary that serves as a lookup mechanism for storing and retrieving schema items within the DbExport.Schema.SchemaItemCollection`1. The dictionary maps item names to their corresponding instances to enable efficient access.
 
 #### Properties
 
@@ -3198,6 +3334,7 @@ Type Parameters:
 
   Removes all items from the DbExport.Schema.SchemaItemCollection`1 and clears the internal dictionary used for name-based lookups.
 
+<a id="type-dbexport-schema-table"></a>
 ### Type `Table` (type)
 
 Represents a database table, which is a specialized DbExport.Schema.ColumnSet containing columns, constraints, and relationships to other tables.
@@ -3256,6 +3393,10 @@ Represents a database table, which is a specialized DbExport.Schema.ColumnSet co
 
   Gets a collection of tables that are referencing this table through foreign keys.
 
+- `FullName`
+
+  No XML summary provided.
+
 #### Constructors
 
 - `Table(DbExport.Schema.Database,System.String,System.String)`
@@ -3292,6 +3433,11 @@ Represents a database table, which is a specialized DbExport.Schema.ColumnSet co
 
   Returns: True if the table is an association table; otherwise, false.
 
+- `AcceptVisitor(DbExport.IVisitor)`
+
+  No XML summary provided.
+
+<a id="type-dbexport-schema-tablecollection"></a>
 ### Type `TableCollection` (type)
 
 Represents a collection of database tables.
@@ -3316,6 +3462,7 @@ Represents a collection of database tables.
   Parameters:
   - `tables`: The collection of items to initialize the collection with.
 
+<a id="type-dbexport-schema-queryoptions"></a>
 ### Type `QueryOptions` (type)
 
 Specifies options for customizing the behavior of query generation in database operations. These options determine how tables and columns are processed and formatted during SQL generation.
@@ -3350,6 +3497,7 @@ Specifies options for customizing the behavior of query generation in database o
 
   Represents a combination of all available query options. This includes skipping identity, computed, and row version columns during query generation, as well as qualifying table names with schema information, ensuring comprehensive customization of the query output.
 
+<a id="type-dbexport-schema-tableextensions"></a>
 ### Type `TableExtensions` (type)
 
 Contains extension methods for performing various database operations on a DbExport.Schema.Table object. These operations include generating SQL statements (SELECT, INSERT, UPDATE, DELETE), executing queries, and managing batch operations.
@@ -3409,39 +3557,6 @@ Contains extension methods for performing various database operations on a DbExp
   - `options`: The query options that specify how the table name should be qualified and determine whether certain table features should be skipped.
 
   Returns: A string containing the generated SQL DELETE statement.
-
-- `IsMatch(DbExport.Schema.Column,DbExport.Schema.QueryOptions)`
-
-  Determines whether a column matches the specified query options.
-
-  Parameters:
-  - `c`: The column to evaluate against the query options.
-  - `o`: The query options that define the criteria for a column to match.
-
-  Returns: A boolean value indicating whether the column meets the specified options.
-
-- `AppendNameOf(System.Text.StringBuilder,DbExport.Schema.Table,System.String,DbExport.Schema.QueryOptions)`
-
-  Appends a fully qualified or unqualified table name to the provided System.Text.StringBuilder instance based on the specified query options.
-
-  Parameters:
-  - `sb`: The System.Text.StringBuilder instance to which the table name will be appended.
-  - `table`: The DbExport.Schema.Table whose name will be appended.
-  - `providerName`: The name of the database provider, used to escape identifiers.
-  - `options`: The query options that determine whether the table name should be qualified with its owner.
-
-  Returns: The System.Text.StringBuilder instance with the appended table name.
-
-- `AppendFilterBy(System.Text.StringBuilder,DbExport.Schema.Key,System.String)`
-
-  Appends a SQL WHERE clause to the provided StringBuilder instance using the specified key columns and provider-specific syntax for a database.
-
-  Parameters:
-  - `sb`: The StringBuilder instance to which the WHERE clause will be appended.
-  - `key`: The key object containing the columns to be included in the filter.
-  - `providerName`: The name of the database provider to ensure provider-specific escaping and parameter naming conventions.
-
-  Returns: The updated StringBuilder instance containing the appended WHERE clause.
 
 - `OpenReader(DbExport.Schema.Table,DbExport.Schema.QueryOptions)`
 
@@ -3700,948 +3815,4 @@ Contains extension methods for performing various database operations on a DbExp
   - `keyValues`: A collection of key values identifying the records to be deleted.
 
   Returns: A boolean indicating whether the operation was successful.
-
-## Namespace `DbExport.SqlHelper`
-
-### Type `ParameterParser` (type)
-
-Provides methods for parsing SQL queries and extracting parameter names. This utility is used to identify and process parameter placeholders within a given SQL string while handling edge cases such as string literals, quoted identifiers, and comments.
-
-#### Methods
-
-- `Extract(System.String)`
-
-  Extracts parameter names from the specified SQL string by identifying and parsing parameter placeholders. Handles SQL syntax rules such as skipping string literals, quoted identifiers, and comments.
-
-  Parameters:
-  - `sql`: The SQL string to parse for parameter placeholders.
-
-  Returns: A read-only list of unique parameter names found in the SQL string.
-
-- `IsParamPrefix(System.Char)`
-
-  Determines whether the specified character is a valid prefix for a SQL parameter.
-
-  Parameters:
-  - `c`: The character to evaluate as a potential parameter prefix.
-
-  Returns: True if the character is a valid parameter prefix; otherwise, false.
-
-- `IsParamChar(System.Char)`
-
-  Determines whether the specified character is valid as part of a SQL parameter name.
-
-  Parameters:
-  - `c`: The character to evaluate.
-
-  Returns: True if the character is a letter, digit, or underscore; otherwise, false.
-
-- `SkipSingleQuote(System.String,System.Int32,System.Int32)`
-
-  Skips over a single-quoted string literal in a SQL string, starting at the given index. Handles escaped single quotes by advancing the index past them.
-
-  Parameters:
-  - `sql`: The SQL string being processed.
-  - `i`: The current index within the SQL string where the single quote starts.
-  - `limit`: The length of the SQL string, used as a boundary for the processing loop.
-
-  Returns: The index immediately following the closing single quote, or the last index of the string if no matching quote is found.
-
-- `SkipDoubleQuote(System.String,System.Int32,System.Int32)`
-
-  Skips over a quoted identifier in the SQL string, starting at the specified index. Advances the index to the position after the closing double-quote or to the end of the string if no closing double-quote is found.
-
-  Parameters:
-  - `sql`: The SQL string being parsed.
-  - `i`: The current position in the SQL string where the quoted identifier begins, including the opening double-quote.
-  - `limit`: The maximum index to evaluate within the SQL string.
-
-  Returns: The index of the closing double-quote or the index of the last evaluable character if the closing double-quote is not found.
-
-- `SkipLineComment(System.String,System.Int32,System.Int32)`
-
-  Skips a line comment within the SQL string, advancing the index to the end of the comment. Line comments are identified as sequences starting with "--" and ending at the next newline character or the end of the string.
-
-  Parameters:
-  - `sql`: The SQL string containing the line comment to skip.
-  - `i`: The current index in the SQL string, positioned at the start of the line comment.
-  - `limit`: The length of the SQL string to determine the upper bounds for processing.
-
-  Returns: The updated index positioned at the end of the line comment or the end of the string, whichever comes first.
-
-- `SkipBlockComment(System.String,System.Int32,System.Int32)`
-
-  Skips a block comment in the SQL string and returns the updated index after the block comment ends. This method is called when a block comment is detected and ensures that parsing continues from the correct position after the comment.
-
-  Parameters:
-  - `sql`: The SQL string being parsed.
-  - `i`: The current index in the SQL string where the block comment starts.
-  - `limit`: The length of the SQL string, used as the upper boundary for parsing.
-
-  Returns: The index immediately after the end of the block comment, or the last index of the SQL string if the comment is unclosed.
-
-## Namespace `System.Text.RegularExpressions.Generated`
-
-### Type `CreateDbRegex_0` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the CreateDbRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `CreateDbRegex_0`
-
-  Initializes the instance.
-
-### Type `DelimiterRegex_1` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the DelimiterRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `DelimiterRegex_1`
-
-  Initializes the instance.
-
-### Type `UserTypeRegex_2` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the UserTypeRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `UserTypeRegex_2`
-
-  Initializes the instance.
-
-### Type `Utf8Regex_3` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the Utf8Regex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `Utf8Regex_3`
-
-  Initializes the instance.
-
-### Type `CreateDbRegex_4` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the CreateDbRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `CreateDbRegex_4`
-
-  Initializes the instance.
-
-### Type `CommaRegex_5` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the CommaRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `CommaRegex_5`
-
-  Initializes the instance.
-
-### Type `CreateDbRegex_6` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the CreateDbRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `CreateDbRegex_6`
-
-  Initializes the instance.
-
-### Type `UniqueRegex_7` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the UniqueRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `UniqueRegex_7`
-
-  Initializes the instance.
-
-### Type `PrimaryKeyRegex_8` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the PrimaryKeyRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `PrimaryKeyRegex_8`
-
-  Initializes the instance.
-
-### Type `DelimiterRegex_9` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the DelimiterRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `DelimiterRegex_9`
-
-  Initializes the instance.
-
-### Type `CreateDbRegex_10` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the CreateDbRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `CreateDbRegex_10`
-
-  Initializes the instance.
-
-### Type `CreateTypeRegex_11` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the CreateTypeRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `CreateTypeRegex_11`
-
-  Initializes the instance.
-
-### Type `PasswordRegex_12` (type)
-
-Custom System.Text.RegularExpressions.Regex-derived type for the PasswordRegex method.
-
-#### Fields
-
-- `Instance`
-
-  Cached, thread-safe singleton instance.
-
-#### Constructors
-
-- `PasswordRegex_12`
-
-  Initializes the instance.
-
-### Type `Utilities` (type)
-
-Helper methods used by generated System.Text.RegularExpressions.Regex-derived implementations.
-
-#### Fields
-
-- `s_defaultTimeout`
-
-  Default timeout value set in System.AppContext, or System.Text.RegularExpressions.Regex.InfiniteMatchTimeout if none was set.
-
-- `s_hasTimeout`
-
-  Whether System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout is non-infinite.
-
-- `WordCategoriesMask`
-
-  Provides a mask of Unicode categories that combine to form [\w].
-
-- `s_indexOfAnyStrings_OrdinalIgnoreCase_21A67AE61D9FA8FB1383A27A7C869F98EABAB8FE6CC6E8623DBE6F2E8E80913C`
-
-  Supports searching for the specified strings.
-
-- `s_indexOfAnyStrings_OrdinalIgnoreCase_44ABEE92F74F079CED68BEA6C00F04F60BAEF113EBEDDFF15724049297685A23`
-
-  Supports searching for the specified strings.
-
-- `s_indexOfString_993F6C5A9B3E9856C185C6E593F2739E6B0B201BACB3493C1EEFA8D46F147512`
-
-  Supports searching for the string "primary key".
-
-- `s_indexOfString_create_OrdinalIgnoreCase`
-
-  Supports searching for the string "create".
-
-- `s_indexOfString_unique_Ordinal`
-
-  Supports searching for the string "unique".
-
-- `s_indexOfString_utf8_OrdinalIgnoreCase`
-
-  Supports searching for the string "utf8".
-
-#### Properties
-
-- `WordCharBitmap`
-
-  Gets a bitmap for whether each character 0 through 127 is in [\w]
-
-#### Methods
-
-- `IsBoundaryWordChar(System.Char)`
-
-  Determines whether the specified index is a boundary word character.
-
-- `IsPostWordCharBoundary(System.ReadOnlySpan{System.Char},System.Int32)`
-
-  Determines whether the specified index is a boundary.
-
-- `IsPreWordCharBoundary(System.ReadOnlySpan{System.Char},System.Int32)`
-
-  Determines whether the specified index is a boundary.
-
-- `IsWordChar(System.Char)`
-
-  Determines whether the character is part of the [\w] set.
-
-- `StackPush(System.Int32[]@,System.Int32@,System.Int32)`
-
-  Pushes 1 value onto the backtracking stack.
-
-## Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_0`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_0.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.DelimiterRegex_1`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.DelimiterRegex_1.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.UserTypeRegex_2`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.UserTypeRegex_2.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.Utf8Regex_3`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.Utf8Regex_3.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_4`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_4.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.CommaRegex_5`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.CommaRegex_5.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_6`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_6.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.UniqueRegex_7`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.UniqueRegex_7.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.PrimaryKeyRegex_8`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.PrimaryKeyRegex_8.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.DelimiterRegex_9`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.DelimiterRegex_9.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_10`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.CreateDbRegex_10.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.CreateTypeRegex_11`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.CreateTypeRegex_11.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
-
-## Namespace `System.Text.RegularExpressions.Generated.PasswordRegex_12`
-
-### Type `RunnerFactory` (type)
-
-Provides a factory for creating System.Text.RegularExpressions.RegexRunner instances to be used by methods on System.Text.RegularExpressions.Regex.
-
-#### Methods
-
-- `CreateInstance`
-
-  Creates an instance of a System.Text.RegularExpressions.RegexRunner used by methods on System.Text.RegularExpressions.Regex.
-
-## Namespace `System.Text.RegularExpressions.Generated.PasswordRegex_12.RunnerFactory`
-
-### Type `Runner` (type)
-
-Provides the runner that contains the custom logic implementing the specified regular expression.
-
-#### Methods
-
-- `Scan(System.ReadOnlySpan{System.Char})`
-
-  Scan the inputSpan starting from base.runtextstart for the next match.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-- `TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})`
-
-  Search inputSpan starting from base.runtextpos for the next location a match could possibly start.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if a possible match was found; false if no more matches are possible.
-
-- `TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})`
-
-  Determine whether inputSpan at base.runtextpos is a match for the regular expression.
-
-  Parameters:
-  - `inputSpan`: The text being scanned by the regular expression.
-
-  Returns: true if the regular expression matches at the current position; otherwise, false.
 

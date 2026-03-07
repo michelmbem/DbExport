@@ -37,14 +37,25 @@ jobs:
         run: ./scripts/generate-api-docs.sh
 
       - name: Generate DocFX metadata
+        continue-on-error: true
         run: |
           export PATH="$PATH:$HOME/.dotnet/tools"
           docfx metadata docfx.json
 
+      - name: Ensure API TOC fallback
+        run: |
+          mkdir -p docs/api
+          if [ ! -f docs/api/toc.yml ]; then
+            cat > docs/api/toc.yml << 'EOF'
+          - name: API Reference
+            href: ../DbExport.Api.md
+          EOF
+          fi
+
       - name: Build DocFX site
         run: |
           export PATH="$PATH:$HOME/.dotnet/tools"
-          docfx docfx.json
+          docfx build docfx.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

@@ -4,6 +4,6 @@ This documentation covers DbExport usage and architecture, including setup guida
 
 ## Sections
 
-- [Readme](README.md)
-- [API Overview](docs/DbExport.Api.md)
-- [API Reference](docs/api/toc.yml)
+- [Readme](../README.md)
+- [API Overview](DbExport.Api.md)
+- [API Reference](api/toc.yml)
