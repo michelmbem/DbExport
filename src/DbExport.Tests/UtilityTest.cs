@@ -204,34 +204,129 @@ public class UtilityTest
             Assert.Equal(expected, Utility.IsDate(obj, out _));
     }
 
-    [Theory]
-    [InlineData("11000000", 2, 192)]
-    [InlineData("FE", 16, 254)]
-    [InlineData("143", 8, 99)]
-    public void FromBaseNTest(string value, byte n, int expected)
+    [Fact]
+    public void ToByteTest()
     {
-        // Act
-        var actual = Utility.FromBaseN(value, n);
+        // Arrange
+        (object? obj, byte)[] data =
+        [
+            (null, 0),
+            (10M, 10),
+            ("Yo!!", 0),
+            ('7', 7),
+            (false, 0),
+            (Convert.DBNull, 0),
+            ("1.97e+2", 197),
+            (Array.Empty<float>(), 0),
+            ("76 Jolliet", 0),
+        ];
+        
+        // Assert
+        foreach (var (obj, expected) in data)
+            Assert.Equal(expected, Utility.ToByte(obj));
+    }
 
+    [Fact]
+    public void ToInt16Test()
+    {
+        // Arrange
+        (object? obj, short)[] data =
+        [
+            (null, 0),
+            (5232f, 5232),
+            ("Hi dude!", 0),
+            ('A', 0),
+            (DBNull.Value, 0),
+            ("0.333E+4", 3330),
+            (new[] {7, 9, 0}, 0),
+            ("0xFF1", 0),
+        ];
+        
+        // Assert
+        foreach (var (obj, expected) in data)
+            Assert.Equal(expected, Utility.ToInt16(obj));
+    }
+
+    [Fact]
+    public void QuotedStrTest()
+    {
+        // Arrange
+        const string original = "It's a sunny day";
+        const string expected = "'It''s a sunny day'";
+        
+        // Act
+        var actual = Utility.QuotedStr(original);
+        
         // Assert
         Assert.Equal(expected, actual);
     }
 
-
-    [Theory]
-    [InlineData(192, 2, "11000000")]
-    [InlineData(254, 16, "FE")]
-    [InlineData(99, 8, "143")]
-    public void ToBaseNTest(byte b, byte n, string expected)
+    [Fact]
+    public void UnquotedStrTest()
     {
+        // Arrange
+        const string original = "'It''s a sunny day'";
+        const string expected = "It's a sunny day";
+        
         // Act
-        var actual = Utility.ToBaseN(b, n);
-
+        var actual = Utility.UnquotedStr(original);
+        
         // Assert
-        Assert.Equal(expected, actual);
+        Assert.Equal(expected, actual);   
     }
 
+    [Fact]
+    public void UnquotedStrTest2()
+    {
+        // Arrange
+        const string original = "\"The famous \"\"All-in-white\"\" party\"";
+        const string expected = "The famous \"All-in-white\" party";
+        
+        // Act
+        var actual = Utility.UnquotedStr(original, '"');
+        
+        // Assert
+        Assert.Equal(expected, actual);   
+    }
 
+    [Fact]
+    public void UnquotedStrTest3()
+    {
+        // Arrange
+        const string original = "Sunny days";
+        
+        // Assert
+        Assert.Equal(original, Utility.UnquotedStr(original));   
+    }
+
+    [Fact]
+    public void BinToHexTest()
+    {
+        // Arrange
+        var bytes = new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        const string expected = "0102030405060708090a0b0c0d0e0f";
+        
+        // Act
+        var actual = Utility.BinToHex(bytes);
+        
+        // Assert
+        Assert.Equal(expected, actual);   
+    }
+
+    [Fact]
+    public void ToBitStringTest()
+    {
+        // Arrange
+        var bytes = new byte[] {1, 2, 3};
+        const string expected = "11011";
+        
+        // Act
+        var actual = Utility.ToBitString(bytes);
+        
+        // Assert
+        Assert.Equal(expected, actual);   
+    }
+    
     [Fact]
     public void FromBitStringTest()
     {
@@ -244,5 +339,31 @@ public class UtilityTest
 
         // Assert
         Assert.Equal(BitConverter.ToString(expected), BitConverter.ToString(actual));
+    }
+
+    [Theory]
+    [InlineData("11000000", 2, 192)]
+    [InlineData("FE", 16, 254)]
+    [InlineData("143", 8, 99)]
+    public void FromBaseNTest(string value, byte n, int expected)
+    {
+        // Act
+        var actual = Utility.FromBaseN(value, n);
+
+        // Assert
+        Assert.Equal(expected, actual);
+    }
+    
+    [Theory]
+    [InlineData(192, 2, "11000000")]
+    [InlineData(254, 16, "FE")]
+    [InlineData(99, 8, "143")]
+    public void ToBaseNTest(byte b, byte n, string expected)
+    {
+        // Act
+        var actual = Utility.ToBaseN(b, n);
+
+        // Assert
+        Assert.Equal(expected, actual);
     }
 }

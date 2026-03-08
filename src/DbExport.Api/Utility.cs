@@ -327,8 +327,13 @@ public static partial class Utility
     /// <param name="quote">The character used to denote quotes in the string. Defaults to a single quote (').</param>
     /// <returns>A string with the surrounding quote characters removed and any consecutive quote characters replaced with a
     /// single instance. Returns an empty string if the input is null or does not contain surrounding quotes.</returns>
-    public static string UnquotedStr(object value, char quote = '\'') =>
-        value.ToString()?[1..^1].Replace(new string(quote, 2), quote.ToString());
+    public static string UnquotedStr(object value, char quote = '\'')
+    {
+        var str = value.ToString();
+        return str?.StartsWith(quote) == true && str.EndsWith(quote)
+             ? value.ToString()?[1..^1].Replace(new string(quote, 2), quote.ToString())
+             : str;
+    }
 
     /// <summary>
     /// Converts a byte array to its hexadecimal string representation.
