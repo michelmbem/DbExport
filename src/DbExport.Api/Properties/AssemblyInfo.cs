@@ -7,3 +7,4 @@
 [assembly: AssemblyVersion("3.1.0")]
 [assembly: AssemblyFileVersion("3.1.0.0")]
 [assembly: AssemblyMetadata("GitHubRepoUrl", "https://github.com/michelmbem/DbExport")]
+[assembly: AssemblyMetadata("GitHubPagesUrl", "https://michelmbem/github.io/DbExport")]
