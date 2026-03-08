@@ -255,12 +255,14 @@ public static partial class Utility
         };
 
     /// <summary>
-    /// Checks if the specified object can be interpreted as a boolean value.
+    /// Determines whether the specified object can be successfully converted to a boolean value.
     /// </summary>
-    /// <param name="value">The object to check for boolean representation.</param>
-    /// <returns><c langword="true"/> if the object can be interpreted as a boolean value; otherwise, <c langword="false"/>.</returns>
-    public static bool IsBoolean(object value) =>
-        Convert.ToString(value, CI)?.ToLower() is "false" or "true";
+    /// <param name="value">The object to evaluate as a potential boolean value.</param>
+    /// <param name="converted">When this method returns, contains the boolean value equivalent of the input,
+    /// if the conversion was successful; otherwise, false.</param>
+    /// <returns>True if the input object can be converted to a boolean value; otherwise, false.</returns>
+    public static bool IsBoolean(object value, out bool converted) =>
+        bool.TryParse(Convert.ToString(value, CI), out converted);
 
     /// <summary>
     /// Determines whether the specified object can be interpreted as a numeric value.

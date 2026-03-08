@@ -462,7 +462,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
             ColumnType.Blob => BytesToHexString(value),
             ColumnType.RowVersion when value is byte[] => BytesToHexString(value),
             ColumnType.Boolean => Convert.ToBoolean(value) ? "1" : "0",
-            _ when Utility.IsBoolean(value) => Convert.ToBoolean(value) ? "1" : "0",
+            _ when Utility.IsBoolean(value, out var converted) => converted ? "1" : "0",
             _ => Convert.ToString(value, CultureInfo.InvariantCulture)
         };
     }
