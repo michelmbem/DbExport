@@ -35,6 +35,6 @@ public abstract class Key : ColumnSet
     /// <returns>
     /// <c>true</c> if the current key matches the signature of the specified key; otherwise, <c>false</c>.
     /// </returns>
-    public bool MatchesSignature(Key other) =>
-        Columns.Count == other.Columns.Count && !Columns.Where((c, i) => c.Name != other.Columns[i].Name).Any();
+    public bool MatchesSignature(Key other) => Columns.Count == other.Columns.Count &&
+        !Columns.Where((c, i) => c.Name != other.Columns[i].Name).Any();
 }
