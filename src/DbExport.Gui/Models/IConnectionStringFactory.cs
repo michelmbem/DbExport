@@ -3,7 +3,6 @@ using System.Data.OleDb;
 #endif
 using System.Data.SQLite;
 using FirebirdSql.Data.FirebirdClient;
-using IBM.Data.Db2;
 using Microsoft.Data.SqlClient;
 using MySqlConnector;
 using Npgsql;
@@ -124,31 +123,6 @@ public class OracleConnectionStringFactory : IConnectionStringFactory
             if (!string.IsNullOrWhiteSpace(password))
                 builder.Password = password;
         }
-
-        return builder.ConnectionString;
-    }
-}
-
-public class DB2ConnectionStringFactory : IConnectionStringFactory
-{
-    public string Build(string dataSource, int? portNumber, string? database,
-                        bool trustedConnection, string? username, string? password)
-    {
-        var builder = new DB2ConnectionStringBuilder
-        {
-            Server = portNumber.HasValue
-                ? $"{dataSource}:{portNumber}"
-                : dataSource
-        };
-
-        if (!string.IsNullOrWhiteSpace(database))
-            builder.Database = database;
-
-        if (!string.IsNullOrWhiteSpace(username))
-            builder.UserID = username;
-
-        if (!string.IsNullOrWhiteSpace(password))
-            builder.Password = password;
 
         return builder.ConnectionString;
     }
