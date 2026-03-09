@@ -43,8 +43,8 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
     {
         var visitSchema = ExportOptions?.ExportSchema == true;
         var visitData = ExportOptions?.ExportData == true;
-        var visitFKs = ExportOptions?.HasFlag(ExportFlags.ExportForeignKeys) == true;
-        var visitIdent = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
+        var visitFKs = ExportOptions?.HasFlag(ExportFlags.IncludeForeignKeys) == true;
+        var visitIdent = ExportOptions?.HasFlag(ExportFlags.IncludeIdentityColumns) == true;
 
         var catalog = new ADOX.Catalog();
 
@@ -87,8 +87,8 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
     /// <inheritdoc/>
     public void VisitTable(Table table)
     {
-        var visitPKs = ExportOptions?.HasFlag(ExportFlags.ExportPrimaryKeys) == true;
-        var visitIndexes = ExportOptions?.HasFlag(ExportFlags.ExportIndexes) == true;
+        var visitPKs = ExportOptions?.HasFlag(ExportFlags.IncludePrimaryKeys) == true;
+        var visitIndexes = ExportOptions?.HasFlag(ExportFlags.IncludeIndexes) == true;
 
         Write("CREATE TABLE {0} (", Escape(table.Name));
 
@@ -121,7 +121,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
     /// <inheritdoc/>
     public void VisitColumn(Column column)
     {
-        var visitDefaults = ExportOptions?.HasFlag(ExportFlags.ExportDefaults) == true;
+        var visitDefaults = ExportOptions?.HasFlag(ExportFlags.IncludeDefaultValues) == true;
 
         Write("{0} {1}", Escape(column.Name), GetTypeName(column, ExportOptions));
         
@@ -276,7 +276,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
             if (dataType != null) return GetTypeName(dataType);
         }
         
-        return options?.HasFlag(ExportFlags.ExportIdentities) == true && column.IsIdentity
+        return options?.HasFlag(ExportFlags.IncludeIdentityColumns) == true && column.IsIdentity
              ? "counter"
              : GetTypeName(column);
     }
@@ -331,7 +331,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         return columnType switch
         {
             ColumnType.Boolean => Convert.ToBoolean(value) ? "1" : "0",
-            { } when Utility.IsBoolean(value) => Convert.ToBoolean(value) ? "1" : "0",
+            { } when Utility.IsBoolean(value, out var converted) => converted ? "1" : "0",
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar or
                 ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Json or
                 ColumnType.Guid or ColumnType.Geometry => Utility.QuotedStr(value),
@@ -423,7 +423,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
     /// <param name="dr">A data reader that provides access to the source record data. Column values in the reader are used to populate the INSERT statement.</param>
     private void ImportRecord(Table table, DbDataReader dr)
     {
-        var skipIdentity = ExportOptions?.HasFlag(ExportFlags.ExportIdentities) == true;
+        var skipIdentity = ExportOptions?.HasFlag(ExportFlags.IncludeIdentityColumns) == true;
         var comma = false;
 
         Write("INSERT INTO {0} (", Escape(table.Name));
