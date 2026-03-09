@@ -18,18 +18,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
-    <PackageReference Include="Microsoft.SqlServer.Types" Version="170.1000.7" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.100" />
-    <PackageReference Include="MySqlConnector" Version="2.5.0" />
-    <PackageReference Include="Npgsql" Version="10.0.1" />
-	<PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.4" />
-    <PackageReference Include="System.Data.SQLite" Version="2.0.2" />
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4"/>
+    <PackageReference Include="Microsoft.SqlServer.Types" Version="170.1000.7"/>
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.100"/>
+    <PackageReference Include="MySqlConnector" Version="2.5.0"/>
+    <PackageReference Include="Npgsql" Version="10.0.1"/>
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.4"/>
+    <PackageReference Include="System.Data.SQLite" Version="2.0.2"/>
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.2"/>
   </ItemGroup>
 
   <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
-    <PackageReference Include="System.Data.OleDb" Version="10.0.3" />
+    <PackageReference Include="Net.IBM.Data.Db2" Version="9.0.0.400"/>
+    <PackageReference Include="System.Data.OleDb" Version="10.0.3"/>
     <COMReference Include="ADODB">
       <WrapperTool>tlbimp</WrapperTool>
       <VersionMinor>1</VersionMinor>
@@ -51,11 +52,13 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(OS)' == 'Unix'">
-    <Compile Remove="Providers\Access\*.cs" />
+    <PackageReference Include="Net.IBM.Data.Db2-osx" Version="9.0.0.400"/>
+    <!-- <PackageReference Include="Net.IBM.Data.Db2-lnx" Version="9.0.0.400"/> -->
+    <Compile Remove="Providers\Access\*.cs"/>
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="DbExport.Schema.Index" Alias="Index" />
+    <Using Include="DbExport.Schema.Index" Alias="Index"/>
   </ItemGroup>
 
 </Project>

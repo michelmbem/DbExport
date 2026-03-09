@@ -35,6 +35,15 @@ public static class ProviderNames
     public const string ORACLE = "Oracle.ManagedDataAccess.Client";
 
     /// <summary>
+    /// A constant string representing the database provider name for IBM Db2.
+    /// </summary>
+    /// <remarks>
+    /// This value is used to configure database connections and perform operations
+    /// when working with an IBM Db2 database using the associated data provider.
+    /// </remarks>
+    public const string DB2 = "IBM.Data.DB2";
+
+    /// <summary>
     /// A constant string representing the database provider name for MySQL.
     /// </summary>
     /// <remarks>

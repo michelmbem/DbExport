@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using DbExport.Providers;
 using DbExport.Schema;
 using FirebirdSql.Data.FirebirdClient;
+using IBM.Data.Db2;
 using Microsoft.Data.SqlClient;
 using MySqlConnector;
 using Npgsql;
@@ -61,6 +62,7 @@ public static partial class Utility
 #endif
         DbProviderFactories.RegisterFactory(ProviderNames.SQLSERVER, SqlClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.ORACLE, OracleClientFactory.Instance);
+        DbProviderFactories.RegisterFactory(ProviderNames.DB2, DB2Factory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.MYSQL, MySqlConnectorFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.POSTGRESQL, NpgsqlFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.FIREBIRD, FirebirdClientFactory.Instance);
