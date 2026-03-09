@@ -7,12 +7,15 @@ public class TableExtensionsTest
 {
     private const string ConnectionString = "Data Source=InMemorySample;Mode=Memory;Cache=Shared";
 
+    static TableExtensionsTest()
+    {
+        TestInitializer.EnsureInitialized();
+    }
+
     [Fact]
     public void GenericTest()
     {
         // Arrange
-        TestInitializer.EnsureInitialized();
-
         const string sql = """
                            DROP TABLE IF EXISTS products;
                            DROP TABLE IF EXISTS categories;

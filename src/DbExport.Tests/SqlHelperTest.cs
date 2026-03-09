@@ -1,16 +1,22 @@
 using DbExport.Providers;
+
+using IBM.Data.Db2;
+
 using static DbExport.SqlHelper;
 
 namespace DbExport.Tests;
 
 public class SqlHelperTest
 {
+    static SqlHelperTest()
+    {
+        TestInitializer.EnsureInitialized();
+    }
+
     [Fact]
     public void GenericTest()
     {
         // Arrange
-        TestInitializer.EnsureInitialized();
-
         const string sql = """
                            CREATE TABLE test_table (
                                id INTEGER PRIMARY KEY AUTOINCREMENT,
