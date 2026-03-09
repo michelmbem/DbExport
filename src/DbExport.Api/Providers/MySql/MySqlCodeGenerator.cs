@@ -2,7 +2,7 @@
 using System.Linq;
 using DbExport.Schema;
 
-namespace DbExport.Providers.MySqlClient;
+namespace DbExport.Providers.MySql;
 
 /// <summary>
 /// A code generator responsible for producing SQL scripts for MySQL databases.

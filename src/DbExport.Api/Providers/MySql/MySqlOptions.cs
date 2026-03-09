@@ -1,4 +1,4 @@
-﻿namespace DbExport.Providers.MySqlClient;
+﻿namespace DbExport.Providers.MySql;
 
 /// <summary>
 /// Represents a MySQL character set, including its name, supported collations, and default collation.

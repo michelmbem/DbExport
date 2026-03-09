@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using DbExport.Schema;
 
-namespace DbExport.Providers.MySqlClient;
+namespace DbExport.Providers.MySql;
 
 /// <summary>
 /// Provides functionality to extract schema information from a MySQL database.

@@ -5,7 +5,7 @@ using System.Data.Common;
 using System.Reflection;
 using DbExport.Providers;
 using DbExport.Providers.Firebird;
-using DbExport.Providers.MySqlClient;
+using DbExport.Providers.MySql;
 using DbExport.Providers.Npgsql;
 using DbExport.Providers.SqlClient;
 using DbExport.Schema;

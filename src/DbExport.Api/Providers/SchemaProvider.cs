@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using DbExport.Providers.DB2;
 using DbExport.Providers.Firebird;
-using DbExport.Providers.MySqlClient;
+using DbExport.Providers.MySql;
 using DbExport.Providers.Npgsql;
-using DbExport.Providers.OracleClient;
+using DbExport.Providers.Oracle;
 using DbExport.Providers.SqlClient;
 using DbExport.Providers.SQLite;
 using DbExport.Schema;

@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
-using DbExport.Providers.MySqlClient;
+using DbExport.Providers.MySql;
 
 namespace DbExport.Gui.ViewModels;
 

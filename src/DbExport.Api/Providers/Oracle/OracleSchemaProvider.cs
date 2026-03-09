@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DbExport.Schema;
 
-namespace DbExport.Providers.OracleClient;
+namespace DbExport.Providers.Oracle;
 
 /// <summary>
 /// Provides schema metadata for Oracle databases by implementing the

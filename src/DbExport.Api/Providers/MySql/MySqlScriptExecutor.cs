@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using MySqlConnector;
 
-namespace DbExport.Providers.MySqlClient;
+namespace DbExport.Providers.MySql;
 
 /// <summary>
 /// Provides functionality for executing MySQL scripts, including management of database creation

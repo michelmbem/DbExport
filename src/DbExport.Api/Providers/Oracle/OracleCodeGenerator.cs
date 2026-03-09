@@ -2,7 +2,7 @@
 using System.IO;
 using DbExport.Schema;
 
-namespace DbExport.Providers.OracleClient;
+namespace DbExport.Providers.Oracle;
 
 /// <summary>
 /// Generates Oracle-specific SQL code for database schema objects and related functionality.
