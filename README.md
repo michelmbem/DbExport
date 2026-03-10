@@ -109,6 +109,7 @@ sourceUsersTable.CopyTo(
 - SQLite
 - Microsoft Access (Windows only)
 - SQL Server LocalDB (Windows only)
+- IBM DB2 (experimental)
 
 ## Platform Notes
 
