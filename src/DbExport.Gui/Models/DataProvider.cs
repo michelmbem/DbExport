@@ -50,7 +50,7 @@ public sealed class DataProvider(
 #endif
         new(ProviderNames.SQLSERVER, "Microsoft SQL Server", ProviderFeatures.SqlServer, new SqlConnectionStringFactory(), SQLSERVER_DATABASE_LIST_QUERY),
         new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.Oracle, new OracleConnectionStringFactory(), ORACLE_DATABASE_LIST_QUERY),
-        new(ProviderNames.DB2, "IBM DB2", ProviderFeatures.DB2, new DB2ConnectionStringFactory()),
+        new(ProviderNames.DB2, "IBM DB2 (experimental)", ProviderFeatures.DB2, new DB2ConnectionStringFactory()),
         new(ProviderNames.MYSQL, "MySQL", ProviderFeatures.MySql, new MySqlConnectionStringFactory(), MYSQL_DATABASE_LIST_QUERY),
         new(ProviderNames.POSTGRESQL, "PostgreSQL", ProviderFeatures.PostgreSQL, new NpgsqlConnectionStringFactory(), POSTGRESQL_DATABASE_LIST_QUERY),
         new(ProviderNames.FIREBIRD, "Firebird", ProviderFeatures.Firebird, new FirebirdConnectionStringFactory()),
