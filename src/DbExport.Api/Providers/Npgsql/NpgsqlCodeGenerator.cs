@@ -157,10 +157,12 @@ public class NpgsqlCodeGenerator : CodeGenerator
     /// <inheritdoc/>
     protected override void WriteDbCreationDirective(Database database)
     {
-        WriteLine($"CREATE DATABASE {database.Name};");
+        Write($"CREATE DATABASE {database.Name}");
+        WriteDelimiter();
         WriteLine();
         
-        WriteLine($@"\c {database.Name};");
+        Write($@"\c {database.Name}");
+        WriteDelimiter();
         WriteLine();
     }
 

@@ -15,14 +15,14 @@ public enum ProviderFeatures
     UsesPathAsDatabaseName = 32,
 
     Access = IsFileBased,
-    LocalDB = Access | SupportsTrustedConnection | SupportsSchemas,
+    LocalDB = IsFileBased | SupportsTrustedConnection | SupportsSchemas,
     SqlServer = SupportsTrustedConnection | SupportsDatabaseCreation | SupportsDDL | SupportsSchemas,
     Oracle = SupportsTrustedConnection | SupportsDDL | SupportsSchemas,
-    DB2 = SupportsDatabaseCreation | SupportsDDL | SupportsSchemas,
+    DB2 = SupportsDDL | SupportsSchemas,
     MySql = SupportsDatabaseCreation | SupportsDDL,
-    PostgreSQL = DB2,
-    Firebird = MySql | UsesPathAsDatabaseName,
-    SQLite = Access | SupportsDDL
+    PostgreSQL = SupportsDatabaseCreation | SupportsDDL | SupportsSchemas,
+    Firebird = SupportsDatabaseCreation | SupportsDDL | UsesPathAsDatabaseName,
+    SQLite = IsFileBased | SupportsDDL | SupportsSchemas
 }
 
 public sealed class DataProvider(

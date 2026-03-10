@@ -25,21 +25,23 @@ public class DB2CodeGenerator : CodeGenerator
 
     #endregion
 
-    #region Properties
+    #region Overriden properties
 
     /// <inheritdoc/>
     public override string ProviderName => ProviderNames.DB2;
 
+    /// <inheritdoc/>
+    protected override bool SupportsDbCreation => false;
+
     #endregion
 
-    #region Overrides
+    #region Overriden methods
 
     /// <inheritdoc/>
     protected override string GetTypeName(IDataItem item) =>
         item.ColumnType switch
         {
-            ColumnType.Boolean => "smallint",
-            ColumnType.TinyInt or ColumnType.UnsignedTinyInt => "smallint",
+            ColumnType.Boolean or ColumnType.TinyInt or ColumnType.UnsignedTinyInt => "smallint",
             ColumnType.SmallInt or ColumnType.UnsignedSmallInt => "smallint",
             ColumnType.Integer or ColumnType.UnsignedInt => "integer",
             ColumnType.BigInt or ColumnType.UnsignedBigInt => "bigint",
@@ -85,17 +87,6 @@ public class DB2CodeGenerator : CodeGenerator
                 $"X'{Utility.BinToHex((byte[])value)}'",
             _ => base.Format(value, columnType)
         };
-    }
-
-    /// <inheritdoc/>
-    protected override void WriteDbCreationDirective(Database database)
-    {
-        Write($"CREATE DATABASE {database.Name}");
-        WriteDelimiter();
-        WriteLine();
-        Write($"CONNECT TO {database.Name}");
-        WriteDelimiter();
-        WriteLine();
     }
 
     #endregion
