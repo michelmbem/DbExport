@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using DbExport.Providers.DB2;
 using DbExport.Providers.Firebird;
 using DbExport.Providers.MySql;
 using DbExport.Providers.Npgsql;
@@ -95,6 +96,7 @@ public abstract class CodeGenerator : IVisitor, IDisposable
         {
             ProviderNames.SQLSERVER => new SqlCodeGenerator(output),
             ProviderNames.ORACLE => new OracleCodeGenerator(output),
+            ProviderNames.DB2 => new DB2CodeGenerator(output),
             ProviderNames.MYSQL => new MySqlCodeGenerator(output),
             ProviderNames.POSTGRESQL => new NpgsqlCodeGenerator(output),
             ProviderNames.FIREBIRD => new FirebirdCodeGenerator(output),

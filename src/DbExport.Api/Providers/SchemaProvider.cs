@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DbExport.Providers.DB2;
 using DbExport.Providers.Firebird;
 using DbExport.Providers.MySql;
 using DbExport.Providers.Npgsql;
@@ -35,6 +36,8 @@ public static class SchemaProvider
                 return new SqlSchemaProvider(connectionString);
             case ProviderNames.ORACLE:
                 return new OracleSchemaProvider(connectionString);
+            case ProviderNames.DB2:
+                return new DB2SchemaProvider(connectionString);
             case ProviderNames.MYSQL:
                 return new MySqlSchemaProvider(connectionString);
             case ProviderNames.POSTGRESQL:

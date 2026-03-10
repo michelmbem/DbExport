@@ -1,4 +1,7 @@
 using DbExport.Providers;
+
+using IBM.Data.Db2;
+
 using static DbExport.SqlHelper;
 
 namespace DbExport.Tests;

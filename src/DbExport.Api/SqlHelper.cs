@@ -328,7 +328,7 @@ public sealed class SqlHelper : IDisposable
             ProviderNames.MYSQL => new MySqlScriptExecutor(),
             ProviderNames.POSTGRESQL => new NpgsqlScriptExecutor(),
             ProviderNames.FIREBIRD => new FirebirdScriptExecutor(),
-            ProviderNames.ORACLE => new BatchScriptExecutor(providerName),
+            ProviderNames.ORACLE or ProviderNames.DB2 => new BatchScriptExecutor(providerName),
             _ => new SimpleScriptExecutor(providerName)
         };
 
