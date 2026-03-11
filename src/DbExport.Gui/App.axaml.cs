@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
+using DbExport.Gui.Utilities;
 using DbExport.Gui.ViewModels;
 using DbExport.Gui.Views;
 
@@ -56,5 +58,20 @@ public class App : Application
         {
             BindingPlugins.DataValidators.Remove(plugin);
         }
+    }
+
+    private async void OnAboutMenuItemClick(object? sender, EventArgs e)
+    {
+        if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop) return;
+        var aboutDialog = new AboutDialog { DataContext = new AboutDialogViewModel() };
+        await aboutDialog.ShowDialog<bool>(desktop.MainWindow!);
+    }
+
+    private void OnCheckUpdatesMenuItemClick(object? sender, EventArgs e)
+    {
+        Process.Start(new ProcessStartInfo($"{AssemblyInfo.GitHubRepoUrl}/releases")
+        {
+            UseShellExecute = true
+        });
     }
 }

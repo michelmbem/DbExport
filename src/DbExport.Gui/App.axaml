@@ -1,18 +1,27 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:DbExport.Gui"
+             xmlns:u="using:DbExport.Gui.Utilities"
              x:Class="DbExport.Gui.App"
+             Name="{x:Static u:AssemblyInfo.Title}"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows the system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <local:ViewLocator />
     </Application.DataTemplates>
 
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="About DbExport..." Click="OnAboutMenuItemClick"/>
+            <NativeMenuItem Header="Check for Updates..." Click="OnCheckUpdatesMenuItemClick"/>
+        </NativeMenu>
+    </NativeMenu.Menu>
+
     <Application.Styles>
-        <FluentTheme/>
-        <StyleInclude Source="Styles.axaml"/>
-        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml"/>
+        <FluentTheme />
+        <StyleInclude Source="Styles.axaml" />
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
     </Application.Styles>
 
     <Application.Resources>
@@ -22,6 +31,6 @@
         <FontFamily x:Key="RobotoMono">avares://dbexport/Assets/Fonts/RobotoMono#Roboto Mono</FontFamily>
 
         <!-- Colors -->
-        <SolidColorBrush x:Key="OverlayBackground" Color="#CC777777"/>
+        <SolidColorBrush x:Key="OverlayBackground" Color="#CC777777" />
     </Application.Resources>
 </Application>
