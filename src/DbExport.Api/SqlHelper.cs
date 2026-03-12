@@ -43,7 +43,7 @@ public sealed class SqlHelper : IDisposable
     private const BindingFlags SET_PROPERTY_FLAGS = PROPERTY_FLAGS | BindingFlags.SetProperty;
     
     #endregion
-    
+
     #region Fields
 
     /// <summary>
@@ -472,7 +472,7 @@ public sealed class SqlHelper : IDisposable
     }
 
     #endregion
-    
+
     #region Parameter binders
 
     /// <summary>
