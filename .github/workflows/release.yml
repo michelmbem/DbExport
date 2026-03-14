@@ -30,17 +30,14 @@ jobs:
 
       - uses: microsoft/setup-msbuild@v2
 
-      - name: Restore
-        run: dotnet restore "${{ env.PROJECT_PATH }}"
-
       - name: Publish
         run: |
           msbuild ${{ env.PROJECT_PATH }} `
+            /t:Restore,Publish `
             /p:Configuration=Release `
             /p:RuntimeIdentifier=${{ matrix.runtime }} `
             /p:Version=${{ steps.version.outputs.VERSION }} `
-            /p:PublishDir=publish\${{ matrix.runtime }} `
-            /t:Publish
+            /p:PublishDir=publish\${{ matrix.runtime }}\
 
       - name: Package
         shell: bash
