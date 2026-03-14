@@ -39,6 +39,7 @@ jobs:
       - name: Build API
         run: |
           msbuild ${{ env.API_PROJECT_PATH }} `
+            /t:Restore,Build `
             /p:Configuration=Release `
             /p:RuntimeIdentifier=${{ matrix.runtime }} `
             /p:OutputPath=bin\Release\${{ matrix.runtime }}\
