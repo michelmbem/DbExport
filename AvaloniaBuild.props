@@ -1,0 +1,9 @@
+<Project>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Build.Tasks" Version="11.3.9" PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <AvaloniaUseCompiledXaml>true</AvaloniaUseCompiledXaml>
+  </PropertyGroup>
+</Project>
