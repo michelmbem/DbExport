@@ -35,14 +35,22 @@ jobs:
         shell: bash
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Publish
+      - name: Build Api
         run: |
-          msbuild ${{ env.PROJECT_PATH }} `
-            /t:Restore,Publish `
+          msbuild src/DbExport.Api/DbExport.Api.csproj `
+            /t:Restore,Build `
             /p:Configuration=Release `
             /p:RuntimeIdentifier=${{ matrix.runtime }} `
-            /p:Version=${{ steps.version.outputs.VERSION }} `
-            /p:PublishDir=publish\${{ matrix.runtime }}\
+            /p:OutputPath=bin\${{ matrix.runtime }}\
+
+      - name: Publish
+        run: |
+          dotnet publish ${{ env.PROJECT_PATH }} `
+            -c Release `
+            -r ${{ matrix.runtime }} `
+            --no-dependencies `
+            -p:Version=${{ steps.version.outputs.VERSION }} `
+            -o publish/${{ matrix.runtime }}
 
       - name: Package
         shell: bash
