@@ -38,9 +38,10 @@ jobs:
       - name: Build
         run: |
           dotnet msbuild ${{ env.PROJECT_PATH }} `
-            -c Release `
-            -r ${{ matrix.runtime }} `
-            -o bin/${{ matrix.runtime }}
+            /t:Restore,Build `
+            /p:Configuration=Release `
+            /p:RuntimeIdentifier=${{ matrix.runtime }} `
+            /p:OutputPath=bin\${{ matrix.runtime }}\
 
       - name: Publish
         run: |
