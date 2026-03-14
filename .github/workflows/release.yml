@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        runtime: [win-x64, win-arm64]
+        runtime: [ win-x64, win-arm64 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -28,15 +28,19 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - run: dotnet restore ${{ env.PROJECT_PATH }}
+      - uses: microsoft/setup-msbuild@v2
 
-      - name: Extract version
-        id: version
-        shell: bash
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      - name: Restore
+        run: dotnet restore "${{ env.PROJECT_PATH }}"
 
       - name: Publish
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
+        run: |
+          msbuild ${{ env.PROJECT_PATH }} `
+            /p:Configuration=Release `
+            /p:RuntimeIdentifier=${{ matrix.runtime }} `
+            /p:Version=${{ steps.version.outputs.VERSION }} `
+            /p:PublishDir=publish\${{ matrix.runtime }} `
+            /t:Publish
 
       - name: Package
         shell: bash
