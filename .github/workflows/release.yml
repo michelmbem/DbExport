@@ -120,7 +120,8 @@ jobs:
           path: "*.tar.gz"
 
   release:
-    needs: [build-windows, build-linux, build-macos]
+    # needs: [build-windows, build-linux, build-macos]
+    needs: [ build-linux, build-macos ]
     runs-on: ubuntu-latest
 
     steps:
