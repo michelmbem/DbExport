@@ -1,6 +1,6 @@
 <Project>
   <ItemGroup>
-    <PackageReference Include="Avalonia.Build.Tasks" Version="11.3.9" PrivateAssets="all" />
+    <PackageReference Include="Avalonia.Build.Tasks" Version="11.*" PrivateAssets="all" />
   </ItemGroup>
 
   <PropertyGroup>
