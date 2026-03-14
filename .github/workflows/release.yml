@@ -50,6 +50,7 @@ jobs:
             -c Release `
             -r ${{ matrix.runtime }} `
             --no-dependencies `
+            -p:ResolveComReferences=false `
             -p:Version=${{ steps.version.outputs.VERSION }} `
             -o publish/${{ matrix.runtime }}
 
