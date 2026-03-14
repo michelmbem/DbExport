@@ -14,89 +14,119 @@ env:
   APP_NAME: dbexport
 
 jobs:
-  build:
+  build-windows:
+    runs-on: windows-latest
+
     strategy:
       matrix:
-        include:
-          - runtime: win-x64
-            os: windows-latest
+        runtime: [win-x64, win-arm64]
 
-          - runtime: win-arm64
-            os: windows-latest
-
-          - runtime: linux-x64
-            os: ubuntu-latest
-
-          - runtime: linux-arm64
-            os: ubuntu-latest
-
-          - runtime: osx-arm64
-            os: macos-latest
-        
-    name: Build ${{ matrix.runtime }}
-    runs-on: ${{ matrix.os }}
-  
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-  
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-  
-      - name: Restore
-        run: dotnet restore ${{ env.PROJECT_PATH }}
-  
+
+      - run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Extract version
+        id: version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Publish
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
+
+      - name: Package
+        shell: bash
+        run: |
+          cd publish/${{ matrix.runtime }}
+          zip ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.zip *
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-${{ matrix.runtime }}
+          path: "*.zip"
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        runtime: [linux-x64, linux-arm64]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - run: dotnet restore ${{ env.PROJECT_PATH }}
+
       - name: Extract version
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-  
+
       - name: Publish
-        run: |
-          dotnet publish ${{ env.PROJECT_PATH }} \
-            -c Release \
-            -r ${{ matrix.runtime }} \
-            -p:Version=${{ steps.version.outputs.VERSION }} \
-            -o publish/${{ matrix.runtime }}
-  
-      - name: Package artifact
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
+
+      - name: Package
         run: |
           cd publish/${{ matrix.runtime }}
-          
-          if [[ "${{ matrix.runtime }}" == win-* ]]; then
-            zip ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.zip *
-          else
-            tar -czf ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.tar.gz *
-          fi
-  
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-${{ matrix.runtime }}
-          path: |
-            *.zip
-            *.tar.gz
-    
-  release:
-    name: Publish GitHub Release
-    needs: build
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+          tar -czf ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.tar.gz *
 
-      - name: Move artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.runtime }}
+          path: "*.tar.gz"
+
+  build-macos:
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        runtime: [osx-arm64]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Publish
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
+
+      - name: Package
+        run: |
+          cd publish/${{ matrix.runtime }}
+          tar -czf ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.tar.gz *
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.runtime }}
+          path: "*.tar.gz"
+
+  release:
+    needs: [build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+
+      - name: Collect artifacts
         run: |
           mkdir release
           find . -name "*.zip" -exec mv {} release/ \;
           find . -name "*.tar.gz" -exec mv {} release/ \;
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: release/*
