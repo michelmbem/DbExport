@@ -50,9 +50,6 @@ jobs:
         run: |
           dotnet publish ${{ env.PROJECT_PATH }} \
             -c Release -r ${{ matrix.runtime }} \
-            --self-contained true \
-            -p:PublishSingleFile=true \
-            -p:PublishTrimmed=false \
             -p:Version=${{ steps.version.outputs.VERSION }} \
             -o publish/${{ matrix.runtime }}
 
@@ -98,24 +95,31 @@ jobs:
           mkdir -p $APP/Contents/Resources
 
           cp -R publish/${{ matrix.runtime }}/* $APP/Contents/MacOS/
+          cp src/DbExport.Gui/Assets/Images/DbExport.icns $APP/Contents/Resources/
 
           cat > $APP/Contents/Info.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-          "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
-          <dict>
-            <key>CFBundleName</key>
-            <string>DbExport</string>
-            <key>CFBundleExecutable</key>
-            <string>dbexport</string>
-            <key>CFBundleIdentifier</key>
-            <string>com.dbexport.app</string>
-            <key>CFBundleVersion</key>
-            <string>${{ steps.version.outputs.VERSION }}</string>
-            <key>CFBundlePackageType</key>
-            <string>APPL</string>
-          </dict>
+            <dict>
+              <key>CFBundleName</key>
+              <string>DbExport</string>
+            
+              <key>CFBundleExecutable</key>
+              <string>${{ env.APP_NAME }}</string>
+            
+              <key>CFBundleIdentifier</key>
+              <string>org.addy.dbexport</string>
+            
+              <key>CFBundleVersion</key>
+              <string>${{ steps.version.outputs.VERSION }}</string>
+            
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+            
+              <key>CFBundleIconFile</key>
+              <string>DbExport</string>
+            </dict>
           </plist>
           EOF
 

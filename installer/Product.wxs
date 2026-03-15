@@ -46,7 +46,7 @@
         <Shortcut
             Id="StartMenuShortcut"
             Name="DbExport"
-            Description="DbExport Database Export Tool"
+            Description="Database Migration Wizard"
             Target="[INSTALLFOLDER]dbexport.exe"
             WorkingDirectory="INSTALLFOLDER"/>
 
