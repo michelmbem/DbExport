@@ -64,6 +64,7 @@ jobs:
           heat dir $publish `
             -cg PublishedFiles `
             -dr INSTALLFOLDER `
+            -var var.PublishDir `
             -gg `
             -srd `
             -sfrag `
@@ -74,9 +75,8 @@ jobs:
         if: startsWith(matrix.runtime, 'win')
         shell: pwsh
         run: |
-          $version="${{ steps.version.outputs.VERSION }}"
-          candle installer\Product.wxs installer\Files.wxs -dVersion="$version"
-          light Product.wixobj Files.wixobj -o "${{ env.APP_NAME }}-$version-${{ matrix.runtime }}.msi"
+          candle installer\Product.wxs installer\Files.wxs "-dPublishDir=$publish" "-dVersion=${{ steps.version.outputs.VERSION }}"
+          light Product.wixobj Files.wixobj -o "${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.msi"
 
       # -------------------------
       # MACOS APP + DMG
