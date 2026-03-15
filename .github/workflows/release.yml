@@ -39,10 +39,11 @@ jobs:
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
 
       - name: Package
-        shell: bash
+        shell: pwsh
         run: |
-          cd publish/${{ matrix.runtime }}
-          zip ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.zip *
+          Compress-Archive `
+            -Path publish/${{ matrix.runtime }}/* `
+            -DestinationPath ${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.zip
 
       - uses: actions/upload-artifact@v4
         with:
