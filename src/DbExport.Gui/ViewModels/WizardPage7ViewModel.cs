@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DbExport.Gui.Models;
 using DbExport.Providers;
+using DbExport.Providers.Access;
 using DbExport.Providers.SqlClient;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -139,12 +140,11 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
         return sqlWriter.ToString();
     }
 
-#if WINDOWS
     private static void GenerateAccessDb(MigrationSummary? summary)
     {
         if (summary == null) return;
         
-        var builder = new Providers.Access.AccessSchemaBuilder(summary.TargetConnectionString)
+        var builder = new AccessSchemaBuilder(summary.TargetConnectionString)
         {
             ExportOptions = summary.ExportOptions
         };
@@ -186,7 +186,6 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
 
         new SqlScripExecutor().Execute(summary.TargetConnectionString, GenerateSqlScript(summary));
     }
-#endif
 
     private static void ShowScriptExecutionMessage(bool hadError)
     {
@@ -221,18 +220,18 @@ public partial class WizardPage7ViewModel : WizardPageViewModel
     {
        try
        {
-#if WINDOWS
            switch (Summary?.TargetProvider.Name)
            {
                 case ProviderNames.ACCESS:
                     GenerateAccessDb(Summary);
-                    return;
+                    break;
                 case ProviderNames.SQLSERVER when Summary.TargetProvider.HasFeature(ProviderFeatures.IsFileBased):
                     GenerateSqlLocalDb(Summary);
-                    return;
+                    break;
+                default:
+                    SqlHelper.ExecuteScript(Summary?.TargetProvider.Name, Summary?.TargetConnectionString, SqlScript);
+                    break;
             }
-#endif
-           SqlHelper.ExecuteScript(Summary?.TargetProvider.Name, Summary?.TargetConnectionString, SqlScript);
        }
        catch (Exception e)
        {

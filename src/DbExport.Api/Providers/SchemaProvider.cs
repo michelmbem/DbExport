@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DbExport.Providers.Access;
 using DbExport.Providers.DB2;
 using DbExport.Providers.Firebird;
 using DbExport.Providers.MySql;
@@ -28,10 +29,8 @@ public static class SchemaProvider
     {
         switch (providerName)
         {
-#if WINDOWS
             case ProviderNames.ACCESS:
-                return new Access.AccessSchemaProvider(connectionString);
-#endif
+                return new AccessSchemaProvider(connectionString);
             case ProviderNames.SQLSERVER:
                 return new SqlSchemaProvider(connectionString);
             case ProviderNames.ORACLE:

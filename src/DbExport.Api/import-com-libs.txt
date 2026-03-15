@@ -1,0 +1,3 @@
+tlbimp "C:\Program Files\Common Files\System\ado\msado15.dll" /namespace:ADODB /out:Interop.ADODB.dll
+
+tlbimp "C:\Program Files\Common Files\System\ado\msadox.dll" /namespace:ADOX /out:Interop.ADOX.dll

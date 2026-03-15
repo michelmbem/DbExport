@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.OleDb;
 using System.Data.SQLite;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using DbExport.Providers;
@@ -15,9 +17,6 @@ using MySqlConnector;
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
 using SQLitePCL;
-#if WINDOWS
-using System.Data.OleDb;
-#endif
 
 namespace DbExport;
 
@@ -55,11 +54,11 @@ public static partial class Utility
     {
         Batteries.Init();
 
-#if WINDOWS
-#pragma warning disable CA1416 // Verify platform compatibility
-        DbProviderFactories.RegisterFactory(ProviderNames.ACCESS, OleDbFactory.Instance);
-#pragma warning restore CA1416 // Verify platform compatibility
-#endif
+        if (OperatingSystem.IsWindows())
+        {
+            DbProviderFactories.RegisterFactory(ProviderNames.ACCESS, OleDbFactory.Instance);
+        }
+
         DbProviderFactories.RegisterFactory(ProviderNames.SQLSERVER, SqlClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.ORACLE, OracleClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.DB2, DB2Factory.Instance);

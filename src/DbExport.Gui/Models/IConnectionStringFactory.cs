@@ -1,6 +1,4 @@
-#if WINDOWS
 using System.Data.OleDb;
-#endif
 using System.Data.SQLite;
 using FirebirdSql.Data.FirebirdClient;
 using IBM.Data.Db2;
@@ -17,7 +15,6 @@ public interface IConnectionStringFactory
                  bool trustedConnection, string? username, string? password);
 }
 
-#if WINDOWS
 public class OleDbConnectionStringFactory : IConnectionStringFactory
 {
 #pragma warning disable CA1416 // Verify platform compatibility
@@ -59,7 +56,6 @@ public class LocalDBConnectionStringFactory : IConnectionStringFactory
         return builder.ConnectionString;
     }
 }
-#endif
 
 public class SqlConnectionStringFactory : IConnectionStringFactory
 {
