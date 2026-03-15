@@ -14,12 +14,24 @@ env:
   APP_NAME: dbexport
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
-
+  build:
     strategy:
       matrix:
-        runtime: [ win-x64, win-arm64 ]
+        include:
+          - os: windows-latest
+            runtime: win-x64
+          - os: windows-latest
+            runtime: win-arm64
+          - os: ubuntu-latest
+            runtime: linux-x64
+          - os: ubuntu-latest
+            runtime: linux-arm64
+          - os: macos-latest
+            runtime: osx-x64
+          - os: macos-latest
+            runtime: osx-arm64
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
@@ -28,94 +40,97 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - uses: microsoft/setup-msbuild@v2
-
       - name: Extract version
         id: version
-        shell: bash
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
       - name: Publish
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
 
-      - name: Package
+      # -------------------------
+      # WINDOWS MSI
+      # -------------------------
+
+      - name: Install WiX
+        if: startsWith(matrix.runtime, 'win')
+        run: choco install wixtoolset -y
+
+      - name: Build MSI
+        if: startsWith(matrix.runtime, 'win')
         shell: pwsh
         run: |
-          Compress-Archive `
-            -Path publish/${{ matrix.runtime }}/* `
-            -DestinationPath ${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.zip
+          $publish="publish/${{ matrix.runtime }}"
+          candle installer.wxs -dPublishDir=$publish -dVersion=${{ steps.version.outputs.VERSION }}
+          light installer.wixobj -o ${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.msi
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: windows-${{ matrix.runtime }}
-          path: "*.zip"
+      # -------------------------
+      # MACOS APP + DMG
+      # -------------------------
 
-  build-linux:
-    runs-on: ubuntu-latest
+      - name: Create macOS bundle
+        if: startsWith(matrix.runtime, 'osx')
+        run: |
+          APP="${{ env.APP_NAME }}.app"
 
-    strategy:
-      matrix:
-        runtime: [linux-x64, linux-arm64]
+          mkdir -p $APP/Contents/MacOS
+          mkdir -p $APP/Contents/Resources
 
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          cp -R publish/${{ matrix.runtime }}/* $APP/Contents/MacOS/
 
-      - run: dotnet restore ${{ env.PROJECT_PATH }}
+          cat > $APP/Contents/Info.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+          "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleName</key>
+            <string>DbExport</string>
+            <key>CFBundleExecutable</key>
+            <string>dbexport</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.dbexport.app</string>
+            <key>CFBundleVersion</key>
+            <string>${{ steps.version.outputs.VERSION }}</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+          </dict>
+          </plist>
+          EOF
 
-      - name: Extract version
-        id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      - name: Create DMG
+        if: startsWith(matrix.runtime, 'osx')
+        run: |
+          hdiutil create \
+            -volname DbExport \
+            -srcfolder dbexport.app \
+            -ov -format UDZO \
+            ${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.dmg
 
-      - name: Publish
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
+      # -------------------------
+      # LINUX TAR
+      # -------------------------
 
-      - name: Package
+      - name: Package Linux
+        if: startsWith(matrix.runtime, 'linux')
         run: |
           cd publish/${{ matrix.runtime }}
           tar -czf ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.tar.gz *
 
-      - uses: actions/upload-artifact@v4
+      # -------------------------
+      # UPLOAD ARTIFACTS
+      # -------------------------
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: linux-${{ matrix.runtime }}
-          path: "*.tar.gz"
-
-  build-macos:
-    runs-on: macos-latest
-
-    strategy:
-      matrix:
-        runtime: [osx-x64, osx-arm64]
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - run: dotnet restore ${{ env.PROJECT_PATH }}
-
-      - name: Extract version
-        id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-
-      - name: Publish
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
-
-      - name: Package
-        run: |
-          cd publish/${{ matrix.runtime }}
-          tar -czf ../../${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.tar.gz *
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: macos-${{ matrix.runtime }}
-          path: "*.tar.gz"
+          name: ${{ matrix.runtime }}
+          path: |
+            *.msi
+            *.dmg
+            *.tar.gz
 
   release:
-    needs: [build-windows, build-linux, build-macos]
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -124,7 +139,8 @@ jobs:
       - name: Collect artifacts
         run: |
           mkdir release
-          find . -name "*.zip" -exec mv {} release/ \;
+          find . -name "*.msi" -exec mv {} release/ \;
+          find . -name "*.dmg" -exec mv {} release/ \;
           find . -name "*.tar.gz" -exec mv {} release/ \;
 
       - uses: softprops/action-gh-release@v2
