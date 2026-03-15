@@ -16,7 +16,7 @@
     <MajorUpgrade
         DowngradeErrorMessage="A newer version of DbExport is already installed."/>
 
-    <MediaTemplate/>
+    <MediaTemplate EmbedCab="yes"/>
 
     <!-- ========================================================= -->
     <!-- INSTALLATION STRUCTURE -->

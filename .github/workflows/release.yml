@@ -46,12 +46,7 @@ jobs:
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
       - name: Publish
-        shell: bash
-        run: |
-          dotnet publish ${{ env.PROJECT_PATH }} \
-            -c Release -r ${{ matrix.runtime }} \
-            -p:Version=${{ steps.version.outputs.VERSION }} \
-            -o publish/${{ matrix.runtime }}
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} -p:Version=${{ steps.version.outputs.VERSION }} -o publish/${{ matrix.runtime }}
 
       # -------------------------
       # WINDOWS MSI
@@ -64,23 +59,14 @@ jobs:
       - name: Harvest publish directory
         if: startsWith(matrix.runtime, 'win')
         shell: pwsh
-        run: |
-          heat dir "publish\${{ matrix.runtime }}" `
-            -cg PublishedFiles `
-            -dr INSTALLFOLDER `
-            -var var.PublishDir `
-            -gg `
-            -srd `
-            -sfrag `
-            -sreg `
-            -out installer\Files.wxs
+        run: heat dir "publish\${{ matrix.runtime }}" -cg PublishedFiles -dr INSTALLFOLDER -var var.PublishDir -gg -srd -sfrag -sreg -out installer\Files.wxs
 
       - name: Build MSI
         if: startsWith(matrix.runtime, 'win')
         shell: pwsh
         run: |
           candle installer\Product.wxs installer\Files.wxs "-dPublishDir=publish\${{ matrix.runtime }}" "-dVersion=${{ steps.version.outputs.VERSION }}"
-          light Product.wixobj Files.wixobj -o "${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.msi"
+          light Product.wixobj Files.wixobj -ext WixUIExtension -o "${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.msi"
 
       # -------------------------
       # MACOS APP + DMG
