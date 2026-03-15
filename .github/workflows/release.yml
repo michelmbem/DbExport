@@ -60,8 +60,7 @@ jobs:
         if: startsWith(matrix.runtime, 'win')
         shell: pwsh
         run: |
-          $publish="publish/${{ matrix.runtime }}"
-          heat dir $publish `
+          heat dir "publish\${{ matrix.runtime }}" `
             -cg PublishedFiles `
             -dr INSTALLFOLDER `
             -var var.PublishDir `
@@ -69,13 +68,13 @@ jobs:
             -srd `
             -sfrag `
             -sreg `
-            -out installer/Files.wxs
+            -out installer\Files.wxs
 
       - name: Build MSI
         if: startsWith(matrix.runtime, 'win')
         shell: pwsh
         run: |
-          candle installer\Product.wxs installer\Files.wxs "-dPublishDir=$publish" "-dVersion=${{ steps.version.outputs.VERSION }}"
+          candle installer\Product.wxs installer\Files.wxs "-dPublishDir=publish\${{ matrix.runtime }}" "-dVersion=${{ steps.version.outputs.VERSION }}"
           light Product.wixobj Files.wixobj -o "${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.msi"
 
       # -------------------------
