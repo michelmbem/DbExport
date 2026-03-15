@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product
+      Id="*"
+      Name="DbExport"
+      Language="1033"
+      Version="$(var.Version)"
+      Manufacturer="Addy"
+      UpgradeCode="f7f6f392-dbcb-4ecd-b6f3-92dbcbdecde7">
+
+    <Package
+        InstallerVersion="500"
+        Compressed="yes"
+        InstallScope="perMachine"/>
+
+    <MajorUpgrade
+        DowngradeErrorMessage="A newer version of DbExport is already installed."/>
+
+    <MediaTemplate/>
+
+    <!-- ========================================================= -->
+    <!-- INSTALLATION STRUCTURE -->
+    <!-- ========================================================= -->
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <!-- Program Files -->
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="DbExport"/>
+      </Directory>
+
+      <!-- Start Menu -->
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="DbExport"/>
+      </Directory>
+
+      <!-- Desktop -->
+      <Directory Id="DesktopFolder"/>
+    </Directory>
+
+    <!-- ========================================================= -->
+    <!-- SHORTCUT COMPONENT -->
+    <!-- ========================================================= -->
+
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="StartMenuShortcut" Guid="*">
+        <Shortcut
+            Id="StartMenuShortcut"
+            Name="DbExport"
+            Description="DbExport Database Export Tool"
+            Target="[INSTALLFOLDER]dbexport.exe"
+            WorkingDirectory="INSTALLFOLDER"/>
+
+        <RemoveFolder
+            Id="ApplicationProgramsFolder"
+            On="uninstall"/>
+
+        <RegistryValue
+            Root="HKCU"
+            Key="Software\DbExport"
+            Name="installed"
+            Type="integer"
+            Value="1"
+            KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <!-- ========================================================= -->
+    <!-- DESKTOP SHORTCUT -->
+    <!-- ========================================================= -->
+
+    <DirectoryRef Id="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="*">
+        <Shortcut
+            Id="DesktopShortcut"
+            Name="DbExport"
+            Description="Database Migration Wizard"
+            Target="[INSTALLFOLDER]dbexport.exe"
+            WorkingDirectory="INSTALLFOLDER"/>
+
+        <RegistryValue
+            Root="HKCU"
+            Key="Software\DbExport"
+            Name="desktopShortcut"
+            Type="integer"
+            Value="1"
+            KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <!-- ========================================================= -->
+    <!-- FEATURES -->
+    <!-- ========================================================= -->
+
+    <Feature
+        Id="MainFeature"
+        Title="DbExport"
+        Level="1">
+
+      <!-- All published files from Heat -->
+      <ComponentGroupRef Id="PublishedFiles"/>
+
+      <!-- Shortcuts -->
+      <ComponentRef Id="StartMenuShortcut"/>
+      <ComponentRef Id="DesktopShortcut"/>
+    </Feature>
+  </Product>
+</Wix>

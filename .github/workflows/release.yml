@@ -55,14 +55,28 @@ jobs:
       - name: Install WiX
         if: startsWith(matrix.runtime, 'win')
         run: choco install wixtoolset -y
+        
+      - name: Harvest publish directory
+        if: startsWith(matrix.runtime, 'win')
+        shell: pwsh
+        run: |
+          $publish="publish/${{ matrix.runtime }}"
+          heat dir $publish `
+            -cg PublishedFiles `
+            -dr INSTALLFOLDER `
+            -gg `
+            -srd `
+            -sfrag `
+            -sreg `
+            -out installer/Files.wxs
 
       - name: Build MSI
         if: startsWith(matrix.runtime, 'win')
         shell: pwsh
         run: |
-          $publish="publish/${{ matrix.runtime }}"
-          candle installer.wxs -dPublishDir=$publish -dVersion=${{ steps.version.outputs.VERSION }}
-          light installer.wixobj -o ${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.msi
+          $version="${{ steps.version.outputs.VERSION }}"
+          candle installer\Product.wxs installer\Files.wxs -dVersion="$version"
+          light Product.wixobj Files.wixobj -o "${{ env.APP_NAME }}-$version-${{ matrix.runtime }}.msi"
 
       # -------------------------
       # MACOS APP + DMG
