@@ -38,7 +38,7 @@ jobs:
       - name: Publish
         run: |
           msbuild ${{ env.PROJECT_PATH }} `
-            /t:Restore,Build,Publish `
+            /t:Restore,Publish `
             /p:Configuration=Release `
             /p:RuntimeIdentifier=${{ matrix.runtime }} `
             /p:Version=${{ steps.version.outputs.VERSION }} `

@@ -55,8 +55,4 @@
   <ItemGroup>
     <ProjectReference Include="..\DbExport.Api\DbExport.Api.csproj"/>
   </ItemGroup>
-
-  <Target Name="CompileAvaloniaXamlFix" BeforeTargets="CoreCompile">
-      <CallTarget Targets="CompileAvaloniaXaml"/>
-  </Target>
 </Project>
