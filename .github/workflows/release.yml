@@ -101,9 +101,11 @@ jobs:
         if: startsWith(matrix.runtime, 'osx')
         run: |
           hdiutil create \
+            -fs HFS+ \
+            -srcfolder ${{ env.APP_NAME }}.app \
             -volname DbExport \
-            -srcfolder dbexport.app \
-            -ov -format UDZO \
+            -format UDZO \
+            -ov \
             ${{ env.APP_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.runtime }}.dmg
 
       # -------------------------
