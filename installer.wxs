@@ -1,0 +1,23 @@
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="DbExport" Language="1033" Version="$(var.Version)" Manufacturer="Michel Mbem" UpgradeCode="f7f6f392-dbcb-4ecd-b6f3-92dbcbdecde7">
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" />
+
+    <MediaTemplate />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="DbExport"/>
+      </Directory>
+    </Directory>
+
+    <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+      <Component Id="MainExecutable" Guid="*">
+        <File Source="$(var.PublishDir)\dbexport.exe"/>
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="MainFeature" Title="DbExport" Level="1">
+      <ComponentGroupRef Id="AppFiles"/>
+    </Feature>
+  </Product>
+</Wix>
