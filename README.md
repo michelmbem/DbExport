@@ -138,6 +138,7 @@ dotnet test
 ```
 
 ## Publishing
+
 Depending on the target platform, you can publish the app as a single executable
 or a self-contained .NET 10 app using one of the following commands:
 
@@ -150,14 +151,16 @@ dotnet publish DbExport.Gui/DbExport.Gui.csproj -c Release -r osx-arm64
 ```
 
 **Notes:**
-- Artifacts are emitted under `Bin/Release/`.
+
+- Artifacts are emitted under `bin/Release/`; use the `-o <target-directory>` commutator to specify another output path.
 - You can ommit the `DbExport.Gui/DbExport.Gui.csproj` part if you run the command from the GUI project directory.
-- Each of the above commands is suitable foe a specific OS and architecture, and will create a self-contained app with the specified runtime.
+- Each of the above commands is suitable for a specific OS and architecture, and will create a self-contained app with the specified runtime.
 - You can use the `--self-contained=false` option to create a portable app that can be run on any OS and architecture. But this will require the user to install .NET 10 runtime on their machine.
 
 ## Screenshots
 
 ### 1. Source Database Setup
+
 Use this screen to configure the source database connection:
 server/host, port, username, and password.
 You can also choose the source schema to migrate.
@@ -166,6 +169,7 @@ A similar screen is used to configure the target database.
 ![Source Database Setup](docs/screenshots/source-database-setup.png)
 
 ### 2. Migration Options
+
 Use this screen to choose the migration mode and options, including whether to include primary keys, foreign keys, defaults, indexes, and identity columns.
 You can export schema only, data only, or both.
 For some providers, additional provider-specific options are available.
@@ -173,11 +177,13 @@ For some providers, additional provider-specific options are available.
 ![Migration Options](docs/screenshots/migration-options.png)
 
 ### 3. Items Selection
+
 On this screen, you can choose which tables, columns, keys, and indexes to include in the migration.
 
 ![Items Selection](docs/screenshots/items-selection.png)
 
 ### 4. Generated SQL Script
+
 The final screen displays the generated SQL script.
 Depending on the selected target provider, you can save the script to a file or execute it directly.
 To run it directly, the target connection must be correctly configured in the third step.
