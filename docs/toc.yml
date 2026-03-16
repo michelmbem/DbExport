@@ -2,5 +2,7 @@
   href: index.md
 - name: Readme
   href: ../README.md
+- name: Install
+  href: ../INSTALL.md
 - name: API Reference
   href: api/toc.yml

@@ -16,7 +16,8 @@
     "content": [
       {
         "files": [
-          "README.md"
+          "README.md",
+          "INSTALL.md"
         ]
       },
       {
