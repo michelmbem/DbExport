@@ -6,4 +6,5 @@ and complete API references for schema extraction, SQL generation, and script ex
 ## Sections
 
 - [Readme](../README.md)
+- [Install](../INSTALL.md)
 - [API Reference](api/toc.yml)
