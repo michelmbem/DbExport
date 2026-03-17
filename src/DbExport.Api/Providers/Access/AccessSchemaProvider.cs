@@ -1,7 +1,13 @@
-﻿using DbExport.Schema;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
+using System.Linq;
+using ADODB;
+using ADOX;
+using DbExport.Schema;
+using Column = ADOX.Column;
+using DataTypeEnum = ADOX.DataTypeEnum;
+using Key = ADOX.Key;
+using Table = ADOX.Table;
 
 namespace DbExport.Providers.Access;
 
@@ -17,7 +23,7 @@ public class AccessSchemaProvider : ISchemaProvider
     /// Provides access to tables, columns, indexes, and relationships within the database schema.
     /// Strongly tied to the connection established through the <see cref="AccessSchemaProvider"/>.
     /// </summary>
-    private readonly ADOX.Catalog catalog;
+    private readonly Catalog catalog;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AccessSchemaProvider"/> class.
@@ -30,9 +36,9 @@ public class AccessSchemaProvider : ISchemaProvider
         var properties = Utility.ParseConnectionString(connectionString);
         DatabaseName = Path.GetFileNameWithoutExtension(properties["data source"]);
 
-        var connection = new ADODB.Connection();
+        var connection = new Connection();
         connection.Open(connectionString, Options: 0);
-        catalog = new ADOX.Catalog { ActiveConnection = connection };
+        catalog = new Catalog { ActiveConnection = connection };
     }
 
     #region ISchemaProvider Members
@@ -47,57 +53,20 @@ public class AccessSchemaProvider : ISchemaProvider
     public string DatabaseName { get; }
 
     /// <inheritdoc/>
-    public NameOwnerPair[] GetTableNames()
-    {
-        List<NameOwnerPair> tablePairs = [];
-
-        foreach (ADOX.Table table in catalog.Tables)
-        {
-            if (table.Type != "TABLE") continue;
-            tablePairs.Add(new NameOwnerPair { Name = table.Name });
-        }
-
-        return [..tablePairs];
-    }
+    public NameOwnerPair[] GetTableNames() =>
+        [..from Table table in catalog.Tables where table.Type == "TABLE" select new NameOwnerPair { Name = table.Name }];
 
     /// <inheritdoc/>
-    public string[] GetColumnNames(string tableName, string tableOwner)
-    {
-        List<string> columnNames = [];
-        var table = catalog.Tables[tableName];
-
-        foreach (ADOX.Column column in table.Columns)
-            columnNames.Add(column.Name);
-
-        return [..columnNames];
-    }
+    public string[] GetColumnNames(string tableName, string tableOwner) =>
+        [..from Column column in catalog.Tables[tableName].Columns select column.Name];
 
     /// <inheritdoc/>
-    public string[] GetIndexNames(string tableName, string tableOwner)
-    {
-        List<string> indexNames = [];
-        var table = catalog.Tables[tableName];
-
-        foreach (ADOX.Index index in table.Indexes)
-            indexNames.Add(index.Name);
-
-        return [..indexNames];
-    }
+    public string[] GetIndexNames(string tableName, string tableOwner) =>
+        [..from ADOX.Index index in catalog.Tables[tableName].Indexes select index.Name];
 
     /// <inheritdoc/>
-    public string[] GetForeignKeyNames(string tableName, string tableOwner)
-    {
-        List<string> fkNames = [];
-        var table = catalog.Tables[tableName];
-
-        foreach (ADOX.Key key in table.Keys)
-        {
-            if (key.Type != ADOX.KeyTypeEnum.adKeyForeign) continue;
-            fkNames.Add(key.Name);
-        }
-
-        return [..fkNames];
-    }
+    public string[] GetForeignKeyNames(string tableName, string tableOwner) =>
+        [..from Key key in catalog.Tables[tableName].Keys where key.Type == KeyTypeEnum.adKeyForeign select key.Name];
 
     /// <inheritdoc/>
     public MetaData GetTableMeta(string tableName, string tableOwner)
@@ -114,7 +83,7 @@ public class AccessSchemaProvider : ISchemaProvider
             if (!index.PrimaryKey) continue;
 
             var pk = new string[index.Columns.Count];
-            for (int i = 0; i < index.Columns.Count; ++i)
+            for (var i = 0; i < index.Columns.Count; ++i)
                 pk[i] = index.Columns[i].Name;
 
             metadata["pk_columns"] = pk;
@@ -177,7 +146,7 @@ public class AccessSchemaProvider : ISchemaProvider
         var index = table.Indexes[indexName];
 
         var columns = new string[index.Columns.Count];
-        for (int i = 0; i < columns.Length; ++i)
+        for (var i = 0; i < columns.Length; ++i)
             columns[i] = index.Columns[i].Name;
 
         return new MetaData
@@ -198,7 +167,7 @@ public class AccessSchemaProvider : ISchemaProvider
         var columns = new string[key.Columns.Count];
         var relatedColumns = new string[key.Columns.Count];
 
-        for (int i = 0; i < columns.Length; ++i)
+        for (var i = 0; i < columns.Length; ++i)
         {
             columns[i] = key.Columns[i].Name;
             relatedColumns[i] = key.Columns[i].RelatedColumn;
@@ -225,24 +194,24 @@ public class AccessSchemaProvider : ISchemaProvider
     /// </summary>
     /// <param name="dataTypeEnum">The ADOX data type enumeration value to convert.</param>
     /// <returns>A <see cref="ColumnType"/> value that represents the equivalent column type.</returns>
-    private static ColumnType GetColumnType(ADOX.DataTypeEnum dataTypeEnum) =>
+    private static ColumnType GetColumnType(DataTypeEnum dataTypeEnum) =>
         dataTypeEnum switch
         {
-            ADOX.DataTypeEnum.adBoolean => ColumnType.Boolean,
-            ADOX.DataTypeEnum.adUnsignedTinyInt => ColumnType.UnsignedTinyInt,
-            ADOX.DataTypeEnum.adSmallInt => ColumnType.SmallInt,
-            ADOX.DataTypeEnum.adInteger => ColumnType.Integer,
-            ADOX.DataTypeEnum.adSingle => ColumnType.SinglePrecision,
-            ADOX.DataTypeEnum.adDouble => ColumnType.DoublePrecision,
-            ADOX.DataTypeEnum.adCurrency => ColumnType.Currency,
-            ADOX.DataTypeEnum.adDecimal or ADOX.DataTypeEnum.adNumeric or
-            ADOX.DataTypeEnum.adVarNumeric => ColumnType.Decimal,
-            ADOX.DataTypeEnum.adDate or ADOX.DataTypeEnum.adDBTime or
-            ADOX.DataTypeEnum.adDBTimeStamp => ColumnType.DateTime,
-            ADOX.DataTypeEnum.adVarChar or ADOX.DataTypeEnum.adVarWChar => ColumnType.NVarChar,
-            ADOX.DataTypeEnum.adLongVarChar or ADOX.DataTypeEnum.adLongVarWChar => ColumnType.NText,
-            ADOX.DataTypeEnum.adLongVarBinary => ColumnType.Blob,
-            ADOX.DataTypeEnum.adGUID => ColumnType.Guid,
+            DataTypeEnum.adBoolean => ColumnType.Boolean,
+            DataTypeEnum.adUnsignedTinyInt => ColumnType.UnsignedTinyInt,
+            DataTypeEnum.adSmallInt => ColumnType.SmallInt,
+            DataTypeEnum.adInteger => ColumnType.Integer,
+            DataTypeEnum.adSingle => ColumnType.SinglePrecision,
+            DataTypeEnum.adDouble => ColumnType.DoublePrecision,
+            DataTypeEnum.adCurrency => ColumnType.Currency,
+            DataTypeEnum.adDecimal or DataTypeEnum.adNumeric or
+                DataTypeEnum.adVarNumeric => ColumnType.Decimal,
+            DataTypeEnum.adDate or DataTypeEnum.adDBTime or
+                DataTypeEnum.adDBTimeStamp => ColumnType.DateTime,
+            DataTypeEnum.adVarChar or DataTypeEnum.adVarWChar => ColumnType.NVarChar,
+            DataTypeEnum.adLongVarChar or DataTypeEnum.adLongVarWChar => ColumnType.NText,
+            DataTypeEnum.adLongVarBinary => ColumnType.Blob,
+            DataTypeEnum.adGUID => ColumnType.Guid,
             _ => ColumnType.Unknown,
         };
 
@@ -251,24 +220,24 @@ public class AccessSchemaProvider : ISchemaProvider
     /// </summary>
     /// <param name="dataTypeEnum">The ADOX data type enumeration value representing the column data type.</param>
     /// <returns>A string representing the native type name for the specified ADOX data type.</returns>
-    private static string GetNativeTypeName(ADOX.DataTypeEnum dataTypeEnum) =>
+    private static string GetNativeTypeName(DataTypeEnum dataTypeEnum) =>
         dataTypeEnum switch
         {
-            ADOX.DataTypeEnum.adBoolean => "bit",
-            ADOX.DataTypeEnum.adUnsignedTinyInt => "byte",
-            ADOX.DataTypeEnum.adSmallInt => "integer",
-            ADOX.DataTypeEnum.adInteger => "long",
-            ADOX.DataTypeEnum.adSingle => "single",
-            ADOX.DataTypeEnum.adDouble => "double",
-            ADOX.DataTypeEnum.adCurrency => "currency",
-            ADOX.DataTypeEnum.adDecimal or ADOX.DataTypeEnum.adNumeric or
-            ADOX.DataTypeEnum.adVarNumeric => "decimal",
-            ADOX.DataTypeEnum.adDate or ADOX.DataTypeEnum.adDBTime or
-                ADOX.DataTypeEnum.adDBTimeStamp => "datetime",
-            ADOX.DataTypeEnum.adVarChar or ADOX.DataTypeEnum.adVarWChar or
-                ADOX.DataTypeEnum.adLongVarChar or ADOX.DataTypeEnum.adLongVarWChar => "text",
-            ADOX.DataTypeEnum.adLongVarBinary => "oleobject",
-            ADOX.DataTypeEnum.adGUID => "uniqueidentifier",
+            DataTypeEnum.adBoolean => "bit",
+            DataTypeEnum.adUnsignedTinyInt => "byte",
+            DataTypeEnum.adSmallInt => "integer",
+            DataTypeEnum.adInteger => "long",
+            DataTypeEnum.adSingle => "single",
+            DataTypeEnum.adDouble => "double",
+            DataTypeEnum.adCurrency => "currency",
+            DataTypeEnum.adDecimal or DataTypeEnum.adNumeric or
+            DataTypeEnum.adVarNumeric => "decimal",
+            DataTypeEnum.adDate or DataTypeEnum.adDBTime or
+                DataTypeEnum.adDBTimeStamp => "datetime",
+            DataTypeEnum.adVarChar or DataTypeEnum.adVarWChar or
+                DataTypeEnum.adLongVarChar or DataTypeEnum.adLongVarWChar => "text",
+            DataTypeEnum.adLongVarBinary => "oleobject",
+            DataTypeEnum.adGUID => "uniqueidentifier",
             _ => "unknown",
         };
 
@@ -309,13 +278,13 @@ public class AccessSchemaProvider : ISchemaProvider
     /// </summary>
     /// <param name="ruleEnum">The <see cref="ADOX.RuleEnum"/> value representing the foreign key rule in an Access database.</param>
     /// <returns>A <see cref="ForeignKeyRule"/> enumeration value corresponding to the provided <paramref name="ruleEnum"/>.</returns>
-    private static ForeignKeyRule GetFKRule(ADOX.RuleEnum ruleEnum)
+    private static ForeignKeyRule GetFKRule(RuleEnum ruleEnum)
     {
         return ruleEnum switch
         {
-            ADOX.RuleEnum.adRICascade => ForeignKeyRule.Cascade,
-            ADOX.RuleEnum.adRISetNull => ForeignKeyRule.SetNull,
-            ADOX.RuleEnum.adRISetDefault => ForeignKeyRule.SetDefault,
+            RuleEnum.adRICascade => ForeignKeyRule.Cascade,
+            RuleEnum.adRISetNull => ForeignKeyRule.SetNull,
+            RuleEnum.adRISetDefault => ForeignKeyRule.SetDefault,
             _ => ForeignKeyRule.None,
         };
     }

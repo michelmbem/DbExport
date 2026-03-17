@@ -52,7 +52,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         {
             connection = (ADODB.Connection)catalog.Create(connectionString);
 
-            foreach (Table table in database.Tables.Where(t => t.IsChecked))
+            foreach (var table in database.Tables.Where(t => t.IsChecked))
                 table.AcceptVisitor(this);
         }
         else
@@ -66,7 +66,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         {
             var queryOptions = visitIdent ? QueryOptions.SkipIdentity : QueryOptions.None;
             
-            foreach (Table table in database.Tables.Where(t => t.IsChecked))
+            foreach (var table in database.Tables.Where(t => t.IsChecked))
             {
                 using var dataReader = table.OpenReader(queryOptions);
 
@@ -92,7 +92,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
         Write("CREATE TABLE {0} (", Escape(table.Name));
 
-        bool comma = false;
+        var comma = false;
 
         foreach (var column in table.Columns.Where(c => c.IsChecked))
         {
@@ -136,7 +136,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
     {
         Write("PRIMARY KEY (");
 
-        for (int i = 0; i < primaryKey.Columns.Count; ++i)
+        for (var i = 0; i < primaryKey.Columns.Count; ++i)
         {
             if (i > 0) Write(", ");
             Write(Escape(primaryKey.Columns[i].Name));
@@ -152,7 +152,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         if (index.IsUnique) Write(" UNIQUE");
         Write(" INDEX {0} ON {1} (", GetKeyName(index), Escape(index.Table.Name));
 
-        for (int i = 0; i < index.Columns.Count; ++i)
+        for (var i = 0; i < index.Columns.Count; ++i)
         {
             if (i > 0) Write(", ");
             Write(Escape(index.Columns[i].Name));
@@ -168,7 +168,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         Write("ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY (",
               Escape(foreignKey.Table.Name), GetKeyName(foreignKey));
 
-        for (int i = 0; i < foreignKey.Columns.Count; ++i)
+        for (var i = 0; i < foreignKey.Columns.Count; ++i)
         {
             if (i > 0) Write(", ");
             Write(Escape(foreignKey.Columns[i].Name));
@@ -176,7 +176,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
         Write(") REFERENCES {0} (", Escape(foreignKey.RelatedTableName));
 
-        for (int i = 0; i < foreignKey.Columns.Count; ++i)
+        for (var i = 0; i < foreignKey.Columns.Count; ++i)
         {
             if (i > 0) Write(", ");
             Write(Escape(foreignKey.RelatedColumnNames[i]));
@@ -307,7 +307,7 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
             ColumnType.Decimal => $"decimal({item.Precision}, {item.Scale})",
             ColumnType.Date or ColumnType.Time or ColumnType.DateTime => "datetime",
             ColumnType.Char or ColumnType.NChar or ColumnType.VarChar or ColumnType.NVarChar =>
-                0 < item.Size && item.Size <= 255 ? $"text({item.Size})" : "text",
+                item.Size is > 0 and <= 255 ? $"text({item.Size})" : "text",
             ColumnType.Text or ColumnType.NText or ColumnType.Xml or ColumnType.Json or ColumnType.Geometry => "text",
             ColumnType.Bit or ColumnType.Blob or ColumnType.RowVersion => "oleobject",
             ColumnType.Guid => "uniqueidentifier",
@@ -428,9 +428,8 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
 
         Write("INSERT INTO {0} (", Escape(table.Name));
 
-        foreach (Column column in table.Columns)
+        foreach (var column in table.Columns.Where(c => !(skipIdentity && c.IsIdentity)))
         {
-            if (skipIdentity && column.IsIdentity) continue;
             if (comma) Write(", ");
             Write(Escape(column.Name));
             comma = true;
@@ -439,10 +438,8 @@ public class AccessSchemaBuilder(string connectionString) : IVisitor
         Write(") VALUES (");
         comma = false;
 
-        foreach (Column column in table.Columns)
+        foreach (var column in table.Columns.Where(c => !(skipIdentity && c.IsIdentity)))
         {
-            if (skipIdentity && column.IsIdentity) continue;
-            
             var columnType = column.ColumnType == ColumnType.UserDefined
                 ? column.DataType?.ColumnType ?? ColumnType.VarChar
                 : column.ColumnType;
