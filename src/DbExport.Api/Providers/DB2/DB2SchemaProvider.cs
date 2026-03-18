@@ -19,9 +19,7 @@ public class DB2SchemaProvider : ISchemaProvider
         ConnectionString = connectionString;
 
         var properties = Utility.ParseConnectionString(connectionString);
-        DatabaseName = properties.TryGetValue("database", out var db)
-            ? db
-            : string.Empty;
+        DatabaseName = properties.TryGetValue("database", out var db) ? db : string.Empty;
     }
     
     #region ISchemaProvider Members

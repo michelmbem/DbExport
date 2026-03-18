@@ -25,30 +25,19 @@ public static class SchemaProvider
     /// <param name="connectionString">The connection string to connect to the database.</param>
     /// <returns>An instance of ISchemaProvider corresponding to the specified provider name.</returns>
     /// <exception cref="ArgumentException">Thrown when the provider name is not recognized.</exception>
-    public static ISchemaProvider GetProvider(string providerName, string connectionString)
-    {
-        switch (providerName)
+    public static ISchemaProvider GetProvider(string providerName, string connectionString) =>
+        providerName switch
         {
-            case ProviderNames.ACCESS:
-                return new AccessSchemaProvider(connectionString);
-            case ProviderNames.SQLSERVER:
-                return new SqlSchemaProvider(connectionString);
-            case ProviderNames.ORACLE:
-                return new OracleSchemaProvider(connectionString);
-            case ProviderNames.DB2:
-                return new DB2SchemaProvider(connectionString);
-            case ProviderNames.MYSQL:
-                return new MySqlSchemaProvider(connectionString);
-            case ProviderNames.POSTGRESQL:
-                return new NpgsqlSchemaProvider(connectionString);
-            case ProviderNames.FIREBIRD:
-                return new FirebirdSchemaProvider(connectionString);
-            case ProviderNames.SQLITE:
-                return new SQLiteSchemaProvider(connectionString);
-            default:
-                throw new ArgumentException(null, nameof(providerName));
-        }
-    }
+            ProviderNames.ACCESS => new AccessSchemaProvider(connectionString),
+            ProviderNames.SQLSERVER => new SqlSchemaProvider(connectionString),
+            ProviderNames.ORACLE => new OracleSchemaProvider(connectionString),
+            ProviderNames.DB2 => new DB2SchemaProvider(connectionString),
+            ProviderNames.MYSQL => new MySqlSchemaProvider(connectionString),
+            ProviderNames.POSTGRESQL => new NpgsqlSchemaProvider(connectionString),
+            ProviderNames.FIREBIRD => new FirebirdSchemaProvider(connectionString),
+            ProviderNames.SQLITE => new SQLiteSchemaProvider(connectionString),
+            _ => throw new ArgumentException(null, nameof(providerName))
+        };
 
     /// <summary>
     /// Extracts the database schema using the provided ISchemaProvider and optional schema filter,
