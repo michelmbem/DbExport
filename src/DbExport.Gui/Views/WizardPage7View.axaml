@@ -52,7 +52,7 @@
             </Border>
             <ae:TextEditor Name="SqlEditor"
                            ShowLineNumbers="True"
-                           FontFamily="{StaticResource RobotoMono}"
+                           FontFamily="{StaticResource JetBrainsMono}"
                            FontSize="13"
                            b:TextEditorBehavior.Text="{Binding SqlScript}">
                 <ae:TextEditor.ContextMenu>
