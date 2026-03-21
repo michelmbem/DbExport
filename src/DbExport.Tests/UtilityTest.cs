@@ -1,9 +1,21 @@
-﻿using DbExport.Providers;
+﻿using System.Runtime.InteropServices;
+using DbExport.Providers;
 
 namespace DbExport.Tests;
 
 public class UtilityTest
 {
+    [Fact]
+    public void IsDb2SupportedTest()
+    {
+        var expected =
+            (OperatingSystem.IsWindows() && RuntimeInformation.ProcessArchitecture == Architecture.X64) ||
+            (OperatingSystem.IsLinux() && RuntimeInformation.ProcessArchitecture == Architecture.X64) ||
+            (OperatingSystem.IsMacOS() && RuntimeInformation.ProcessArchitecture == Architecture.Arm64);
+
+        Assert.Equal(expected, Utility.IsDb2Supported());
+    }
+
     [Fact]
     public void ParseConnectionStringTest()
     {

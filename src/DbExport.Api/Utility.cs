@@ -47,6 +47,19 @@ public static partial class Utility
     #region Database utilities
 
     /// <summary>
+    /// Determines whether the current runtime platform supports the DB2 provider.
+    /// </summary>
+    /// <returns>
+    /// <see langword="true"/> only on Windows x64, Linux x64, and macOS Arm64; otherwise, <see langword="false"/>.
+    /// </returns>
+    public static bool IsDb2Supported() => RuntimeInformation.ProcessArchitecture switch
+    {
+        Architecture.X64 => OperatingSystem.IsWindows() || OperatingSystem.IsLinux(),
+        Architecture.Arm64 => OperatingSystem.IsMacOS(),
+        _ => false
+    };
+
+    /// <summary>
     /// Registers database provider factories for supported database types,
     /// enabling ADO.NET support for those providers within the application.
     /// </summary>
@@ -59,9 +72,13 @@ public static partial class Utility
             DbProviderFactories.RegisterFactory(ProviderNames.ACCESS, OleDbFactory.Instance);
         }
 
+        if (IsDb2Supported())
+        {
+            DbProviderFactories.RegisterFactory(ProviderNames.DB2, DB2Factory.Instance);
+        }
+
         DbProviderFactories.RegisterFactory(ProviderNames.SQLSERVER, SqlClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.ORACLE, OracleClientFactory.Instance);
-        DbProviderFactories.RegisterFactory(ProviderNames.DB2, DB2Factory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.MYSQL, MySqlConnectorFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.POSTGRESQL, NpgsqlFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.FIREBIRD, FirebirdClientFactory.Instance);
