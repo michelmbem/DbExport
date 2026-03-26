@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DbExport.Providers;
 
 namespace DbExport.Gui.Models;
@@ -40,7 +41,7 @@ public sealed class DataProvider(
     private const string MYSQL_DATABASE_LIST_QUERY = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA ORDER BY SCHEMA_NAME";
     private const string POSTGRESQL_DATABASE_LIST_QUERY = "SELECT datname FROM pg_catalog.pg_database ORDER BY datname";
 
-    public static DataProvider()
+    static DataProvider()
     {
         List<DataProvider> allProviders = [];
 

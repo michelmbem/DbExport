@@ -216,9 +216,6 @@ public class SQLiteConnectionStringFactory : IConnectionStringFactory
             Version = 3
         };
 
-        if (!string.IsNullOrWhiteSpace(username))
-            builder.UserID = username;
-
         if (!string.IsNullOrWhiteSpace(password))
             builder.Password = password;
 
