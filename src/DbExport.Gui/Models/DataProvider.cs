@@ -53,13 +53,14 @@ public sealed class DataProvider(
         
         allProviders.Add(new(ProviderNames.SQLSERVER, "Microsoft SQL Server", ProviderFeatures.SqlServer, new SqlConnectionStringFactory(), SQLSERVER_DATABASE_LIST_QUERY));
         allProviders.Add(new(ProviderNames.ORACLE, "Oracle Database", ProviderFeatures.Oracle, new OracleConnectionStringFactory(), ORACLE_DATABASE_LIST_QUERY));
+
+        if (Utility.IsDb2Supported())
+            allProviders.Add(new(ProviderNames.DB2, "IBM DB2", ProviderFeatures.DB2, new DB2ConnectionStringFactory()));
+
         allProviders.Add(new(ProviderNames.MYSQL, "MySQL", ProviderFeatures.MySql, new MySqlConnectionStringFactory(), MYSQL_DATABASE_LIST_QUERY));
         allProviders.Add(new(ProviderNames.POSTGRESQL, "PostgreSQL", ProviderFeatures.PostgreSQL, new NpgsqlConnectionStringFactory(), POSTGRESQL_DATABASE_LIST_QUERY));
         allProviders.Add(new(ProviderNames.FIREBIRD, "Firebird", ProviderFeatures.Firebird, new FirebirdConnectionStringFactory()));
         allProviders.Add(new(ProviderNames.SQLITE, "SQLite", ProviderFeatures.SQLite, new SQLiteConnectionStringFactory(), SQLITE_DATABASE_FILE_PATTERN));
-
-        if (Utility.IsDb2Supported())
-            allProviders.Add(new(ProviderNames.DB2, "IBM DB2 (experimental)", ProviderFeatures.DB2, new DB2ConnectionStringFactory()));
 
         All = [..allProviders];
     }

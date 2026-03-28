@@ -125,6 +125,31 @@ public class OracleConnectionStringFactory : IConnectionStringFactory
     }
 }
 
+public class DB2ConnectionStringFactory : IConnectionStringFactory
+{
+    public string Build(string dataSource, int? portNumber, string? database,
+                        bool trustedConnection, string? username, string? password)
+    {
+        var builder = new DB2ConnectionStringBuilder
+        {
+            Server = portNumber.HasValue
+                ? $"{dataSource}:{portNumber}"
+                : dataSource
+        };
+
+        if (!string.IsNullOrWhiteSpace(database))
+            builder.Database = database;
+
+        if (!string.IsNullOrWhiteSpace(username))
+            builder.UserID = username;
+
+        if (!string.IsNullOrWhiteSpace(password))
+            builder.Password = password;
+
+        return builder.ConnectionString;
+    }
+}
+
 public class MySqlConnectionStringFactory : IConnectionStringFactory
 {
     public string Build(string dataSource, int? portNumber, string? database,
@@ -215,31 +240,6 @@ public class SQLiteConnectionStringFactory : IConnectionStringFactory
             DataSource = dataSource,
             Version = 3
         };
-
-        if (!string.IsNullOrWhiteSpace(password))
-            builder.Password = password;
-
-        return builder.ConnectionString;
-    }
-}
-
-public class DB2ConnectionStringFactory : IConnectionStringFactory
-{
-    public string Build(string dataSource, int? portNumber, string? database,
-                        bool trustedConnection, string? username, string? password)
-    {
-        var builder = new DB2ConnectionStringBuilder
-        {
-            Server = portNumber.HasValue
-                ? $"{dataSource}:{portNumber}"
-                : dataSource
-        };
-
-        if (!string.IsNullOrWhiteSpace(database))
-            builder.Database = database;
-
-        if (!string.IsNullOrWhiteSpace(username))
-            builder.UserID = username;
 
         if (!string.IsNullOrWhiteSpace(password))
             builder.Password = password;

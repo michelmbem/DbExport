@@ -11,7 +11,6 @@ using System.Text.RegularExpressions;
 using DbExport.Providers;
 using DbExport.Schema;
 using FirebirdSql.Data.FirebirdClient;
-using IBM.Data.Db2;
 using Microsoft.Data.SqlClient;
 using MySqlConnector;
 using Npgsql;
@@ -68,14 +67,10 @@ public static partial class Utility
         Batteries.Init();
 
         if (OperatingSystem.IsWindows())
-        {
             DbProviderFactories.RegisterFactory(ProviderNames.ACCESS, OleDbFactory.Instance);
-        }
 
         if (IsDb2Supported())
-        {
-            DbProviderFactories.RegisterFactory(ProviderNames.DB2, DB2Factory.Instance);
-        }
+            DbProviderFactories.RegisterFactory(ProviderNames.DB2, "IBM.Data.Db2.DB2Factory, IBM.Data.Db2");
 
         DbProviderFactories.RegisterFactory(ProviderNames.SQLSERVER, SqlClientFactory.Instance);
         DbProviderFactories.RegisterFactory(ProviderNames.ORACLE, OracleClientFactory.Instance);
