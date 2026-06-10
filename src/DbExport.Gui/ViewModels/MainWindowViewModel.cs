@@ -118,7 +118,7 @@ public partial class MainWindowViewModel : ViewModelBase
             bool canceled = false;
 
             Task.Run(() => LoadDatabaseSchema(ref canceled))
-                .WaitAsync(TimeSpan.FromMinutes(15)) // Hard coded timeout of 15 minutes, which should be more than enough for metadata extraction.
+                .WaitAsync(TimeSpan.FromMinutes(15)) // Hard-coded timeout of 15 minutes, which should be more than enough for metadata extraction.
                 .GetAwaiter()
                 .OnCompleted(() =>
                 {

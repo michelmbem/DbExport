@@ -56,7 +56,8 @@
                 <StackPanel Grid.Column="{OnPlatform 0, macOS=1}"
                             HorizontalAlignment="{OnPlatform Left, macOS=Center}"
                             IsVisible="{OnPlatform True, Linux=False}">
-                    <Image Source="{Binding $parent[Window].Icon, Converter={x:Static c:ImageConverters.FromWindowIcon}}"/>
+                    <Image Source="{Binding $parent[Window].Icon,
+                            Converter={x:Static c:ImageConverters.FromWindowIcon}}"/>
                     <TextBlock Text="{Binding $parent[Window].Title}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="{OnPlatform 1, macOS=0}">
